@@ -72,22 +72,19 @@ $OutDir = Join-Path $RendersDir $Timestamp
 
 # Ensure ALL UE processes are terminated even if the script exits
 # abnormally (terminating error / Ctrl-C / pipeline failure). Without
-# this trap the .bat wrapper can leave UnrealEditor-Cmd.exe running
+# this the .bat wrapper can leave UnrealEditor-Cmd.exe running
 # in the background holding the project file lock.
 function Stop-AllUE {
     Get-Process -Name "UnrealEditor*" -ErrorAction SilentlyContinue | ForEach-Object {
         try { Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue } catch {}
     }
 }
-trap {
-    Write-Host "TRAP: script terminating — cleaning up any UE processes"
-    Stop-AllUE
-    break
-}
 
 # 1. Kill stale UE
 Stop-AllUE
 Start-Sleep -Seconds 1
+
+try {
 
 # 2. Clean prior screenshots
 if (Test-Path $ScreenshotsDir) {
@@ -96,7 +93,13 @@ if (Test-Path $ScreenshotsDir) {
 
 # 2b. If a viewpoint override was supplied, move PlayerStart to that
 #    position before rendering. Uses a Python commandlet (~5-15s).
-if ($null -ne $X -and $null -ne $Y -and $null -ne $Z) {
+#    Use $PSBoundParameters.ContainsKey instead of $null comparison —
+#    [Nullable[double]] in PowerShell wraps the value in a way that
+#    can break $null -ne $X checks depending on PSVersion / strict
+#    mode. ContainsKey is unambiguous: did the caller pass -X at all?
+$hasViewpoint = ($PSBoundParameters.ContainsKey('X') -and $PSBoundParameters.ContainsKey('Y') -and $PSBoundParameters.ContainsKey('Z'))
+Write-Host "DEBUG: hasViewpoint=$hasViewpoint X=$X Y=$Y Z=$Z"
+if ($hasViewpoint) {
     Write-Host "moving PlayerStart to ($X, $Y, $Z) pitch=$Pitch yaw=$Yaw..."
     $env:AC_VP_X = "$X"
     $env:AC_VP_Y = "$Y"
@@ -106,36 +109,30 @@ if ($null -ne $X -and $null -ne $Y -and $null -ne $Z) {
     $env:AC_VP_ROLL = "$Roll"
     $moveScript = Join-Path $PSScriptRoot "move_player_start.py"
     $UeCmdExe = "C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
-    # Capture log size BEFORE the move so we can scope the log scan
-    # to lines added during this run — prevents picking up an old
-    # "[move-ps] level saved" from a previous successful invocation.
-    $logFile = Join-Path $RepoRoot "Saved\Logs\AcUnreal.log"
-    $logSizeBefore = if (Test-Path $logFile) { (Get-Item $logFile).Length } else { 0 }
+    # Capture umap LastWriteTime BEFORE the move. We'll verify the
+    # commandlet actually re-wrote it (rather than grepping the async
+    # editor log which buffers and may not flush before exit).
+    $umapPath = Join-Path $RepoRoot "Content\Academy\Maps\AcademyMap.umap"
+    $umapTimeBefore = if (Test-Path $umapPath) { (Get-Item $umapPath).LastWriteTime } else { [DateTime]::MinValue }
     $moveProc = Start-Process -FilePath $UeCmdExe -ArgumentList @(
         $Project, "-run=pythonscript", "-script=$moveScript",
         "-nop4", "-nosplash", "-stdout", "-RenderOffScreen", "-nocrashreports"
     ) -PassThru -NoNewWindow -Wait
     Stop-AllUE
     Start-Sleep -Seconds 1
-    # Scope log scan to bytes written after the run started.
-    $moveOk = $false
-    if (Test-Path $logFile) {
-        $logSizeAfter = (Get-Item $logFile).Length
-        if ($logSizeAfter -gt $logSizeBefore) {
-            $stream = [System.IO.File]::Open($logFile, 'Open', 'Read', 'ReadWrite')
-            try {
-                $stream.Seek($logSizeBefore, 'Begin') | Out-Null
-                $reader = New-Object System.IO.StreamReader($stream)
-                $newLogText = $reader.ReadToEnd()
-                if ($newLogText -match '\[move-ps\] level saved') { $moveOk = $true }
-            } finally { $stream.Dispose() }
+    # Verify the umap LastWriteTime changed.
+    $umapSaved = $false
+    if (Test-Path $umapPath) {
+        $umapTime = (Get-Item $umapPath).LastWriteTime
+        if ($umapTime -gt $umapTimeBefore) {
+            $umapSaved = $true
         }
     }
-    if ($moveProc.ExitCode -ne 0 -or -not $moveOk) {
-        Write-Host "ERROR: move_player_start failed (exit=$($moveProc.ExitCode) logOk=$moveOk)"
+    if (-not $umapSaved) {
+        Write-Host "ERROR: move_player_start did not re-save the umap (before=$umapTimeBefore, after=$umapTime, exit=$($moveProc.ExitCode))"
         exit 2
     }
-    Write-Host "PlayerStart moved + level saved"
+    Write-Host "PlayerStart moved + level saved (umap re-written at $umapTime)"
 }
 
 # 3. Launch the .bat. PowerShell's argument splitter mangles UE's
@@ -202,3 +199,7 @@ Write-Host "wrote $target"
 $relTarget = (Resolve-Path -Path $target -Relative).TrimStart(".\")
 Set-Content -Path (Join-Path $RendersDir "latest.txt") -Value $relTarget.Replace("\", "/") -NoNewline
 exit 0
+} finally {
+    # Guaranteed cleanup even on Ctrl-C / terminating errors.
+    Stop-AllUE
+}
