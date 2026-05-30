@@ -72,6 +72,7 @@ internal static class Program
                 "export-academy"     => Commands.ExportAcademy(args.AsSpan(1)),
                 "dump-academy-layout" => Commands.DumpAcademyLayout(args.AsSpan(1)),
                 "dump-academy-statics" => Commands.DumpAcademyStatics(args.AsSpan(1)),
+                "dump-academy-lights" => Commands.DumpAcademyLights(args.AsSpan(1)),
                 "export-setup"       => Commands.ExportSetup(args.AsSpan(1)),
                 "export-academy-statics" => Commands.ExportAcademyStatics(args.AsSpan(1)),
                 "dump-starterareas"  => Commands.DumpStarterAreas(args.AsSpan(1)),
@@ -874,6 +875,175 @@ internal static class Commands
         Console.WriteLine($"Wrote statics JSON to {outPath}");
         Console.WriteLine($"  {allInstances.Count} instances across {cellsWithStatics} cells");
         Console.WriteLine($"  {uniqueSetups.Count} unique setups");
+        return 0;
+    }
+
+    /// <summary>
+    /// Walk every Stab in a landblock, look up its SetupModel's Lights,
+    /// compose cell.world * setup.local * light.local frames, emit a
+    /// JSON with world-space point/spot light data in UE coords.
+    /// Bare-GfxObj stabs (0x01 Id) have no lights and are skipped.
+    /// </summary>
+    public static int DumpAcademyLights(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 3) { Console.Error.WriteLine("dump-academy-lights: missing <datDir> <hexLandblockId> <out.json>"); return 1; }
+        var datDir = args[0];
+        if (!TryParseLandblockHex(args[1], out var lbHigh16)) { Console.Error.WriteLine($"Bad hex landblock id: {args[1]}"); return 1; }
+        var outPath = args[2];
+
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: true);
+        var cellDb = DatManager.CellDat ?? throw new InvalidOperationException("CellDat unavailable.");
+        var portalDb = DatManager.PortalDat ?? throw new InvalidOperationException("PortalDat unavailable.");
+
+        var minId = (lbHigh16 << 16) | 0x0100u;
+        var maxId = (lbHigh16 << 16) | 0xFFFDu;
+        var envCellIds = cellDb.AllFiles.Keys.Where(id => id >= minId && id <= maxId).OrderBy(id => id).ToList();
+
+        const float kCmPerMetre = 100.0f;
+
+        static (float x, float y, float z, float w) QuatMulAc((float x, float y, float z, float w) a, (float x, float y, float z, float w) b)
+        {
+            return (
+                a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+                a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+                a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
+                a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z);
+        }
+        static (float x, float y, float z) RotateAcVec((float x, float y, float z, float w) q, (float x, float y, float z) v)
+        {
+            float qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+            float tx = 2 * (qy * v.z - qz * v.y);
+            float ty = 2 * (qz * v.x - qx * v.z);
+            float tz = 2 * (qx * v.y - qy * v.x);
+            return (
+                v.x + qw * tx + (qy * tz - qz * ty),
+                v.y + qw * ty + (qz * tx - qx * tz),
+                v.z + qw * tz + (qx * ty - qy * tx));
+        }
+
+        // Cache: setup_id -> (has_lights, lights_data)
+        var setupLightsCache = new Dictionary<uint, List<(System.Numerics.Vector3 pos, System.Numerics.Quaternion orient, uint color, float intensity, float falloff, float cone)>>();
+
+        List<(System.Numerics.Vector3 pos, System.Numerics.Quaternion orient, uint color, float intensity, float falloff, float cone)> GetLights(uint setupId)
+        {
+            if (setupLightsCache.TryGetValue(setupId, out var cached)) return cached;
+            var list = new List<(System.Numerics.Vector3, System.Numerics.Quaternion, uint, float, float, float)>();
+            uint typeNibble = (setupId >> 24) & 0xFFu;
+            if (typeNibble == 0x02 && portalDb.AllFiles.ContainsKey(setupId))
+            {
+                try
+                {
+                    var setup = portalDb.ReadFromDat<SetupModel>(setupId);
+                    if (setup.Lights != null)
+                    {
+                        foreach (var kv in setup.Lights)
+                        {
+                            var li = kv.Value;
+                            list.Add((li.ViewerSpaceLocation.Origin, li.ViewerSpaceLocation.Orientation,
+                                      li.Color, li.Intensity, li.Falloff, li.ConeAngle));
+                        }
+                    }
+                }
+                catch { /* swallow; skip lights for malformed setups */ }
+            }
+            setupLightsCache[setupId] = list;
+            return list;
+        }
+
+        // Decode AC's _RGB color: bytes are [00 RR GG BB] (high byte usually 0xFF or 0x00).
+        // Return (r, g, b) in 0..1.
+        static (float r, float g, float b) DecodeAcColor(uint c)
+        {
+            float r = ((c >> 16) & 0xFF) / 255.0f;
+            float g = ((c >> 8) & 0xFF) / 255.0f;
+            float b = ((c >> 0) & 0xFF) / 255.0f;
+            return (r, g, b);
+        }
+
+        var allLights = new List<object>();
+        int warmLightCount = 0;
+        foreach (var cellId in envCellIds)
+        {
+            var ec = cellDb.ReadFromDat<EnvCell>(cellId);
+            if (ec.StaticObjects == null || ec.StaticObjects.Count == 0) continue;
+
+            var cellPos = (x: ec.Position.Origin.X, y: ec.Position.Origin.Y, z: ec.Position.Origin.Z);
+            var cellOrient = (
+                x: ec.Position.Orientation.X,
+                y: ec.Position.Orientation.Y,
+                z: ec.Position.Orientation.Z,
+                w: ec.Position.Orientation.W);
+
+            foreach (var stab in ec.StaticObjects)
+            {
+                var lights = GetLights(stab.Id);
+                if (lights.Count == 0) continue;
+
+                var stabLocalPos = (x: stab.Frame.Origin.X, y: stab.Frame.Origin.Y, z: stab.Frame.Origin.Z);
+                var stabLocalOrient = (
+                    x: stab.Frame.Orientation.X,
+                    y: stab.Frame.Orientation.Y,
+                    z: stab.Frame.Orientation.Z,
+                    w: stab.Frame.Orientation.W);
+
+                // Stab world frame
+                var stabWorldPos = RotateAcVec(cellOrient, stabLocalPos);
+                stabWorldPos = (cellPos.x + stabWorldPos.x, cellPos.y + stabWorldPos.y, cellPos.z + stabWorldPos.z);
+                var stabWorldOrient = QuatMulAc(cellOrient, stabLocalOrient);
+
+                foreach (var light in lights)
+                {
+                    var lightLocalPos = (x: light.pos.X, y: light.pos.Y, z: light.pos.Z);
+                    // Light world position: stabWorld.pos + stabWorld.rot * light.local.pos
+                    var rotLight = RotateAcVec(stabWorldOrient, lightLocalPos);
+                    var lightWorldPosAc = (x: stabWorldPos.x + rotLight.x, y: stabWorldPos.y + rotLight.y, z: stabWorldPos.z + rotLight.z);
+
+                    var (r, g, b) = DecodeAcColor(light.color);
+                    // Tag "fire-like" lights for Phase 5h to attach effects.
+                    bool isWarm = r >= 0.4f && r >= g && g >= b && (r - b) >= 0.15f;
+                    if (isWarm) warmLightCount++;
+
+                    allLights.Add(new
+                    {
+                        cell_id = $"0x{cellId:X8}",
+                        setup_id = $"0x{stab.Id:X8}",
+                        // UE-coords (cm).
+                        position = new
+                        {
+                            x = lightWorldPosAc.y * kCmPerMetre,
+                            y = lightWorldPosAc.x * kCmPerMetre,
+                            z = lightWorldPosAc.z * kCmPerMetre,
+                        },
+                        color_rgb = new { r, g, b },
+                        color_raw = $"0x{light.color:X8}",
+                        intensity = light.intensity,
+                        falloff = light.falloff,
+                        cone_angle_degrees = light.cone * 180.0f / (float)Math.PI,
+                        is_point_light = light.cone <= 0.001f,
+                        is_warm_for_fire_fx = isWarm,
+                    });
+                }
+            }
+        }
+
+        var doc = new
+        {
+            schema_version = 1,
+            landblock_id = $"0x{lbHigh16:X4}",
+            coordinate_system = "UE-ready: left-handed Z-up, centimetres. World-space.",
+            light_count = allLights.Count,
+            warm_light_count = warmLightCount,
+            unique_setup_count = setupLightsCache.Count,
+            lights = allLights,
+        };
+
+        var json = JsonSerializer.Serialize(doc, new JsonSerializerOptions { WriteIndented = true });
+        var dir = Path.GetDirectoryName(outPath);
+        if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+        File.WriteAllText(outPath, json);
+
+        Console.WriteLine($"Wrote lights JSON to {outPath}");
+        Console.WriteLine($"  {allLights.Count} lights ({warmLightCount} warm/fire-like)");
         return 0;
     }
 

@@ -1,0 +1,2650 @@
+{
+  "schema_version": 1,
+  "landblock_id": "0x8602",
+  "coordinate_system": "UE-ready: left-handed Z-up, centimetres. World-space.",
+  "light_count": 132,
+  "warm_light_count": 105,
+  "unique_setup_count": 200,
+  "lights": [
+    {
+      "cell_id": "0x86020100",
+      "setup_id": "0x02000817",
+      "position": {
+        "x": -46314.094,
+        "y": 30421.447,
+        "z": -2396.7297
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020101",
+      "setup_id": "0x020007FB",
+      "position": {
+        "x": -9216.151,
+        "y": 39317.766,
+        "z": -1825.158
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC86464",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020102",
+      "setup_id": "0x020007FB",
+      "position": {
+        "x": -38899.535,
+        "y": -6897.9966,
+        "z": -1877.791
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC86464",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020103",
+      "setup_id": "0x02000815",
+      "position": {
+        "x": -40471.22,
+        "y": -8015.152,
+        "z": -2396.7297
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 2,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020104",
+      "setup_id": "0x020007FB",
+      "position": {
+        "x": -9313.137,
+        "y": 41309.883,
+        "z": -1881.6531
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC86464",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020104",
+      "setup_id": "0x02000817",
+      "position": {
+        "x": -8630.975,
+        "y": 40502.66,
+        "z": -2396.7297
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020106",
+      "setup_id": "0x02000817",
+      "position": {
+        "x": -41408.66,
+        "y": -7100.4653,
+        "z": -2396.7297
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020107",
+      "setup_id": "0x020007FB",
+      "position": {
+        "x": -431.45224,
+        "y": -255.28314,
+        "z": -1992.61
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC86464",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020108",
+      "setup_id": "0x020007F9",
+      "position": {
+        "x": -47999.324,
+        "y": 35910.477,
+        "z": -2042.293
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC86464",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020108",
+      "setup_id": "0x02000AB4",
+      "position": {
+        "x": -47888.754,
+        "y": 36110.582,
+        "z": -2166.0598
+      },
+      "color_rgb": {
+        "r": 0,
+        "g": 0.78431374,
+        "b": 0
+      },
+      "color_raw": "0xFF00C800",
+      "intensity": 100,
+      "falloff": 3,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x8602010C",
+      "setup_id": "0x020007F9",
+      "position": {
+        "x": 120.22633,
+        "y": 15.7260685,
+        "z": -2198.39
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC86464",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602010C",
+      "setup_id": "0x02000815",
+      "position": {
+        "x": -227.99864,
+        "y": -130.30733,
+        "z": -2335.21
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 2,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x8602010F",
+      "setup_id": "0x02000801",
+      "position": {
+        "x": -2783.8875,
+        "y": 41298.047,
+        "z": -2345.9102
+      },
+      "color_rgb": {
+        "r": 0.39215687,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFF6464C8",
+      "intensity": 100,
+      "falloff": 2,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020112",
+      "setup_id": "0x02000815",
+      "position": {
+        "x": -216.08357,
+        "y": -298.04407,
+        "z": -2345.9102
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 2,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020115",
+      "setup_id": "0x020007F9",
+      "position": {
+        "x": -47999.324,
+        "y": 37854.277,
+        "z": -2061.5178
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC86464",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020115",
+      "setup_id": "0x02000815",
+      "position": {
+        "x": -48239.246,
+        "y": 37790.312,
+        "z": -2397.23
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 2,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020115",
+      "setup_id": "0x02000815",
+      "position": {
+        "x": -48342.094,
+        "y": 38144.867,
+        "z": -2328.52
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 2,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020119",
+      "setup_id": "0x020007F9",
+      "position": {
+        "x": -44123.375,
+        "y": -5994.752,
+        "z": -2223.3298
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC86464",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020119",
+      "setup_id": "0x02000801",
+      "position": {
+        "x": -43849.72,
+        "y": -5850.3457,
+        "z": -2396.7297
+      },
+      "color_rgb": {
+        "r": 0.39215687,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFF6464C8",
+      "intensity": 100,
+      "falloff": 2,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x8602011D",
+      "setup_id": "0x02000AB3",
+      "position": {
+        "x": -42131.1,
+        "y": 39598.598,
+        "z": -2241.7102
+      },
+      "color_rgb": {
+        "r": 0,
+        "g": 0.78431374,
+        "b": 0
+      },
+      "color_raw": "0xFF00C800",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x8602011E",
+      "setup_id": "0x02000AB4",
+      "position": {
+        "x": -42357.902,
+        "y": 40097.4,
+        "z": -2166.0999
+      },
+      "color_rgb": {
+        "r": 0,
+        "g": 0.78431374,
+        "b": 0
+      },
+      "color_raw": "0xFF00C800",
+      "intensity": 100,
+      "falloff": 3,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x8602011F",
+      "setup_id": "0x02000801",
+      "position": {
+        "x": -41783.91,
+        "y": -1701.9803,
+        "z": -2345.9102
+      },
+      "color_rgb": {
+        "r": 0.39215687,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFF6464C8",
+      "intensity": 100,
+      "falloff": 2,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020123",
+      "setup_id": "0x02000AB3",
+      "position": {
+        "x": -46131.1,
+        "y": 39598.598,
+        "z": -2241.7102
+      },
+      "color_rgb": {
+        "r": 0,
+        "g": 0.78431374,
+        "b": 0
+      },
+      "color_raw": "0xFF00C800",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020124",
+      "setup_id": "0x02000AB4",
+      "position": {
+        "x": -46357.902,
+        "y": 40097.4,
+        "z": -2166.0999
+      },
+      "color_rgb": {
+        "r": 0,
+        "g": 0.78431374,
+        "b": 0
+      },
+      "color_raw": "0xFF00C800",
+      "intensity": 100,
+      "falloff": 3,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020131",
+      "setup_id": "0x02000AB3",
+      "position": {
+        "x": -131.09888,
+        "y": -401.39853,
+        "z": -1041.712
+      },
+      "color_rgb": {
+        "r": 0,
+        "g": 0.78431374,
+        "b": 0
+      },
+      "color_raw": "0xFF00C800",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020134",
+      "setup_id": "0x02000805",
+      "position": {
+        "x": -31968.46,
+        "y": 23986.453,
+        "z": -1068.724
+      },
+      "color_rgb": {
+        "r": 0.39215687,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFF6464C8",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020142",
+      "setup_id": "0x02000AB3",
+      "position": {
+        "x": -36131.1,
+        "y": 25598.6,
+        "z": -1041.712
+      },
+      "color_rgb": {
+        "r": 0,
+        "g": 0.78431374,
+        "b": 0
+      },
+      "color_raw": "0xFF00C800",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020146",
+      "setup_id": "0x02000838",
+      "position": {
+        "x": -6985.585,
+        "y": 33013.21,
+        "z": -1026.802
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC89664",
+      "intensity": 100,
+      "falloff": 7,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020148",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": -27663.732,
+        "y": 28329.074,
+        "z": -971.37006
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020148",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": -28331.375,
+        "y": 28332.168,
+        "z": -962.5
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020148",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": -27667.525,
+        "y": 27665.635,
+        "z": -962.5
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020148",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": -28328.666,
+        "y": 27661.826,
+        "z": -962.5
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602014E",
+      "setup_id": "0x02000838",
+      "position": {
+        "x": -32972.184,
+        "y": -4943.6714,
+        "z": -828.067
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC89664",
+      "intensity": 100,
+      "falloff": 7,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020150",
+      "setup_id": "0x0200081A",
+      "position": {
+        "x": -6933.422,
+        "y": 34943.195,
+        "z": -1196.73
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 7,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020160",
+      "setup_id": "0x0200081A",
+      "position": {
+        "x": -34946.18,
+        "y": -5060.321,
+        "z": -1122.3209
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 7,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020176",
+      "setup_id": "0x02000AB3",
+      "position": {
+        "x": -36868.9,
+        "y": -4598.622,
+        "z": -1041.712
+      },
+      "color_rgb": {
+        "r": 0,
+        "g": 0.78431374,
+        "b": 0
+      },
+      "color_raw": "0xFF00C800",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020196",
+      "setup_id": "0x02000AB3",
+      "position": {
+        "x": -40131.1,
+        "y": 33598.598,
+        "z": -1041.712
+      },
+      "color_rgb": {
+        "r": 0,
+        "g": 0.78431374,
+        "b": 0
+      },
+      "color_raw": "0xFF00C800",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x86020198",
+      "setup_id": "0x02000817",
+      "position": {
+        "x": -207.07317,
+        "y": -79.57423,
+        "z": -1077.693
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x8602019F",
+      "setup_id": "0x02000815",
+      "position": {
+        "x": -40457.727,
+        "y": 36222.86,
+        "z": -1196.73
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 2,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x860201A1",
+      "setup_id": "0x02000815",
+      "position": {
+        "x": -42452.816,
+        "y": 36151.164,
+        "z": -1141.8931
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.39215687,
+        "b": 0.78431374
+      },
+      "color_raw": "0xFFC864C8",
+      "intensity": 100,
+      "falloff": 2,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x860201A8",
+      "setup_id": "0x02000838",
+      "position": {
+        "x": -39961.574,
+        "y": -21.550804,
+        "z": -1054.9419
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC89664",
+      "intensity": 100,
+      "falloff": 7,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201AA",
+      "setup_id": "0x02000838",
+      "position": {
+        "x": -22.873634,
+        "y": 38.425045,
+        "z": -946.157
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC89664",
+      "intensity": 100,
+      "falloff": 7,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201AB",
+      "setup_id": "0x0200071A",
+      "position": {
+        "x": -12444.72,
+        "y": -411.8436,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.29411766
+      },
+      "color_raw": "0xFFFF964B",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201AC",
+      "setup_id": "0x0200071A",
+      "position": {
+        "x": -6910.415,
+        "y": 7248.0264,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.29411766
+      },
+      "color_raw": "0xFFFF964B",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201AD",
+      "setup_id": "0x020005D8",
+      "position": {
+        "x": 449.04517,
+        "y": 124.49,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.3137255
+      },
+      "color_raw": "0xFFFF9650",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201AD",
+      "setup_id": "0x0200034D",
+      "position": {
+        "x": -360.55008,
+        "y": -40.899746,
+        "z": 103.15001
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 8,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201AE",
+      "setup_id": "0x0200071A",
+      "position": {
+        "x": -7910.4136,
+        "y": -5751.983,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.29411766
+      },
+      "color_raw": "0xFFFF964B",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201AF",
+      "setup_id": "0x0200071A",
+      "position": {
+        "x": 173.4032,
+        "y": 111.50348,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.29411766
+      },
+      "color_raw": "0xFFFF964B",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201B1",
+      "setup_id": "0x02000835",
+      "position": {
+        "x": -999.34576,
+        "y": 5000.196,
+        "z": 302.77
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC89664",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201B6",
+      "setup_id": "0x0200034D",
+      "position": {
+        "x": -6361.809,
+        "y": -2027.5942,
+        "z": 95.112
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 8,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201B6",
+      "setup_id": "0x020005D9",
+      "position": {
+        "x": -5649.3423,
+        "y": -1959.8751,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.3137255
+      },
+      "color_raw": "0xFFFF9650",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201B6",
+      "setup_id": "0x020005D9",
+      "position": {
+        "x": -5800.9463,
+        "y": -2281.0742,
+        "z": 327.84702
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.3137255
+      },
+      "color_raw": "0xFFFF9650",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201B6",
+      "setup_id": "0x02000837",
+      "position": {
+        "x": -6349.405,
+        "y": -2036.0582,
+        "z": 270.77
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC89664",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201B7",
+      "setup_id": "0x0200071A",
+      "position": {
+        "x": -5197.204,
+        "y": 9225.506,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.29411766
+      },
+      "color_raw": "0xFFFF964B",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201BA",
+      "setup_id": "0x0200071A",
+      "position": {
+        "x": -9973.158,
+        "y": -5758.6206,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.29411766
+      },
+      "color_raw": "0xFFFF964B",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201C4",
+      "setup_id": "0x02000835",
+      "position": {
+        "x": -22005.326,
+        "y": 3973.356,
+        "z": 163.76999
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC89664",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201D6",
+      "setup_id": "0x02000835",
+      "position": {
+        "x": -11998.781,
+        "y": 16000.142,
+        "z": 195.87
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC89664",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201D9",
+      "setup_id": "0x0200071A",
+      "position": {
+        "x": 763.6091,
+        "y": 4891.901,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.29411766
+      },
+      "color_raw": "0xFFFF964B",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201DC",
+      "setup_id": "0x0200071A",
+      "position": {
+        "x": -5977.3677,
+        "y": 241.11285,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.29411766
+      },
+      "color_raw": "0xFFFF964B",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201EC",
+      "setup_id": "0x02000362",
+      "position": {
+        "x": -11004.93,
+        "y": 17218.084,
+        "z": 151.732
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201EF",
+      "setup_id": "0x0200071A",
+      "position": {
+        "x": 2101.1152,
+        "y": 5880.996,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.29411766
+      },
+      "color_raw": "0xFFFF964B",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860201F6",
+      "setup_id": "0x02000839",
+      "position": {
+        "x": -5034.9375,
+        "y": 13046.039,
+        "z": 114.282
+      },
+      "color_rgb": {
+        "r": 0.78431374,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFC89664",
+      "intensity": 100,
+      "falloff": 8,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020201",
+      "setup_id": "0x02000362",
+      "position": {
+        "x": -10004.929,
+        "y": 18218.084,
+        "z": 151.732
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602020B",
+      "setup_id": "0x02000362",
+      "position": {
+        "x": -1999.4347,
+        "y": 9999.623,
+        "z": 3.2699997
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020212",
+      "setup_id": "0x0200071A",
+      "position": {
+        "x": -4004.9358,
+        "y": 9751.859,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.29411766
+      },
+      "color_raw": "0xFFFF964B",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020221",
+      "setup_id": "0x02000285",
+      "position": {
+        "x": -14389.407,
+        "y": -3615.718,
+        "z": 231.75002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFFF9664",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020221",
+      "setup_id": "0x02000285",
+      "position": {
+        "x": -14387.677,
+        "y": -4382.8994,
+        "z": 231.75002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFFF9664",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020223",
+      "setup_id": "0x02000285",
+      "position": {
+        "x": -16349.905,
+        "y": -5611.8105,
+        "z": 231.75002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFFF9664",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020223",
+      "setup_id": "0x02000285",
+      "position": {
+        "x": -15629.286,
+        "y": -5584.21,
+        "z": 231.75002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.39215687
+      },
+      "color_raw": "0xFFFF9664",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020229",
+      "setup_id": "0x02000362",
+      "position": {
+        "x": -8997.059,
+        "y": 19385.77,
+        "z": 182.495
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020237",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": -6839.869,
+        "y": 5333.5786,
+        "z": 257.348
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020237",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": -6664.1533,
+        "y": 5162.7124,
+        "z": 257.3
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602023A",
+      "setup_id": "0x020009A3",
+      "position": {
+        "x": -3895.3477,
+        "y": 11561.375,
+        "z": 236.00002
+      },
+      "color_rgb": {
+        "r": 0.5058824,
+        "g": 0.69803923,
+        "b": 1
+      },
+      "color_raw": "0xFF81B2FF",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": false
+    },
+    {
+      "cell_id": "0x8602023C",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": -6163.5054,
+        "y": 11663.127,
+        "z": 257.3
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602023C",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": -6335.696,
+        "y": 11836.029,
+        "z": 257.3
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020278",
+      "setup_id": "0x020005D8",
+      "position": {
+        "x": -18117.19,
+        "y": 14289.743,
+        "z": 200.50002
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.3137255
+      },
+      "color_raw": "0xFFFF9650",
+      "intensity": 100,
+      "falloff": 6,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020279",
+      "setup_id": "0x02000365",
+      "position": {
+        "x": -17999.326,
+        "y": 14000.076,
+        "z": 301.69
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 7,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020292",
+      "setup_id": "0x02000362",
+      "position": {
+        "x": -9000.67,
+        "y": 9000.136,
+        "z": 3.2699997
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020296",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": -332.4386,
+        "y": -159.53992,
+        "z": 257.3
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020296",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": -161.97234,
+        "y": -333.94022,
+        "z": 257.3
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602029B",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": 6161.83,
+        "y": 12333.878,
+        "z": 257.3
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602029B",
+      "setup_id": "0x0200026E",
+      "position": {
+        "x": 6338.2305,
+        "y": 12164.755,
+        "z": 257.3
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202C4",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -26000.076,
+        "y": 0.6568378,
+        "z": 2.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202C5",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -0.67362213,
+        "y": -0.074407935,
+        "z": 2.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202CB",
+      "setup_id": "0x02000363",
+      "position": {
+        "x": -27999.326,
+        "y": 30000.076,
+        "z": 2.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202CC",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -0.05762363,
+        "y": 30000.674,
+        "z": 2.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202CD",
+      "setup_id": "0x02000363",
+      "position": {
+        "x": -31999.326,
+        "y": 30000.076,
+        "z": 2.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202D0",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -27999.924,
+        "y": 31999.326,
+        "z": 2.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202D1",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -29999.326,
+        "y": 32000.076,
+        "z": 121.413994
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202D2",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": 0.077459306,
+        "y": -0.6736226,
+        "z": 2.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202D3",
+      "setup_id": "0x02000363",
+      "position": {
+        "x": -27999.326,
+        "y": 34000.08,
+        "z": 2.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202D4",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -32000.08,
+        "y": 2000.6554,
+        "z": 2.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202D5",
+      "setup_id": "0x02000363",
+      "position": {
+        "x": -31999.326,
+        "y": 34000.08,
+        "z": 2.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 5,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202E0",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -11999.325,
+        "y": 0.075933695,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202E1",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -7000.6704,
+        "y": 6999.928,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202E3",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -8000.6714,
+        "y": -6000.081,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202E4",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": 0.675148,
+        "y": 0.076601386,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202E5",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -3999.3247,
+        "y": 4000.076,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202E6",
+      "setup_id": "0x020005D9",
+      "position": {
+        "x": 225.96765,
+        "y": 626.0628,
+        "z": 1435.6
+      },
+      "color_rgb": {
+        "r": 1,
+        "g": 0.5882353,
+        "b": 0.3137255
+      },
+      "color_raw": "0xFFFF9650",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202EC",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -23999.326,
+        "y": 6000.0757,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202ED",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -10000.664,
+        "y": 15999.932,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202EF",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -13999.325,
+        "y": 8000.076,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202F0",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": 0.675148,
+        "y": 0.07669675,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202F3",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -16000.668,
+        "y": -8000.087,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202F4",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -9000.663,
+        "y": 16999.93,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202F9",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -11999.325,
+        "y": 10000.076,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202FA",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": 0.67591095,
+        "y": 0.07669675,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202FD",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -17000.668,
+        "y": -7000.088,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x860202FE",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": 0.675148,
+        "y": 0.07707822,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020302",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": 3999.33,
+        "y": 7999.921,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020307",
+      "setup_id": "0x020001E5",
+      "position": {
+        "x": -16140.393,
+        "y": 11862.41,
+        "z": 1107.5
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 3,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020307",
+      "setup_id": "0x020001E5",
+      "position": {
+        "x": -16140.393,
+        "y": 11862.41,
+        "z": 1107.5
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 3,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602030D",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -1999.3248,
+        "y": 14000.076,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602030E",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -3999.3247,
+        "y": 14000.076,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602030F",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": 0.6757202,
+        "y": 0.075933814,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020313",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -10000.679,
+        "y": 5999.917,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020318",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -11000.679,
+        "y": 6999.917,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602031E",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -25999.326,
+        "y": 24000.076,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602031F",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -2000.6577,
+        "y": 25999.924,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020320",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -26000.674,
+        "y": -0.09424443,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020321",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": 0.6766739,
+        "y": 0.07745969,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020322",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -0.65683913,
+        "y": 29999.924,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020323",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -27999.326,
+        "y": 32000.076,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020324",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -29999.326,
+        "y": 32000.076,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020325",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": 0.6766739,
+        "y": 0.07745969,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020326",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -32000.678,
+        "y": 1999.9043,
+        "z": 1202.77
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020329",
+      "setup_id": "0x020001E5",
+      "position": {
+        "x": -12859.607,
+        "y": -862.4186,
+        "z": 2307.5
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 3,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x8602032A",
+      "setup_id": "0x02000354",
+      "position": {
+        "x": -11636.968,
+        "y": 13631.519,
+        "z": 2464.0002
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 4,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020334",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -11999.325,
+        "y": 14000.076,
+        "z": 3602.7698
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020335",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -0.6659944,
+        "y": 13999.924,
+        "z": 3602.7698
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020336",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": -14000.676,
+        "y": 1999.9146,
+        "z": 3602.7698
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    },
+    {
+      "cell_id": "0x86020337",
+      "setup_id": "0x02000360",
+      "position": {
+        "x": 0.67591095,
+        "y": 0.07669675,
+        "z": 3602.7698
+      },
+      "color_rgb": {
+        "r": 0.98039216,
+        "g": 0.84313726,
+        "b": 0.6117647
+      },
+      "color_raw": "0xFFFAD79C",
+      "intensity": 100,
+      "falloff": 10,
+      "cone_angle_degrees": -2.4728977E+10,
+      "is_point_light": true,
+      "is_warm_for_fire_fx": true
+    }
+  ]
+}
