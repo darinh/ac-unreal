@@ -78,3 +78,6 @@ contract/decompile-artifacts/*
 !contract/decompile-artifacts/.gitkeep
 !contract/decompile-artifacts/README.md
 !contract/decompile-artifacts/physics-feel-spec-response.md
+
+# UE auto-creates per-developer collection folders; don't commit.
+Content/Developers/
