@@ -3,6 +3,7 @@
 # 16 verts, 14 polys
 # UE-ready coords: left-handed Z-up, centimetres. UE.X=AC.Y*100, UE.Y=AC.X*100, UE.Z=AC.Z*100.
 # Triangle winding flipped (v1<->v2) to preserve outward normals through the X-Y swap.
+mtllib cell_860201AD.mtl
 o cell_860201AD
 v -500 500 600
 v -500 500 0
