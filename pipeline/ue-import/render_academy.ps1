@@ -140,8 +140,11 @@ if ($hasViewpoint) {
 #    A .bat sidesteps this — cmd.exe parses %1 %2 ... correctly.
 $bat = Join-Path $PSScriptRoot "_run_highresshot.bat"
 Write-Host "launching UE -game via $bat (timeout ${TimeoutSec}s)..."
+# Pass extra cmds via env var because cmd.exe splits comma-containing
+# positional args, which would silently drop the cmds after the first
+# comma. Env var preserves the full string.
+$env:AC_EXTRA_CMDS = $ExtraCmds
 $batArgs = @($ResX.ToString(), $ResY.ToString())
-if ($ExtraCmds -ne "") { $batArgs += $ExtraCmds }
 $proc = Start-Process -FilePath $bat -ArgumentList $batArgs -PassThru -NoNewWindow
 
 # 4. Watch for the screenshot to appear and finish writing. UE writes
