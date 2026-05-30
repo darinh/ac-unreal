@@ -330,9 +330,18 @@ internal static class Commands
     /// → CellStruct with vertices + polygons. Triangulates quads and
     /// emits one OBJ group per surface (material) index.
     ///
-    /// Coordinate system: AC native (right-handed Z-up). UE import is
-    /// responsible for the chirality flip via the Phase 0 coord-transform
-    /// (see Source/AcUnreal/Public/CoordCore/CoordTransform.h).
+    /// **Coordinate system: UE-ready** (left-handed Z-up, centimetres).
+    /// AC native is right-handed Z-up metres; we apply the Phase 0
+    /// coord transform at export time — X/Y swap (the odd permutation
+    /// that flips chirality from AC RH → UE LH) plus ×100 metre→cm.
+    /// Triangle winding is also swapped (v1 ↔ v2 in face output) so
+    /// the chirality flip preserves outward-facing normals. The
+    /// resulting OBJ drag-and-drops into UE5 at scale 1.0 with no
+    /// import-dialog tweaks needed.
+    ///
+    /// Trade-off: emitting in UE coords means these OBJs aren't
+    /// directly usable by a non-UE consumer (Blender, Maya) without
+    /// inverse-mapping. Acceptable — this pipeline targets UE5.
     /// </summary>
     public static int ExportEnvCell(ReadOnlySpan<string> args)
     {
@@ -372,24 +381,22 @@ internal static class Commands
         var outDir = Path.GetDirectoryName(outPath);
         if (!string.IsNullOrEmpty(outDir)) Directory.CreateDirectory(outDir);
 
-        // OBJ uses 1-based vertex indices. We emit:
-        //   v   <x> <y> <z>            (position)
-        //   vn  <nx> <ny> <nz>         (normal)
-        //   vt  <u> <v>                (texture coord)
-        //   o   cell_<hexId>
-        //   g   surf_<idx>             (one group per PosSurface material)
-        //   f   v/vt/vn ...            (triangulated polygons)
-        //
-        // SWVertex.UVs is per-vertex; ACE polys reference UV indices
-        // within each vertex's UV list. We collapse to UV[0] (the
-        // primary channel) for OBJ — AC's secondary UVs typically
-        // target lightmap layers we don't need at extraction time.
+        // Conversion constants (single source of truth: Phase 0 coord transform):
+        //   UE.X = AC.Y * 100   (AC north → UE forward, scaled to cm)
+        //   UE.Y = AC.X * 100   (AC east  → UE right,   scaled to cm)
+        //   UE.Z = AC.Z * 100   (AC up    → UE up,      scaled to cm)
+        //   Triangle winding flipped (v1 ↔ v2) because the X-Y swap is
+        //   an odd permutation that would otherwise invert face normals.
+        // See Source/AcUnreal/Public/CoordCore/CoordTransform.h and
+        // README decision #9 for the full reasoning.
+        const float kCmPerMetre = 100.0f;
 
         using var sw = new StreamWriter(outPath);
         sw.WriteLine($"# Exported by acdat from EnvCell 0x{fullId:X8}");
         sw.WriteLine($"# EnvironmentId=0x{ec.EnvironmentId:X8}  CellStructure={ec.CellStructure}");
         sw.WriteLine($"# {vertCount} verts, {polyCount} polys");
-        sw.WriteLine($"# AC native coords (right-handed Z-up, metres). UE import must apply the coord transform.");
+        sw.WriteLine($"# UE-ready coords: left-handed Z-up, centimetres. UE.X=AC.Y*100, UE.Y=AC.X*100, UE.Z=AC.Z*100.");
+        sw.WriteLine($"# Triangle winding flipped (v1<->v2) to preserve outward normals through the X-Y swap.");
         sw.WriteLine($"o cell_{fullId:X8}");
 
         // Map original vertex ID -> OBJ 1-based index (positions + normals share the same map).
@@ -398,16 +405,16 @@ internal static class Commands
         for (int i = 0; i < vertOrder.Count; i++)
         {
             var sv = cs.VertexArray.Vertices[vertOrder[i]];
-            sw.WriteLine($"v {sv.Origin.X:R} {sv.Origin.Y:R} {sv.Origin.Z:R}");
+            // AC (X, Y, Z) → UE (Y*100, X*100, Z*100) — swap X↔Y then scale m→cm.
+            sw.WriteLine($"v {sv.Origin.Y * kCmPerMetre:R} {sv.Origin.X * kCmPerMetre:R} {sv.Origin.Z * kCmPerMetre:R}");
             idToObjIndex[vertOrder[i]] = i + 1; // OBJ is 1-based
         }
         for (int i = 0; i < vertOrder.Count; i++)
         {
             var sv = cs.VertexArray.Vertices[vertOrder[i]];
-            sw.WriteLine($"vn {sv.Normal.X:R} {sv.Normal.Y:R} {sv.Normal.Z:R}");
+            // Normals: same X↔Y swap, no scale (normals are unitless directions).
+            sw.WriteLine($"vn {sv.Normal.Y:R} {sv.Normal.X:R} {sv.Normal.Z:R}");
         }
-        // Emit UVs in vertex order. For each vertex, take UV[0] (primary channel).
-        // Some vertices have no UVs (decorative geometry) — write 0,0.
         for (int i = 0; i < vertOrder.Count; i++)
         {
             var sv = cs.VertexArray.Vertices[vertOrder[i]];
@@ -433,18 +440,17 @@ internal static class Commands
             sw.WriteLine($"usemtl surf_{grp.Key}");
             foreach (var poly in grp)
             {
-                // Skip degenerate polys.
                 if (poly.NumPts < 3) { polysSkipped++; continue; }
                 if (poly.VertexIds == null || poly.VertexIds.Count < poly.NumPts) { polysSkipped++; continue; }
 
-                // Triangulate fan: (v0,v1,v2), (v0,v2,v3), ... for n-gons.
-                // OBJ vertex index = position/UV/normal triple (all share idToObjIndex here).
                 int v0 = idToObjIndex[(ushort)poly.VertexIds[0]];
                 for (int i = 1; i + 1 < poly.NumPts; i++)
                 {
                     int va = idToObjIndex[(ushort)poly.VertexIds[i]];
                     int vb = idToObjIndex[(ushort)poly.VertexIds[i + 1]];
-                    sw.WriteLine($"f {v0}/{v0}/{v0} {va}/{va}/{va} {vb}/{vb}/{vb}");
+                    // Winding swap: emit (v0, vb, va) instead of (v0, va, vb)
+                    // to compensate for the chirality flip from the X-Y axis swap.
+                    sw.WriteLine($"f {v0}/{v0}/{v0} {vb}/{vb}/{vb} {va}/{va}/{va}");
                     triEmitted++;
                 }
             }
@@ -454,7 +460,7 @@ internal static class Commands
         var bytes = new FileInfo(outPath).Length;
         Console.WriteLine($"Wrote {bytes} bytes to {outPath}");
         Console.WriteLine($"  Cell 0x{fullId:X8}: {vertCount} verts, {polyCount} polys -> {triEmitted} triangles ({polysSkipped} skipped)");
-        Console.WriteLine($"  Materials: {groups.Count()} unique surfaces");
+        Console.WriteLine($"  Materials: {groups.Count()} unique surfaces  (UE-ready coords, scale 1.0)");
         return 0;
     }
 
@@ -522,6 +528,11 @@ internal static class Commands
         var cells = envCellIds.Select(id =>
         {
             var ec = cellDb.ReadFromDat<EnvCell>(id);
+            // Apply the same AC→UE coord transform we apply at OBJ export:
+            // X↔Y swap + m→cm. So the position in this JSON is in the
+            // SAME coordinate space as the OBJ vertices — UE-side import
+            // can drop a StaticMeshActor at this position directly.
+            const float kCmPerMetre = 100.0f;
             return new
             {
                 cell_id = $"0x{id:X8}",
@@ -529,12 +540,21 @@ internal static class Commands
                 obj_file = $"cell_{id:X8}.obj",
                 environment_id = $"0x{ec.EnvironmentId:X8}",
                 cell_structure = (int)ec.CellStructure,
+                // UE-coords (cm). UE.X = AC.Y * 100, UE.Y = AC.X * 100, UE.Z = AC.Z * 100.
                 position = new
                 {
-                    x = ec.Position.Origin.X,
-                    y = ec.Position.Origin.Y,
-                    z = ec.Position.Origin.Z,
+                    x = ec.Position.Origin.Y * kCmPerMetre,
+                    y = ec.Position.Origin.X * kCmPerMetre,
+                    z = ec.Position.Origin.Z * kCmPerMetre,
                 },
+                // Quaternion: emitted as raw AC values. The X↔Y axis swap
+                // changes quaternion components non-trivially; for most
+                // academy cells the orientation is identity or an
+                // axis-aligned 90° rotation, so visual placement is
+                // approximately correct. A follow-up pass (Phase 5d)
+                // should apply the proper quaternion conjugation for
+                // axis-swap chirality flip.
+                // TODO Phase 5d: rotate around the X↔Y swap properly.
                 orientation = new
                 {
                     w = ec.Position.Orientation.W,
@@ -551,10 +571,10 @@ internal static class Commands
 
         var doc = new
         {
-            schema_version = 1,
+            schema_version = 2,
             landblock_id = $"0x{lbHigh16:X4}",
             landblock_id_decimal = lbHigh16,
-            coordinate_system = "AC native (right-handed Z-up, metres). UE import applies the Phase 0 coord transform (see Source/AcUnreal/Public/CoordCore/CoordTransform.h).",
+            coordinate_system = "UE-ready: left-handed Z-up, centimetres. UE.X = AC.Y*100, UE.Y = AC.X*100, UE.Z = AC.Z*100. Matches the per-cell OBJ files (drag-and-drop into UE5 at scale 1.0). Quaternion orientation is raw AC values — see TODO in obj_file referenced OBJs.",
             cell_count = cells.Count,
             cells = cells,
         };

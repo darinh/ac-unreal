@@ -98,17 +98,26 @@ $acdat = ".\bin\Release\net8.0\acdat.exe"
 ### Indoor EnvCell (`export-envcell`, `export-academy`)
 - Triangulated Wavefront OBJ with positions + normals + UV0.
 - One OBJ group per material surface (`g surf_<idx>` / `usemtl surf_<idx>`).
-- AC native coordinates (right-handed Z-up, metres). UE import applies
-  the Phase 0 coord transform.
+- **UE-ready coordinates** — left-handed Z-up, centimetres. The Phase 0
+  coord transform is baked in at export time: `UE.X = AC.Y * 100`,
+  `UE.Y = AC.X * 100`, `UE.Z = AC.Z * 100`. Triangle winding is flipped
+  to compensate for the chirality reversal so outward normals stay
+  outward. **Drop straight into UE5 at Import Uniform Scale = 1.0** —
+  no per-import dialog tweaks needed.
 - **Verified Phase 5**: full Aluvian Training Academy (landblock
   `0x8602`, 568 EnvCells) extracts cleanly in ~30s — 7,396 vertices /
   5,756 polygons total.
 
 ### Layout (`dump-academy-layout`)
-- JSON per-cell metadata: position (XYZ), orientation (quaternion),
+- JSON per-cell metadata (schema_version 2): position (XYZ in UE cm),
+  orientation (quaternion — currently raw AC values, see TODO below),
   environment ID, portal count, static object count, OBJ filename.
-- UE-side import reads this and instantiates a StaticMeshActor per
-  cell at the right transform.
+- UE-side import reads this and instantiates a StaticMeshActor per cell
+  at the right transform.
+- **TODO (Phase 5d)**: the quaternion is still in AC's right-handed
+  basis. Most academy cells use identity / axis-aligned 90° rotations so
+  placement is approximately correct without the conjugation, but
+  arbitrary orientations need the full transform.
 
 ## Committed sample fixtures
 

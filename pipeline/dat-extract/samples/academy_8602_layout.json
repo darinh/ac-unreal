@@ -1,8 +1,8 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "landblock_id": "0x8602",
   "landblock_id_decimal": 34306,
-  "coordinate_system": "AC native (right-handed Z-up, metres). UE import applies the Phase 0 coord transform (see Source/AcUnreal/Public/CoordCore/CoordTransform.h).",
+  "coordinate_system": "UE-ready: left-handed Z-up, centimetres. UE.X = AC.Y*100, UE.Y = AC.X*100, UE.Z = AC.Z*100. Matches the per-cell OBJ files (drag-and-drop into UE5 at scale 1.0). Quaternion orientation is raw AC values \u2014 see TODO in obj_file referenced OBJs.",
   "cell_count": 568,
   "cells": [
     {
@@ -12,9 +12,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -230,
-        "z": -12
+        "x": -23000,
+        "y": 15000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -34,9 +34,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 15000,
+        "z": -1200
       },
       "orientation": {
         "w": -0.707107,
@@ -56,9 +56,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -230,
-        "z": -12
+        "x": -23000,
+        "y": 16000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -78,9 +78,9 @@
       "environment_id": "0x0D00027B",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 16000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -100,9 +100,9 @@
       "environment_id": "0x0D000285",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -250,
-        "z": -12
+        "x": -25000,
+        "y": 16000,
+        "z": -1200
       },
       "orientation": {
         "w": -0.707107,
@@ -122,9 +122,9 @@
       "environment_id": "0x0D0001EC",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 17000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -144,9 +144,9 @@
       "environment_id": "0x0D0001EC",
       "cell_structure": 1,
       "position": {
-        "x": 170,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 17000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -166,9 +166,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -250,
-        "z": -12
+        "x": -25000,
+        "y": 17000,
+        "z": -1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -188,9 +188,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 18000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -210,9 +210,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 1,
       "position": {
-        "x": 180,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 18000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -232,9 +232,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 2,
       "position": {
-        "x": 180,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 18000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -254,9 +254,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 3,
       "position": {
-        "x": 180,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 18000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -276,9 +276,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -250,
-        "z": -12
+        "x": -25000,
+        "y": 18000,
+        "z": -1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -298,9 +298,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 180,
-        "y": -250,
-        "z": -12
+        "x": -25000,
+        "y": 18000,
+        "z": -1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -320,9 +320,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 180,
-        "y": -250,
-        "z": -12
+        "x": -25000,
+        "y": 18000,
+        "z": -1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -342,9 +342,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 190,
-        "y": -220,
-        "z": -12
+        "x": -22000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": -0.707107,
@@ -364,9 +364,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 190,
-        "y": -220,
-        "z": -12
+        "x": -22000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": -0.707107,
@@ -386,9 +386,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 190,
-        "y": -220,
-        "z": -12
+        "x": -22000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": -0.707107,
@@ -408,9 +408,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 190,
-        "y": -230,
-        "z": -12
+        "x": -23000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -430,9 +430,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 190,
-        "y": -230,
-        "z": -12
+        "x": -23000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -452,9 +452,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 190,
-        "y": -230,
-        "z": -12
+        "x": -23000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -474,9 +474,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 0,
       "position": {
-        "x": 190,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -496,9 +496,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 1,
       "position": {
-        "x": 190,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -518,9 +518,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 2,
       "position": {
-        "x": 190,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -540,9 +540,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 3,
       "position": {
-        "x": 190,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -562,9 +562,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 190,
-        "y": -250,
-        "z": -12
+        "x": -25000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -584,9 +584,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 190,
-        "y": -250,
-        "z": -12
+        "x": -25000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -606,9 +606,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 190,
-        "y": -250,
-        "z": -12
+        "x": -25000,
+        "y": 19000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -628,9 +628,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -210,
-        "z": -12
+        "x": -21000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -650,9 +650,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 200,
-        "y": -210,
-        "z": -12
+        "x": -21000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -672,9 +672,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 200,
-        "y": -210,
-        "z": -12
+        "x": -21000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -694,9 +694,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -220,
-        "z": -12
+        "x": -22000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -716,9 +716,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 200,
-        "y": -220,
-        "z": -12
+        "x": -22000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -738,9 +738,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 200,
-        "y": -220,
-        "z": -12
+        "x": -22000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -760,9 +760,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -230,
-        "z": -12
+        "x": -23000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -782,9 +782,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 200,
-        "y": -230,
-        "z": -12
+        "x": -23000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -804,9 +804,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 200,
-        "y": -230,
-        "z": -12
+        "x": -23000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -826,9 +826,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -848,9 +848,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 1,
       "position": {
-        "x": 200,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -870,9 +870,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 2,
       "position": {
-        "x": 200,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -892,9 +892,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 3,
       "position": {
-        "x": 200,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -914,9 +914,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 4,
       "position": {
-        "x": 200,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": 1,
@@ -936,9 +936,9 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -250,
-        "z": -12
+        "x": -25000,
+        "y": 20000,
+        "z": -1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -958,9 +958,9 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 210,
-        "y": -240,
-        "z": -12
+        "x": -24000,
+        "y": 21000,
+        "z": -1200
       },
       "orientation": {
         "w": 0.707107,
@@ -980,9 +980,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 110,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 11000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -1002,9 +1002,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 110,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 11000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -1024,9 +1024,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 110,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 11000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -1046,9 +1046,9 @@
       "environment_id": "0x0D000129",
       "cell_structure": 0,
       "position": {
-        "x": 110,
-        "y": -170,
-        "z": -6
+        "x": -17000,
+        "y": 11000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1068,9 +1068,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 110,
-        "y": -180,
-        "z": -6
+        "x": -18000,
+        "y": 11000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -1090,9 +1090,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 110,
-        "y": -180,
-        "z": -6
+        "x": -18000,
+        "y": 11000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -1112,9 +1112,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 110,
-        "y": -180,
-        "z": -6
+        "x": -18000,
+        "y": 11000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -1134,9 +1134,9 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 120,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 12000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1156,9 +1156,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 0,
       "position": {
-        "x": 120,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 12000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1178,9 +1178,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 1,
       "position": {
-        "x": 120,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 12000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1200,9 +1200,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 2,
       "position": {
-        "x": 120,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 12000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1222,9 +1222,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 3,
       "position": {
-        "x": 120,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 12000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1244,9 +1244,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 4,
       "position": {
-        "x": 120,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 12000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1266,9 +1266,9 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 120,
-        "y": -170,
-        "z": -6
+        "x": -17000,
+        "y": 12000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -1288,9 +1288,9 @@
       "environment_id": "0x0D000129",
       "cell_structure": 0,
       "position": {
-        "x": 120,
-        "y": -180,
-        "z": -6
+        "x": -18000,
+        "y": 12000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -1310,9 +1310,9 @@
       "environment_id": "0x0D000044",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -130,
-        "z": -6
+        "x": -13000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1332,9 +1332,9 @@
       "environment_id": "0x0D0001C1",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -1354,9 +1354,9 @@
       "environment_id": "0x0D000129",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1376,9 +1376,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -1398,9 +1398,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 130,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -1420,9 +1420,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 130,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -1442,9 +1442,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -180,
-        "z": -6
+        "x": -18000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1464,9 +1464,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 130,
-        "y": -180,
-        "z": -6
+        "x": -18000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1486,9 +1486,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 130,
-        "y": -180,
-        "z": -6
+        "x": -18000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1508,9 +1508,9 @@
       "environment_id": "0x0D0001EC",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -190,
-        "z": -6
+        "x": -19000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1530,9 +1530,9 @@
       "environment_id": "0x0D0001EC",
       "cell_structure": 1,
       "position": {
-        "x": 130,
-        "y": -190,
-        "z": -6
+        "x": -19000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1552,9 +1552,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 13000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -1574,9 +1574,9 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 140,
-        "y": -130,
-        "z": -6
+        "x": -13000,
+        "y": 14000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1596,9 +1596,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 0,
       "position": {
-        "x": 140,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 14000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1618,9 +1618,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 1,
       "position": {
-        "x": 140,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 14000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1640,9 +1640,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 2,
       "position": {
-        "x": 140,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 14000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1662,9 +1662,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 3,
       "position": {
-        "x": 140,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 14000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1684,9 +1684,9 @@
       "environment_id": "0x0D000126",
       "cell_structure": 4,
       "position": {
-        "x": 140,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 14000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1706,9 +1706,9 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 140,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 14000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -1728,9 +1728,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 140,
-        "y": -190,
-        "z": -6
+        "x": -19000,
+        "y": 14000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -1750,9 +1750,9 @@
       "environment_id": "0x0D00027B",
       "cell_structure": 0,
       "position": {
-        "x": 140,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 14000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -1772,9 +1772,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 140,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 14000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -1794,9 +1794,9 @@
       "environment_id": "0x0D0001D3",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1816,9 +1816,9 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1838,9 +1838,9 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 1,
       "position": {
-        "x": 150,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1860,9 +1860,9 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 2,
       "position": {
-        "x": 150,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1882,9 +1882,9 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 3,
       "position": {
-        "x": 150,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -1904,9 +1904,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -1926,9 +1926,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 150,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -1948,9 +1948,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 150,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -1970,9 +1970,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 150,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -1992,9 +1992,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 150,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2014,9 +2014,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 150,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2036,9 +2036,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 150,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2058,9 +2058,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 150,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2080,9 +2080,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 150,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2102,9 +2102,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 150,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2124,9 +2124,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2146,9 +2146,9 @@
       "environment_id": "0x0D0001EE",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -2168,9 +2168,9 @@
       "environment_id": "0x0D0001EE",
       "cell_structure": 1,
       "position": {
-        "x": 150,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -2190,9 +2190,9 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -230,
-        "z": -6
+        "x": -23000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -2212,9 +2212,9 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -240,
-        "z": -6
+        "x": -24000,
+        "y": 15000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2234,9 +2234,9 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2256,9 +2256,9 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 1,
       "position": {
-        "x": 160,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2278,9 +2278,9 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 2,
       "position": {
-        "x": 160,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2300,9 +2300,9 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 3,
       "position": {
-        "x": 160,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2322,9 +2322,9 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -2344,9 +2344,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2366,9 +2366,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 160,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2388,9 +2388,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 160,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2410,9 +2410,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 160,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2432,9 +2432,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 160,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2454,9 +2454,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 160,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2476,9 +2476,9 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -190,
-        "z": -6
+        "x": -19000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -2498,9 +2498,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2520,9 +2520,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 1,
       "position": {
-        "x": 160,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2542,9 +2542,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 2,
       "position": {
-        "x": 160,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2564,9 +2564,9 @@
       "environment_id": "0x0D000183",
       "cell_structure": 3,
       "position": {
-        "x": 160,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2586,9 +2586,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2608,9 +2608,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 160,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2630,9 +2630,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 160,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2652,9 +2652,9 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -230,
-        "z": -6
+        "x": -23000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2674,9 +2674,9 @@
       "environment_id": "0x0D00027C",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -240,
-        "z": -6
+        "x": -24000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2696,9 +2696,9 @@
       "environment_id": "0x0D000286",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -250,
-        "z": -6
+        "x": -25000,
+        "y": 16000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -2718,9 +2718,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2740,9 +2740,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 170,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2762,9 +2762,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 170,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2784,9 +2784,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 170,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2806,9 +2806,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 170,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2828,9 +2828,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 170,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2850,9 +2850,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 170,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2872,9 +2872,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 170,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2894,9 +2894,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 170,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2916,9 +2916,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 170,
-        "y": -140,
-        "z": -6
+        "x": -14000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -2938,9 +2938,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -2960,9 +2960,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 170,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -2982,9 +2982,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 170,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3004,9 +3004,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 170,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3026,9 +3026,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 170,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3048,9 +3048,9 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 170,
-        "y": -150,
-        "z": -6
+        "x": -15000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3070,9 +3070,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3092,9 +3092,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 170,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3114,9 +3114,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 170,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3136,9 +3136,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 170,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3158,9 +3158,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 170,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3180,9 +3180,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 170,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3202,9 +3202,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 170,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3224,9 +3224,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 170,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3246,9 +3246,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 170,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3268,9 +3268,9 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 170,
-        "y": -160,
-        "z": -6
+        "x": -16000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3290,9 +3290,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -3312,9 +3312,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 170,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -3334,9 +3334,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 170,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -3356,9 +3356,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3378,9 +3378,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 170,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3400,9 +3400,9 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 170,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3422,9 +3422,9 @@
       "environment_id": "0x0D000286",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -240,
-        "z": -6
+        "x": -24000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -3444,9 +3444,9 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -250,
-        "z": -6
+        "x": -25000,
+        "y": 17000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3466,9 +3466,9 @@
       "environment_id": "0x0D0001C9",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -110,
-        "z": -6
+        "x": -11000,
+        "y": 18000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -3488,9 +3488,9 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -120,
-        "z": -6
+        "x": -12000,
+        "y": 18000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3510,9 +3510,9 @@
       "environment_id": "0x0D000285",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 18000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -3532,9 +3532,9 @@
       "environment_id": "0x0D00028B",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 18000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -3554,9 +3554,9 @@
       "environment_id": "0x0D00028B",
       "cell_structure": 1,
       "position": {
-        "x": 180,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 18000,
+        "z": -600
       },
       "orientation": {
         "w": 1,
@@ -3576,9 +3576,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -220,
-        "z": -6
+        "x": -22000,
+        "y": 18000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -3598,9 +3598,9 @@
       "environment_id": "0x0D000294",
       "cell_structure": 0,
       "position": {
-        "x": 190,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 19000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -3620,9 +3620,9 @@
       "environment_id": "0x0D0001E7",
       "cell_structure": 0,
       "position": {
-        "x": 190,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 19000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -3642,9 +3642,9 @@
       "environment_id": "0x0D0001E7",
       "cell_structure": 1,
       "position": {
-        "x": 190,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 19000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -3664,9 +3664,9 @@
       "environment_id": "0x0D0001E7",
       "cell_structure": 2,
       "position": {
-        "x": 190,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 19000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -3686,9 +3686,9 @@
       "environment_id": "0x0D000294",
       "cell_structure": 0,
       "position": {
-        "x": 190,
-        "y": -220,
-        "z": -6
+        "x": -22000,
+        "y": 19000,
+        "z": -600
       },
       "orientation": {
         "w": -0.707107,
@@ -3708,9 +3708,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -200,
-        "z": -6
+        "x": -20000,
+        "y": 20000,
+        "z": -600
       },
       "orientation": {
         "w": 0.707107,
@@ -3730,9 +3730,9 @@
       "environment_id": "0x0D000294",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -210,
-        "z": -6
+        "x": -21000,
+        "y": 20000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3752,9 +3752,9 @@
       "environment_id": "0x0D000297",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -220,
-        "z": -6
+        "x": -22000,
+        "y": 20000,
+        "z": -600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -3774,8 +3774,8 @@
       "environment_id": "0x0D000044",
       "cell_structure": 0,
       "position": {
-        "x": 0,
-        "y": -60,
+        "x": -6000,
+        "y": 0,
         "z": 0
       },
       "orientation": {
@@ -3796,8 +3796,8 @@
       "environment_id": "0x0D000094",
       "cell_structure": 0,
       "position": {
-        "x": 0,
-        "y": -70,
+        "x": -7000,
+        "y": 0,
         "z": 0
       },
       "orientation": {
@@ -3818,8 +3818,8 @@
       "environment_id": "0x0D0001C9",
       "cell_structure": 0,
       "position": {
-        "x": 10,
-        "y": -30,
+        "x": -3000,
+        "y": 1000,
         "z": 0
       },
       "orientation": {
@@ -3840,8 +3840,8 @@
       "environment_id": "0x0D000094",
       "cell_structure": 0,
       "position": {
-        "x": 10,
-        "y": -70,
+        "x": -7000,
+        "y": 1000,
         "z": 0
       },
       "orientation": {
@@ -3862,8 +3862,8 @@
       "environment_id": "0x0D0001BB",
       "cell_structure": 0,
       "position": {
-        "x": 10,
-        "y": -80,
+        "x": -8000,
+        "y": 1000,
         "z": 0
       },
       "orientation": {
@@ -3884,8 +3884,8 @@
       "environment_id": "0x0D0001C9",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -20,
+        "x": -2000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -3906,8 +3906,8 @@
       "environment_id": "0x0D000126",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -30,
+        "x": -3000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -3928,8 +3928,8 @@
       "environment_id": "0x0D000126",
       "cell_structure": 1,
       "position": {
-        "x": 20,
-        "y": -30,
+        "x": -3000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -3950,8 +3950,8 @@
       "environment_id": "0x0D000126",
       "cell_structure": 2,
       "position": {
-        "x": 20,
-        "y": -30,
+        "x": -3000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -3972,8 +3972,8 @@
       "environment_id": "0x0D000126",
       "cell_structure": 3,
       "position": {
-        "x": 20,
-        "y": -30,
+        "x": -3000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -3994,8 +3994,8 @@
       "environment_id": "0x0D000126",
       "cell_structure": 4,
       "position": {
-        "x": 20,
-        "y": -30,
+        "x": -3000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4016,8 +4016,8 @@
       "environment_id": "0x0D0001C9",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -40,
+        "x": -4000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4038,8 +4038,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -70,
+        "x": -7000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4060,8 +4060,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 20,
-        "y": -70,
+        "x": -7000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4082,8 +4082,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 20,
-        "y": -70,
+        "x": -7000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4104,8 +4104,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -80,
+        "x": -8000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4126,8 +4126,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 20,
-        "y": -80,
+        "x": -8000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4148,8 +4148,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 20,
-        "y": -80,
+        "x": -8000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4170,8 +4170,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -110,
+        "x": -11000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4192,8 +4192,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 20,
-        "y": -110,
+        "x": -11000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4214,8 +4214,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 20,
-        "y": -110,
+        "x": -11000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4236,8 +4236,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 20,
-        "y": -110,
+        "x": -11000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4258,8 +4258,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 20,
-        "y": -110,
+        "x": -11000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4280,8 +4280,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 20,
-        "y": -110,
+        "x": -11000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4302,8 +4302,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 20,
-        "y": -110,
+        "x": -11000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4324,8 +4324,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 20,
-        "y": -110,
+        "x": -11000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4346,8 +4346,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 20,
-        "y": -110,
+        "x": -11000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4368,8 +4368,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 20,
-        "y": -110,
+        "x": -11000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4390,8 +4390,8 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -120,
+        "x": -12000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4412,8 +4412,8 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 1,
       "position": {
-        "x": 20,
-        "y": -120,
+        "x": -12000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4434,8 +4434,8 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 2,
       "position": {
-        "x": 20,
-        "y": -120,
+        "x": -12000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4456,8 +4456,8 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 3,
       "position": {
-        "x": 20,
-        "y": -120,
+        "x": -12000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4478,8 +4478,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -130,
+        "x": -13000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4500,8 +4500,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 1,
       "position": {
-        "x": 20,
-        "y": -130,
+        "x": -13000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4522,8 +4522,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 2,
       "position": {
-        "x": 20,
-        "y": -130,
+        "x": -13000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4544,8 +4544,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 3,
       "position": {
-        "x": 20,
-        "y": -130,
+        "x": -13000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4566,8 +4566,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -140,
+        "x": -14000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4588,8 +4588,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 20,
-        "y": -140,
+        "x": -14000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4610,8 +4610,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 20,
-        "y": -140,
+        "x": -14000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4632,8 +4632,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 20,
-        "y": -140,
+        "x": -14000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4654,8 +4654,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 20,
-        "y": -140,
+        "x": -14000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4676,8 +4676,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 20,
-        "y": -140,
+        "x": -14000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4698,8 +4698,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 20,
-        "y": -140,
+        "x": -14000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4720,8 +4720,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 20,
-        "y": -140,
+        "x": -14000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4742,8 +4742,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 20,
-        "y": -140,
+        "x": -14000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4764,8 +4764,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 20,
-        "y": -140,
+        "x": -14000,
+        "y": 2000,
         "z": 0
       },
       "orientation": {
@@ -4786,8 +4786,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -20,
+        "x": -2000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -4808,8 +4808,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 30,
-        "y": -20,
+        "x": -2000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -4830,8 +4830,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 30,
-        "y": -20,
+        "x": -2000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -4852,8 +4852,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -30,
+        "x": -3000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -4874,8 +4874,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 1,
       "position": {
-        "x": 30,
-        "y": -30,
+        "x": -3000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -4896,8 +4896,8 @@
       "environment_id": "0x0D000125",
       "cell_structure": 2,
       "position": {
-        "x": 30,
-        "y": -30,
+        "x": -3000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -4918,8 +4918,8 @@
       "environment_id": "0x0D000129",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -70,
+        "x": -7000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -4940,8 +4940,8 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -90,
+        "x": -9000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -4962,8 +4962,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -110,
+        "x": -11000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -4984,8 +4984,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 30,
-        "y": -110,
+        "x": -11000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5006,8 +5006,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 30,
-        "y": -110,
+        "x": -11000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5028,8 +5028,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 30,
-        "y": -110,
+        "x": -11000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5050,8 +5050,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 30,
-        "y": -110,
+        "x": -11000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5072,8 +5072,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 30,
-        "y": -110,
+        "x": -11000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5094,8 +5094,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -120,
+        "x": -12000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5116,8 +5116,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -130,
+        "x": -13000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5138,8 +5138,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -140,
+        "x": -14000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5160,8 +5160,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 30,
-        "y": -140,
+        "x": -14000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5182,8 +5182,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 30,
-        "y": -140,
+        "x": -14000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5204,8 +5204,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 30,
-        "y": -140,
+        "x": -14000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5226,8 +5226,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 30,
-        "y": -140,
+        "x": -14000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5248,8 +5248,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 30,
-        "y": -140,
+        "x": -14000,
+        "y": 3000,
         "z": 0
       },
       "orientation": {
@@ -5270,8 +5270,8 @@
       "environment_id": "0x0D00017F",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -20,
+        "x": -2000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5292,8 +5292,8 @@
       "environment_id": "0x0D00017F",
       "cell_structure": 1,
       "position": {
-        "x": 40,
-        "y": -20,
+        "x": -2000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5314,8 +5314,8 @@
       "environment_id": "0x0D00017F",
       "cell_structure": 2,
       "position": {
-        "x": 40,
-        "y": -20,
+        "x": -2000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5336,8 +5336,8 @@
       "environment_id": "0x0D00017F",
       "cell_structure": 3,
       "position": {
-        "x": 40,
-        "y": -20,
+        "x": -2000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5358,8 +5358,8 @@
       "environment_id": "0x0D00017F",
       "cell_structure": 4,
       "position": {
-        "x": 40,
-        "y": -20,
+        "x": -2000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5380,8 +5380,8 @@
       "environment_id": "0x0D0001D3",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -70,
+        "x": -7000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5402,8 +5402,8 @@
       "environment_id": "0x0D0000BD",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -80,
+        "x": -8000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5424,8 +5424,8 @@
       "environment_id": "0x0D0001D7",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -90,
+        "x": -9000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5446,8 +5446,8 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -100,
+        "x": -10000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5468,8 +5468,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -110,
+        "x": -11000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5490,8 +5490,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 1,
       "position": {
-        "x": 40,
-        "y": -110,
+        "x": -11000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5512,8 +5512,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 2,
       "position": {
-        "x": 40,
-        "y": -110,
+        "x": -11000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5534,8 +5534,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 3,
       "position": {
-        "x": 40,
-        "y": -110,
+        "x": -11000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5556,8 +5556,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -120,
+        "x": -12000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5578,8 +5578,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -130,
+        "x": -13000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5600,8 +5600,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -140,
+        "x": -14000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5622,8 +5622,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 40,
-        "y": -140,
+        "x": -14000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5644,8 +5644,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 40,
-        "y": -140,
+        "x": -14000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5666,8 +5666,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 40,
-        "y": -140,
+        "x": -14000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5688,8 +5688,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 40,
-        "y": -140,
+        "x": -14000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5710,8 +5710,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 40,
-        "y": -140,
+        "x": -14000,
+        "y": 4000,
         "z": 0
       },
       "orientation": {
@@ -5732,8 +5732,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -10,
+        "x": -1000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5754,8 +5754,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 50,
-        "y": -10,
+        "x": -1000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5776,8 +5776,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 50,
-        "y": -10,
+        "x": -1000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5798,8 +5798,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 50,
-        "y": -10,
+        "x": -1000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5820,8 +5820,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 50,
-        "y": -10,
+        "x": -1000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5842,8 +5842,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 50,
-        "y": -10,
+        "x": -1000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5864,8 +5864,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 50,
-        "y": -10,
+        "x": -1000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5886,8 +5886,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 50,
-        "y": -10,
+        "x": -1000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5908,8 +5908,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 50,
-        "y": -10,
+        "x": -1000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5930,8 +5930,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 50,
-        "y": -10,
+        "x": -1000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5952,8 +5952,8 @@
       "environment_id": "0x0D0000D5",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -20,
+        "x": -2000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5974,8 +5974,8 @@
       "environment_id": "0x0D0000D5",
       "cell_structure": 1,
       "position": {
-        "x": 50,
-        "y": -20,
+        "x": -2000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -5996,8 +5996,8 @@
       "environment_id": "0x0D0000D5",
       "cell_structure": 2,
       "position": {
-        "x": 50,
-        "y": -20,
+        "x": -2000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6018,8 +6018,8 @@
       "environment_id": "0x0D0000D5",
       "cell_structure": 3,
       "position": {
-        "x": 50,
-        "y": -20,
+        "x": -2000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6040,8 +6040,8 @@
       "environment_id": "0x0D0000D5",
       "cell_structure": 4,
       "position": {
-        "x": 50,
-        "y": -20,
+        "x": -2000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6062,8 +6062,8 @@
       "environment_id": "0x0D0000D5",
       "cell_structure": 5,
       "position": {
-        "x": 50,
-        "y": -20,
+        "x": -2000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6084,8 +6084,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -30,
+        "x": -3000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6106,8 +6106,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 50,
-        "y": -30,
+        "x": -3000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6128,8 +6128,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 50,
-        "y": -30,
+        "x": -3000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6150,8 +6150,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 50,
-        "y": -30,
+        "x": -3000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6172,8 +6172,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 50,
-        "y": -30,
+        "x": -3000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6194,8 +6194,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 50,
-        "y": -30,
+        "x": -3000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6216,8 +6216,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 50,
-        "y": -30,
+        "x": -3000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6238,8 +6238,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 50,
-        "y": -30,
+        "x": -3000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6260,8 +6260,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 50,
-        "y": -30,
+        "x": -3000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6282,8 +6282,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 50,
-        "y": -30,
+        "x": -3000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6304,8 +6304,8 @@
       "environment_id": "0x0D00041C",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -50,
+        "x": -5000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6326,8 +6326,8 @@
       "environment_id": "0x0D0001BD",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -60,
+        "x": -6000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6348,8 +6348,8 @@
       "environment_id": "0x0D000094",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -70,
+        "x": -7000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6370,8 +6370,8 @@
       "environment_id": "0x0D0001C5",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -90,
+        "x": -9000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6392,8 +6392,8 @@
       "environment_id": "0x0D000129",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -100,
+        "x": -10000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6414,8 +6414,8 @@
       "environment_id": "0x0D0001DD",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -110,
+        "x": -11000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6436,8 +6436,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -120,
+        "x": -12000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6458,8 +6458,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -130,
+        "x": -13000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6480,8 +6480,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -140,
+        "x": -14000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6502,8 +6502,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 50,
-        "y": -140,
+        "x": -14000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6524,8 +6524,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 50,
-        "y": -140,
+        "x": -14000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6546,8 +6546,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 50,
-        "y": -140,
+        "x": -14000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6568,8 +6568,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 50,
-        "y": -140,
+        "x": -14000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6590,8 +6590,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 50,
-        "y": -140,
+        "x": -14000,
+        "y": 5000,
         "z": 0
       },
       "orientation": {
@@ -6612,8 +6612,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": 0,
+        "x": 0,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6634,8 +6634,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": 0,
+        "x": 0,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6656,8 +6656,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": 0,
+        "x": 0,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6678,8 +6678,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 60,
-        "y": 0,
+        "x": 0,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6700,8 +6700,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 60,
-        "y": 0,
+        "x": 0,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6722,8 +6722,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 60,
-        "y": 0,
+        "x": 0,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6744,8 +6744,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 60,
-        "y": 0,
+        "x": 0,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6766,8 +6766,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 60,
-        "y": 0,
+        "x": 0,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6788,8 +6788,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 60,
-        "y": 0,
+        "x": 0,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6810,8 +6810,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 60,
-        "y": 0,
+        "x": 0,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6832,8 +6832,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -10,
+        "x": -1000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6854,8 +6854,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": -10,
+        "x": -1000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6876,8 +6876,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": -10,
+        "x": -1000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6898,8 +6898,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 3,
       "position": {
-        "x": 60,
-        "y": -10,
+        "x": -1000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6920,8 +6920,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -20,
+        "x": -2000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6942,8 +6942,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -30,
+        "x": -3000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6964,8 +6964,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": -30,
+        "x": -3000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -6986,8 +6986,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": -30,
+        "x": -3000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7008,8 +7008,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 3,
       "position": {
-        "x": 60,
-        "y": -30,
+        "x": -3000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7030,8 +7030,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -40,
+        "x": -4000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7052,8 +7052,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": -40,
+        "x": -4000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7074,8 +7074,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": -40,
+        "x": -4000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7096,8 +7096,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 60,
-        "y": -40,
+        "x": -4000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7118,8 +7118,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 60,
-        "y": -40,
+        "x": -4000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7140,8 +7140,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 60,
-        "y": -40,
+        "x": -4000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7162,8 +7162,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 60,
-        "y": -40,
+        "x": -4000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7184,8 +7184,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 60,
-        "y": -40,
+        "x": -4000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7206,8 +7206,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 60,
-        "y": -40,
+        "x": -4000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7228,8 +7228,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 60,
-        "y": -40,
+        "x": -4000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7250,8 +7250,8 @@
       "environment_id": "0x0D00017F",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -90,
+        "x": -9000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7272,8 +7272,8 @@
       "environment_id": "0x0D00017F",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": -90,
+        "x": -9000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7294,8 +7294,8 @@
       "environment_id": "0x0D00017F",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": -90,
+        "x": -9000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7316,8 +7316,8 @@
       "environment_id": "0x0D00017F",
       "cell_structure": 3,
       "position": {
-        "x": 60,
-        "y": -90,
+        "x": -9000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7338,8 +7338,8 @@
       "environment_id": "0x0D00017F",
       "cell_structure": 4,
       "position": {
-        "x": 60,
-        "y": -90,
+        "x": -9000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7360,8 +7360,8 @@
       "environment_id": "0x0D0000A3",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -110,
+        "x": -11000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7382,8 +7382,8 @@
       "environment_id": "0x0D0000A3",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": -110,
+        "x": -11000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7404,8 +7404,8 @@
       "environment_id": "0x0D0000A3",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": -110,
+        "x": -11000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7426,8 +7426,8 @@
       "environment_id": "0x0D0000A3",
       "cell_structure": 3,
       "position": {
-        "x": 60,
-        "y": -110,
+        "x": -11000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7448,8 +7448,8 @@
       "environment_id": "0x0D0000A3",
       "cell_structure": 4,
       "position": {
-        "x": 60,
-        "y": -110,
+        "x": -11000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7470,8 +7470,8 @@
       "environment_id": "0x0D0000A3",
       "cell_structure": 5,
       "position": {
-        "x": 60,
-        "y": -110,
+        "x": -11000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7492,8 +7492,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -120,
+        "x": -12000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7514,8 +7514,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": -120,
+        "x": -12000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7536,8 +7536,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": -120,
+        "x": -12000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7558,8 +7558,8 @@
       "environment_id": "0x0D0000DC",
       "cell_structure": 3,
       "position": {
-        "x": 60,
-        "y": -120,
+        "x": -12000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7580,8 +7580,8 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -130,
+        "x": -13000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7602,8 +7602,8 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": -130,
+        "x": -13000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7624,8 +7624,8 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": -130,
+        "x": -13000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7646,8 +7646,8 @@
       "environment_id": "0x0D0000E2",
       "cell_structure": 3,
       "position": {
-        "x": 60,
-        "y": -130,
+        "x": -13000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7668,8 +7668,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -140,
+        "x": -14000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7690,8 +7690,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": -140,
+        "x": -14000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7712,8 +7712,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": -140,
+        "x": -14000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7734,8 +7734,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 60,
-        "y": -140,
+        "x": -14000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7756,8 +7756,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 60,
-        "y": -140,
+        "x": -14000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7778,8 +7778,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 60,
-        "y": -140,
+        "x": -14000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7800,8 +7800,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 60,
-        "y": -140,
+        "x": -14000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7822,8 +7822,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 60,
-        "y": -140,
+        "x": -14000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7844,8 +7844,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 60,
-        "y": -140,
+        "x": -14000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7866,8 +7866,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 60,
-        "y": -140,
+        "x": -14000,
+        "y": 6000,
         "z": 0
       },
       "orientation": {
@@ -7888,8 +7888,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": 0,
+        "x": 0,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -7910,8 +7910,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 70,
-        "y": 0,
+        "x": 0,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -7932,8 +7932,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 70,
-        "y": 0,
+        "x": 0,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -7954,8 +7954,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 70,
-        "y": 0,
+        "x": 0,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -7976,8 +7976,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 70,
-        "y": 0,
+        "x": 0,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -7998,8 +7998,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 70,
-        "y": 0,
+        "x": 0,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8020,8 +8020,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -10,
+        "x": -1000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8042,8 +8042,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -20,
+        "x": -2000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8064,8 +8064,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -30,
+        "x": -3000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8086,8 +8086,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -40,
+        "x": -4000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8108,8 +8108,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 70,
-        "y": -40,
+        "x": -4000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8130,8 +8130,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 70,
-        "y": -40,
+        "x": -4000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8152,8 +8152,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 70,
-        "y": -40,
+        "x": -4000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8174,8 +8174,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 70,
-        "y": -40,
+        "x": -4000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8196,8 +8196,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 70,
-        "y": -40,
+        "x": -4000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8218,8 +8218,8 @@
       "environment_id": "0x0D0000FF",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -80,
+        "x": -8000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8240,8 +8240,8 @@
       "environment_id": "0x0D0000FF",
       "cell_structure": 1,
       "position": {
-        "x": 70,
-        "y": -80,
+        "x": -8000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8262,8 +8262,8 @@
       "environment_id": "0x0D0000FF",
       "cell_structure": 2,
       "position": {
-        "x": 70,
-        "y": -80,
+        "x": -8000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8284,8 +8284,8 @@
       "environment_id": "0x0D000105",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -90,
+        "x": -9000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8306,8 +8306,8 @@
       "environment_id": "0x0D000105",
       "cell_structure": 1,
       "position": {
-        "x": 70,
-        "y": -90,
+        "x": -9000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8328,8 +8328,8 @@
       "environment_id": "0x0D000105",
       "cell_structure": 2,
       "position": {
-        "x": 70,
-        "y": -90,
+        "x": -9000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8350,8 +8350,8 @@
       "environment_id": "0x0D000105",
       "cell_structure": 3,
       "position": {
-        "x": 70,
-        "y": -90,
+        "x": -9000,
+        "y": 7000,
         "z": 0
       },
       "orientation": {
@@ -8372,8 +8372,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": 0,
+        "x": 0,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8394,8 +8394,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 80,
-        "y": 0,
+        "x": 0,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8416,8 +8416,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 80,
-        "y": 0,
+        "x": 0,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8438,8 +8438,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 80,
-        "y": 0,
+        "x": 0,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8460,8 +8460,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 80,
-        "y": 0,
+        "x": 0,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8482,8 +8482,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 80,
-        "y": 0,
+        "x": 0,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8504,8 +8504,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -10,
+        "x": -1000,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8526,8 +8526,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -20,
+        "x": -2000,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8548,8 +8548,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -30,
+        "x": -3000,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8570,8 +8570,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -40,
+        "x": -4000,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8592,8 +8592,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 80,
-        "y": -40,
+        "x": -4000,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8614,8 +8614,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 80,
-        "y": -40,
+        "x": -4000,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8636,8 +8636,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 80,
-        "y": -40,
+        "x": -4000,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8658,8 +8658,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 80,
-        "y": -40,
+        "x": -4000,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8680,8 +8680,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 80,
-        "y": -40,
+        "x": -4000,
+        "y": 8000,
         "z": 0
       },
       "orientation": {
@@ -8702,8 +8702,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": 0,
+        "x": 0,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8724,8 +8724,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 90,
-        "y": 0,
+        "x": 0,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8746,8 +8746,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 90,
-        "y": 0,
+        "x": 0,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8768,8 +8768,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 90,
-        "y": 0,
+        "x": 0,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8790,8 +8790,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 90,
-        "y": 0,
+        "x": 0,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8812,8 +8812,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 90,
-        "y": 0,
+        "x": 0,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8834,8 +8834,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 90,
-        "y": 0,
+        "x": 0,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8856,8 +8856,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 90,
-        "y": 0,
+        "x": 0,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8878,8 +8878,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 90,
-        "y": 0,
+        "x": 0,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8900,8 +8900,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 90,
-        "y": 0,
+        "x": 0,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8922,8 +8922,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": -10,
+        "x": -1000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8944,8 +8944,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 1,
       "position": {
-        "x": 90,
-        "y": -10,
+        "x": -1000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8966,8 +8966,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 2,
       "position": {
-        "x": 90,
-        "y": -10,
+        "x": -1000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -8988,8 +8988,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 3,
       "position": {
-        "x": 90,
-        "y": -10,
+        "x": -1000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9010,8 +9010,8 @@
       "environment_id": "0x0D000065",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": -20,
+        "x": -2000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9032,8 +9032,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": -30,
+        "x": -3000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9054,8 +9054,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 1,
       "position": {
-        "x": 90,
-        "y": -30,
+        "x": -3000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9076,8 +9076,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 2,
       "position": {
-        "x": 90,
-        "y": -30,
+        "x": -3000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9098,8 +9098,8 @@
       "environment_id": "0x0D000069",
       "cell_structure": 3,
       "position": {
-        "x": 90,
-        "y": -30,
+        "x": -3000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9120,8 +9120,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": -40,
+        "x": -4000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9142,8 +9142,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 90,
-        "y": -40,
+        "x": -4000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9164,8 +9164,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 90,
-        "y": -40,
+        "x": -4000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9186,8 +9186,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 90,
-        "y": -40,
+        "x": -4000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9208,8 +9208,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 90,
-        "y": -40,
+        "x": -4000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9230,8 +9230,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 90,
-        "y": -40,
+        "x": -4000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9252,8 +9252,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 90,
-        "y": -40,
+        "x": -4000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9274,8 +9274,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 90,
-        "y": -40,
+        "x": -4000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9296,8 +9296,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 90,
-        "y": -40,
+        "x": -4000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9318,8 +9318,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 90,
-        "y": -40,
+        "x": -4000,
+        "y": 9000,
         "z": 0
       },
       "orientation": {
@@ -9340,8 +9340,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 100,
-        "y": -10,
+        "x": -1000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9362,8 +9362,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 100,
-        "y": -10,
+        "x": -1000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9384,8 +9384,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 100,
-        "y": -10,
+        "x": -1000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9406,8 +9406,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 100,
-        "y": -10,
+        "x": -1000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9428,8 +9428,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 100,
-        "y": -10,
+        "x": -1000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9450,8 +9450,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 100,
-        "y": -10,
+        "x": -1000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9472,8 +9472,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 100,
-        "y": -10,
+        "x": -1000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9494,8 +9494,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 100,
-        "y": -10,
+        "x": -1000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9516,8 +9516,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 100,
-        "y": -10,
+        "x": -1000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9538,8 +9538,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 100,
-        "y": -10,
+        "x": -1000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9560,8 +9560,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 0,
       "position": {
-        "x": 100,
-        "y": -20,
+        "x": -2000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9582,8 +9582,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 1,
       "position": {
-        "x": 100,
-        "y": -20,
+        "x": -2000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9604,8 +9604,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 2,
       "position": {
-        "x": 100,
-        "y": -20,
+        "x": -2000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9626,8 +9626,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 3,
       "position": {
-        "x": 100,
-        "y": -20,
+        "x": -2000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9648,8 +9648,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 4,
       "position": {
-        "x": 100,
-        "y": -20,
+        "x": -2000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9670,8 +9670,8 @@
       "environment_id": "0x0D0000E6",
       "cell_structure": 5,
       "position": {
-        "x": 100,
-        "y": -20,
+        "x": -2000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9692,8 +9692,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 0,
       "position": {
-        "x": 100,
-        "y": -30,
+        "x": -3000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9714,8 +9714,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 1,
       "position": {
-        "x": 100,
-        "y": -30,
+        "x": -3000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9736,8 +9736,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 2,
       "position": {
-        "x": 100,
-        "y": -30,
+        "x": -3000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9758,8 +9758,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 3,
       "position": {
-        "x": 100,
-        "y": -30,
+        "x": -3000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9780,8 +9780,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 4,
       "position": {
-        "x": 100,
-        "y": -30,
+        "x": -3000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9802,8 +9802,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 5,
       "position": {
-        "x": 100,
-        "y": -30,
+        "x": -3000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9824,8 +9824,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 6,
       "position": {
-        "x": 100,
-        "y": -30,
+        "x": -3000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9846,8 +9846,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 7,
       "position": {
-        "x": 100,
-        "y": -30,
+        "x": -3000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9868,8 +9868,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 8,
       "position": {
-        "x": 100,
-        "y": -30,
+        "x": -3000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9890,8 +9890,8 @@
       "environment_id": "0x0D000096",
       "cell_structure": 9,
       "position": {
-        "x": 100,
-        "y": -30,
+        "x": -3000,
+        "y": 10000,
         "z": 0
       },
       "orientation": {
@@ -9912,8 +9912,8 @@
       "environment_id": "0x0D000094",
       "cell_structure": 0,
       "position": {
-        "x": 120,
-        "y": -130,
+        "x": -13000,
+        "y": 12000,
         "z": 0
       },
       "orientation": {
@@ -9934,8 +9934,8 @@
       "environment_id": "0x0D000094",
       "cell_structure": 0,
       "position": {
-        "x": 120,
-        "y": -140,
+        "x": -14000,
+        "y": 12000,
         "z": 0
       },
       "orientation": {
@@ -9956,8 +9956,8 @@
       "environment_id": "0x0D0000A0",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -130,
+        "x": -13000,
+        "y": 13000,
         "z": 0
       },
       "orientation": {
@@ -9978,8 +9978,8 @@
       "environment_id": "0x0D0000A0",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -140,
+        "x": -14000,
+        "y": 13000,
         "z": 0
       },
       "orientation": {
@@ -10000,8 +10000,8 @@
       "environment_id": "0x0D000286",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -190,
+        "x": -19000,
+        "y": 13000,
         "z": 0
       },
       "orientation": {
@@ -10022,8 +10022,8 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -200,
+        "x": -20000,
+        "y": 13000,
         "z": 0
       },
       "orientation": {
@@ -10044,8 +10044,8 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 140,
-        "y": -190,
+        "x": -19000,
+        "y": 14000,
         "z": 0
       },
       "orientation": {
@@ -10066,8 +10066,8 @@
       "environment_id": "0x0D00027C",
       "cell_structure": 0,
       "position": {
-        "x": 140,
-        "y": -200,
+        "x": -20000,
+        "y": 14000,
         "z": 0
       },
       "orientation": {
@@ -10088,8 +10088,8 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 140,
-        "y": -210,
+        "x": -21000,
+        "y": 14000,
         "z": 0
       },
       "orientation": {
@@ -10110,8 +10110,8 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -140,
+        "x": -14000,
+        "y": 15000,
         "z": 0
       },
       "orientation": {
@@ -10132,8 +10132,8 @@
       "environment_id": "0x0D000050",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -150,
+        "x": -15000,
+        "y": 15000,
         "z": 0
       },
       "orientation": {
@@ -10154,8 +10154,8 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -160,
+        "x": -16000,
+        "y": 15000,
         "z": 0
       },
       "orientation": {
@@ -10176,8 +10176,8 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -200,
+        "x": -20000,
+        "y": 15000,
         "z": 0
       },
       "orientation": {
@@ -10198,8 +10198,8 @@
       "environment_id": "0x0D000286",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -210,
+        "x": -21000,
+        "y": 15000,
         "z": 0
       },
       "orientation": {
@@ -10220,8 +10220,8 @@
       "environment_id": "0x0D000050",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -140,
+        "x": -14000,
+        "y": 16000,
         "z": 0
       },
       "orientation": {
@@ -10242,8 +10242,8 @@
       "environment_id": "0x0D00006B",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -150,
+        "x": -15000,
+        "y": 16000,
         "z": 0
       },
       "orientation": {
@@ -10264,8 +10264,8 @@
       "environment_id": "0x0D000050",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -160,
+        "x": -16000,
+        "y": 16000,
         "z": 0
       },
       "orientation": {
@@ -10286,8 +10286,8 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -140,
+        "x": -14000,
+        "y": 17000,
         "z": 0
       },
       "orientation": {
@@ -10308,8 +10308,8 @@
       "environment_id": "0x0D000050",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -150,
+        "x": -15000,
+        "y": 17000,
         "z": 0
       },
       "orientation": {
@@ -10330,8 +10330,8 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -160,
+        "x": -16000,
+        "y": 17000,
         "z": 0
       },
       "orientation": {
@@ -10352,8 +10352,8 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -110,
+        "x": -11000,
+        "y": 18000,
         "z": 0
       },
       "orientation": {
@@ -10374,8 +10374,8 @@
       "environment_id": "0x0D000286",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -200,
+        "x": -20000,
+        "y": 18000,
         "z": 0
       },
       "orientation": {
@@ -10396,8 +10396,8 @@
       "environment_id": "0x0D0002AE",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -210,
+        "x": -21000,
+        "y": 18000,
         "z": 0
       },
       "orientation": {
@@ -10418,8 +10418,8 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 180,
-        "y": -220,
+        "x": -22000,
+        "y": 18000,
         "z": 0
       },
       "orientation": {
@@ -10440,8 +10440,8 @@
       "environment_id": "0x0D0002AE",
       "cell_structure": 0,
       "position": {
-        "x": 190,
-        "y": -200,
+        "x": -20000,
+        "y": 19000,
         "z": 0
       },
       "orientation": {
@@ -10462,8 +10462,8 @@
       "environment_id": "0x0D000281",
       "cell_structure": 0,
       "position": {
-        "x": 190,
-        "y": -210,
+        "x": -21000,
+        "y": 19000,
         "z": 0
       },
       "orientation": {
@@ -10484,8 +10484,8 @@
       "environment_id": "0x0D0002AE",
       "cell_structure": 0,
       "position": {
-        "x": 190,
-        "y": -220,
+        "x": -22000,
+        "y": 19000,
         "z": 0
       },
       "orientation": {
@@ -10506,8 +10506,8 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -200,
+        "x": -20000,
+        "y": 20000,
         "z": 0
       },
       "orientation": {
@@ -10528,8 +10528,8 @@
       "environment_id": "0x0D0002AE",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -210,
+        "x": -21000,
+        "y": 20000,
         "z": 0
       },
       "orientation": {
@@ -10550,8 +10550,8 @@
       "environment_id": "0x0D000299",
       "cell_structure": 0,
       "position": {
-        "x": 200,
-        "y": -220,
+        "x": -22000,
+        "y": 20000,
         "z": 0
       },
       "orientation": {
@@ -10572,9 +10572,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 0,
-        "y": -60,
-        "z": 6
+        "x": -6000,
+        "y": 0,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10594,9 +10594,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 0,
-        "y": -70,
-        "z": 6
+        "x": -7000,
+        "y": 0,
+        "z": 600
       },
       "orientation": {
         "w": -0.707107,
@@ -10616,9 +10616,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 10,
-        "y": -30,
-        "z": 6
+        "x": -3000,
+        "y": 1000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10638,9 +10638,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 10,
-        "y": -70,
-        "z": 6
+        "x": -7000,
+        "y": 1000,
+        "z": 600
       },
       "orientation": {
         "w": 0.707107,
@@ -10660,9 +10660,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 10,
-        "y": -80,
-        "z": 6
+        "x": -8000,
+        "y": 1000,
+        "z": 600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -10682,9 +10682,9 @@
       "environment_id": "0x0D000063",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -20,
-        "z": 6
+        "x": -2000,
+        "y": 2000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10704,9 +10704,9 @@
       "environment_id": "0x0D000063",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -40,
-        "z": 6
+        "x": -4000,
+        "y": 2000,
+        "z": 600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -10726,9 +10726,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -110,
-        "z": 6
+        "x": -11000,
+        "y": 2000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10748,9 +10748,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -120,
-        "z": 6
+        "x": -12000,
+        "y": 2000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10770,9 +10770,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -130,
-        "z": 6
+        "x": -13000,
+        "y": 2000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10792,9 +10792,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 20,
-        "y": -140,
-        "z": 6
+        "x": -14000,
+        "y": 2000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10814,9 +10814,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -110,
-        "z": 6
+        "x": -11000,
+        "y": 3000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10836,9 +10836,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -120,
-        "z": 6
+        "x": -12000,
+        "y": 3000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10858,9 +10858,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -130,
-        "z": 6
+        "x": -13000,
+        "y": 3000,
+        "z": 600
       },
       "orientation": {
         "w": -0.707107,
@@ -10880,9 +10880,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 30,
-        "y": -140,
-        "z": 6
+        "x": -14000,
+        "y": 3000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10902,9 +10902,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -70,
-        "z": 6
+        "x": -7000,
+        "y": 4000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10924,9 +10924,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -80,
-        "z": 6
+        "x": -8000,
+        "y": 4000,
+        "z": 600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -10946,9 +10946,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -90,
-        "z": 6
+        "x": -9000,
+        "y": 4000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10968,9 +10968,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -110,
-        "z": 6
+        "x": -11000,
+        "y": 4000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -10990,9 +10990,9 @@
       "environment_id": "0x0D0000D9",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -120,
-        "z": 6
+        "x": -12000,
+        "y": 4000,
+        "z": 600
       },
       "orientation": {
         "w": 0.707107,
@@ -11012,9 +11012,9 @@
       "environment_id": "0x0D0000D9",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -130,
-        "z": 6
+        "x": -13000,
+        "y": 4000,
+        "z": 600
       },
       "orientation": {
         "w": -0.707107,
@@ -11034,9 +11034,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 40,
-        "y": -140,
-        "z": 6
+        "x": -14000,
+        "y": 4000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11056,9 +11056,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -10,
-        "z": 6
+        "x": -1000,
+        "y": 5000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11078,9 +11078,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -20,
-        "z": 6
+        "x": -2000,
+        "y": 5000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11100,9 +11100,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -30,
-        "z": 6
+        "x": -3000,
+        "y": 5000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11122,9 +11122,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -60,
-        "z": 6
+        "x": -6000,
+        "y": 5000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11144,9 +11144,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -70,
-        "z": 6
+        "x": -7000,
+        "y": 5000,
+        "z": 600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -11166,9 +11166,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -90,
-        "z": 6
+        "x": -9000,
+        "y": 5000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11188,9 +11188,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -110,
-        "z": 6
+        "x": -11000,
+        "y": 5000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11210,9 +11210,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -120,
-        "z": 6
+        "x": -12000,
+        "y": 5000,
+        "z": 600
       },
       "orientation": {
         "w": 0.707107,
@@ -11232,9 +11232,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -130,
-        "z": 6
+        "x": -13000,
+        "y": 5000,
+        "z": 600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -11254,9 +11254,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 50,
-        "y": -140,
-        "z": 6
+        "x": -14000,
+        "y": 5000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11276,9 +11276,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": 0,
-        "z": 6
+        "x": 0,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11298,9 +11298,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -10,
-        "z": 6
+        "x": -1000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11320,9 +11320,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -20,
-        "z": 6
+        "x": -2000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": -0.707107,
@@ -11342,9 +11342,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -30,
-        "z": 6
+        "x": -3000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11364,9 +11364,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -40,
-        "z": 6
+        "x": -4000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11386,9 +11386,9 @@
       "environment_id": "0x0D000115",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -80,
-        "z": 6
+        "x": -8000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11408,9 +11408,9 @@
       "environment_id": "0x0D000115",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": -80,
-        "z": 6
+        "x": -8000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11430,9 +11430,9 @@
       "environment_id": "0x0D000115",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": -80,
-        "z": 6
+        "x": -8000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11452,9 +11452,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -110,
-        "z": 6
+        "x": -11000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11474,9 +11474,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -120,
-        "z": 6
+        "x": -12000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11496,9 +11496,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -130,
-        "z": 6
+        "x": -13000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11518,9 +11518,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -140,
-        "z": 6
+        "x": -14000,
+        "y": 6000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11540,9 +11540,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": 0,
-        "z": 6
+        "x": 0,
+        "y": 7000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11562,9 +11562,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -10,
-        "z": 6
+        "x": -1000,
+        "y": 7000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11584,9 +11584,9 @@
       "environment_id": "0x0D000066",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -20,
-        "z": 6
+        "x": -2000,
+        "y": 7000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11606,9 +11606,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -30,
-        "z": 6
+        "x": -3000,
+        "y": 7000,
+        "z": 600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -11628,9 +11628,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -40,
-        "z": 6
+        "x": -4000,
+        "y": 7000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11650,9 +11650,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": 0,
-        "z": 6
+        "x": 0,
+        "y": 8000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11672,9 +11672,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -10,
-        "z": 6
+        "x": -1000,
+        "y": 8000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11694,9 +11694,9 @@
       "environment_id": "0x0D0000BE",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -20,
-        "z": 6
+        "x": -2000,
+        "y": 8000,
+        "z": 600
       },
       "orientation": {
         "w": 0.707107,
@@ -11716,9 +11716,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -30,
-        "z": 6
+        "x": -3000,
+        "y": 8000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11738,9 +11738,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -40,
-        "z": 6
+        "x": -4000,
+        "y": 8000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11760,9 +11760,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": 0,
-        "z": 6
+        "x": 0,
+        "y": 9000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11782,9 +11782,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": -10,
-        "z": 6
+        "x": -1000,
+        "y": 9000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11804,9 +11804,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": -20,
-        "z": 6
+        "x": -2000,
+        "y": 9000,
+        "z": 600
       },
       "orientation": {
         "w": 0.707107,
@@ -11826,9 +11826,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": -30,
-        "z": 6
+        "x": -3000,
+        "y": 9000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11848,9 +11848,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": -40,
-        "z": 6
+        "x": -4000,
+        "y": 9000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11870,9 +11870,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 100,
-        "y": -10,
-        "z": 6
+        "x": -1000,
+        "y": 10000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11892,9 +11892,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 100,
-        "y": -20,
-        "z": 6
+        "x": -2000,
+        "y": 10000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11914,9 +11914,9 @@
       "environment_id": "0x0D0000CA",
       "cell_structure": 0,
       "position": {
-        "x": 100,
-        "y": -30,
-        "z": 6
+        "x": -3000,
+        "y": 10000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11936,9 +11936,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 120,
-        "y": -130,
-        "z": 6
+        "x": -13000,
+        "y": 12000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -11958,9 +11958,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 120,
-        "y": -140,
-        "z": 6
+        "x": -14000,
+        "y": 12000,
+        "z": 600
       },
       "orientation": {
         "w": -0.707107,
@@ -11980,9 +11980,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -130,
-        "z": 6
+        "x": -13000,
+        "y": 13000,
+        "z": 600
       },
       "orientation": {
         "w": 0.707107,
@@ -12002,9 +12002,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 130,
-        "y": -140,
-        "z": 6
+        "x": -14000,
+        "y": 13000,
+        "z": 600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -12024,9 +12024,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 150,
-        "y": -150,
-        "z": 6
+        "x": -15000,
+        "y": 15000,
+        "z": 600
       },
       "orientation": {
         "w": -0.707107,
@@ -12046,9 +12046,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -140,
-        "z": 6
+        "x": -14000,
+        "y": 16000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -12068,9 +12068,9 @@
       "environment_id": "0x0D000066",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -150,
-        "z": 6
+        "x": -15000,
+        "y": 16000,
+        "z": 600
       },
       "orientation": {
         "w": 1,
@@ -12090,9 +12090,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 160,
-        "y": -160,
-        "z": 6
+        "x": -16000,
+        "y": 16000,
+        "z": 600
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -12112,9 +12112,9 @@
       "environment_id": "0x0D000045",
       "cell_structure": 0,
       "position": {
-        "x": 170,
-        "y": -150,
-        "z": 6
+        "x": -15000,
+        "y": 17000,
+        "z": 600
       },
       "orientation": {
         "w": 0.707107,
@@ -12134,9 +12134,9 @@
       "environment_id": "0x0D000115",
       "cell_structure": 0,
       "position": {
-        "x": 60,
-        "y": -70,
-        "z": 12
+        "x": -7000,
+        "y": 6000,
+        "z": 1200
       },
       "orientation": {
         "w": 0.707107,
@@ -12156,9 +12156,9 @@
       "environment_id": "0x0D000115",
       "cell_structure": 1,
       "position": {
-        "x": 60,
-        "y": -70,
-        "z": 12
+        "x": -7000,
+        "y": 6000,
+        "z": 1200
       },
       "orientation": {
         "w": 0.707107,
@@ -12178,9 +12178,9 @@
       "environment_id": "0x0D000115",
       "cell_structure": 2,
       "position": {
-        "x": 60,
-        "y": -70,
-        "z": 12
+        "x": -7000,
+        "y": 6000,
+        "z": 1200
       },
       "orientation": {
         "w": 0.707107,
@@ -12200,9 +12200,9 @@
       "environment_id": "0x0D000094",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -60,
-        "z": 12
+        "x": -6000,
+        "y": 7000,
+        "z": 1200
       },
       "orientation": {
         "w": 1,
@@ -12222,9 +12222,9 @@
       "environment_id": "0x0D00007D",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -70,
-        "z": 12
+        "x": -7000,
+        "y": 7000,
+        "z": 1200
       },
       "orientation": {
         "w": -0.707107,
@@ -12244,9 +12244,9 @@
       "environment_id": "0x0D00007D",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -60,
-        "z": 12
+        "x": -6000,
+        "y": 8000,
+        "z": 1200
       },
       "orientation": {
         "w": 0.707107,
@@ -12266,9 +12266,9 @@
       "environment_id": "0x0D00009E",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -70,
-        "z": 12
+        "x": -7000,
+        "y": 8000,
+        "z": 1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -12288,9 +12288,9 @@
       "environment_id": "0x0D00009E",
       "cell_structure": 1,
       "position": {
-        "x": 80,
-        "y": -70,
-        "z": 12
+        "x": -7000,
+        "y": 8000,
+        "z": 1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -12310,9 +12310,9 @@
       "environment_id": "0x0D00009E",
       "cell_structure": 2,
       "position": {
-        "x": 80,
-        "y": -70,
-        "z": 12
+        "x": -7000,
+        "y": 8000,
+        "z": 1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -12332,9 +12332,9 @@
       "environment_id": "0x0D00009E",
       "cell_structure": 3,
       "position": {
-        "x": 80,
-        "y": -70,
-        "z": 12
+        "x": -7000,
+        "y": 8000,
+        "z": 1200
       },
       "orientation": {
         "w": -4.37114E-08,
@@ -12354,9 +12354,9 @@
       "environment_id": "0x0D000103",
       "cell_structure": 0,
       "position": {
-        "x": 90,
-        "y": -60,
-        "z": 12
+        "x": -6000,
+        "y": 9000,
+        "z": 1200
       },
       "orientation": {
         "w": -0.707107,
@@ -12376,9 +12376,9 @@
       "environment_id": "0x0D000103",
       "cell_structure": 1,
       "position": {
-        "x": 90,
-        "y": -60,
-        "z": 12
+        "x": -6000,
+        "y": 9000,
+        "z": 1200
       },
       "orientation": {
         "w": -0.707107,
@@ -12398,9 +12398,9 @@
       "environment_id": "0x0D000103",
       "cell_structure": 2,
       "position": {
-        "x": 90,
-        "y": -60,
-        "z": 12
+        "x": -6000,
+        "y": 9000,
+        "z": 1200
       },
       "orientation": {
         "w": -0.707107,
@@ -12420,9 +12420,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -60,
-        "z": 18
+        "x": -6000,
+        "y": 7000,
+        "z": 1800
       },
       "orientation": {
         "w": 1,
@@ -12442,9 +12442,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 70,
-        "y": -70,
-        "z": 18
+        "x": -7000,
+        "y": 7000,
+        "z": 1800
       },
       "orientation": {
         "w": -0.707107,
@@ -12464,9 +12464,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -60,
-        "z": 18
+        "x": -6000,
+        "y": 8000,
+        "z": 1800
       },
       "orientation": {
         "w": 0.707107,
@@ -12486,9 +12486,9 @@
       "environment_id": "0x0D000095",
       "cell_structure": 0,
       "position": {
-        "x": 80,
-        "y": -70,
-        "z": 18
+        "x": -7000,
+        "y": 8000,
+        "z": 1800
       },
       "orientation": {
         "w": -4.37114E-08,
