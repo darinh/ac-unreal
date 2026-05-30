@@ -81,3 +81,7 @@ contract/decompile-artifacts/*
 
 # UE auto-creates per-developer collection folders; don't commit.
 Content/Developers/
+
+# Python caches
+__pycache__/
+*.pyc

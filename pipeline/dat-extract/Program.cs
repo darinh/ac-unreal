@@ -71,6 +71,9 @@ internal static class Program
                 "export-envcell"     => Commands.ExportEnvCell(args.AsSpan(1)),
                 "export-academy"     => Commands.ExportAcademy(args.AsSpan(1)),
                 "dump-academy-layout" => Commands.DumpAcademyLayout(args.AsSpan(1)),
+                "dump-academy-statics" => Commands.DumpAcademyStatics(args.AsSpan(1)),
+                "export-setup"       => Commands.ExportSetup(args.AsSpan(1)),
+                "export-academy-statics" => Commands.ExportAcademyStatics(args.AsSpan(1)),
                 "dump-starterareas"  => Commands.DumpStarterAreas(args.AsSpan(1)),
                 "export-landblock"   => Commands.ExportLandblock(args.AsSpan(1)),
                 "--help" or "-h"     => DoUsage(),
@@ -722,6 +725,432 @@ internal static class Commands
         Console.WriteLine($"Wrote layout JSON ({new FileInfo(outPath).Length} bytes) for {cells.Count} cells in landblock 0x{lbHigh16:X4} to {outPath}");
         return 0;
     }
+
+    // =========================================================================
+    // Phase 5f: static-objects extraction.
+    //
+    // EnvCell.StaticObjects (the "Stab" list) is the per-cell prop array:
+    // fireplaces, chairs, signs, tables, beds, lecterns, training dummies, etc.
+    // Each Stab is { Id = SetupModel ID (0x02), Frame = position+orientation
+    // *relative to the cell origin* }.
+    //
+    // A SetupModel (0x02) is itself a multi-part container: it owns a list of
+    // GfxObj (0x01) "Parts", a per-part PlacementFrame within the setup, and
+    // per-part DefaultScale. Most academy props are single-part, but some
+    // (fireplaces with andirons + grates + logs) decompose into 3+ parts.
+    //
+    // For UE we merge a Setup's parts into one StaticMesh, pre-transforming
+    // each part by its placement frame + scale. Surfaces are dedup'd across
+    // parts so a sign with two repeated panels emits one texture, not two.
+    // =========================================================================
+
+    /// <summary>
+    /// Walk every EnvCell in a landblock and emit one JSON file enumerating
+    /// the StaticObjects in each cell (with their setup IDs and world-space
+    /// position/orientation in UE coords). UE-side import consumes this to
+    /// spawn one StaticMeshActor per Stab.
+    /// </summary>
+    public static int DumpAcademyStatics(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 3) { Console.Error.WriteLine("dump-academy-statics: missing <datDir> <hexLandblockId> <out.json>"); return 1; }
+        var datDir = args[0];
+        if (!TryParseLandblockHex(args[1], out var lbHigh16)) { Console.Error.WriteLine($"Bad hex landblock id: {args[1]}"); return 1; }
+        var outPath = args[2];
+
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: true);
+        var cellDb = DatManager.CellDat ?? throw new InvalidOperationException("CellDat unavailable.");
+
+        var minId = (lbHigh16 << 16) | 0x0100u;
+        var maxId = (lbHigh16 << 16) | 0xFFFDu;
+        var envCellIds = cellDb.AllFiles.Keys.Where(id => id >= minId && id <= maxId).OrderBy(id => id).ToList();
+
+        const float kCmPerMetre = 100.0f;
+
+        // Per-cell, per-stab world transform:
+        //   stab.world = cell.world ⊕ stab.local
+        // We apply the AC→UE coord transform to the WORLD-SPACE result so
+        // UE can drop a StaticMeshActor at this position directly.
+        // Orientation needs the same (w, -y, -x, -z) basis-swap quaternion
+        // as in DumpAcademyLayout. We also have to compose the cell's
+        // orientation with the stab's local orientation in AC space FIRST,
+        // then transform the combined quaternion — otherwise the stab
+        // inherits a wrong basis.
+        static (float x, float y, float z, float w) QuatMulAc((float x, float y, float z, float w) a, (float x, float y, float z, float w) b)
+        {
+            return (
+                a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+                a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+                a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
+                a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z);
+        }
+        static (float x, float y, float z) RotateAcVec((float x, float y, float z, float w) q, (float x, float y, float z) v)
+        {
+            // Standard quaternion-vector rotation: v' = q ⊗ v ⊗ q^-1
+            float qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+            float tx = 2 * (qy * v.z - qz * v.y);
+            float ty = 2 * (qz * v.x - qx * v.z);
+            float tz = 2 * (qx * v.y - qy * v.x);
+            return (
+                v.x + qw * tx + (qy * tz - qz * ty),
+                v.y + qw * ty + (qz * tx - qx * tz),
+                v.z + qw * tz + (qx * ty - qy * tx));
+        }
+
+        var allInstances = new List<object>();
+        var uniqueSetups = new HashSet<uint>();
+        int cellsWithStatics = 0;
+
+        foreach (var id in envCellIds)
+        {
+            var ec = cellDb.ReadFromDat<EnvCell>(id);
+            if (ec.StaticObjects == null || ec.StaticObjects.Count == 0) continue;
+            cellsWithStatics++;
+
+            var cellPos = (x: ec.Position.Origin.X, y: ec.Position.Origin.Y, z: ec.Position.Origin.Z);
+            var cellOrient = (
+                x: ec.Position.Orientation.X,
+                y: ec.Position.Orientation.Y,
+                z: ec.Position.Orientation.Z,
+                w: ec.Position.Orientation.W);
+
+            foreach (var stab in ec.StaticObjects)
+            {
+                uniqueSetups.Add(stab.Id);
+
+                var localPos = (x: stab.Frame.Origin.X, y: stab.Frame.Origin.Y, z: stab.Frame.Origin.Z);
+                var localOrient = (
+                    x: stab.Frame.Orientation.X,
+                    y: stab.Frame.Orientation.Y,
+                    z: stab.Frame.Orientation.Z,
+                    w: stab.Frame.Orientation.W);
+
+                // Compose: stab_world.pos = cell.pos + cell.rot * stab.local.pos
+                //          stab_world.rot = cell.rot * stab.local.rot
+                var rotatedLocal = RotateAcVec(cellOrient, localPos);
+                var worldPosAc = (x: cellPos.x + rotatedLocal.x, y: cellPos.y + rotatedLocal.y, z: cellPos.z + rotatedLocal.z);
+                var worldOrientAc = QuatMulAc(cellOrient, localOrient);
+
+                allInstances.Add(new
+                {
+                    cell_id = $"0x{id:X8}",
+                    setup_id = $"0x{stab.Id:X8}",
+                    setup_asset_name = $"SM_Setup_{stab.Id:X8}",
+                    // UE-coords (cm).
+                    position = new
+                    {
+                        x = worldPosAc.y * kCmPerMetre,
+                        y = worldPosAc.x * kCmPerMetre,
+                        z = worldPosAc.z * kCmPerMetre,
+                    },
+                    // UE-basis quaternion (w, -y, -x, -z).
+                    orientation = new
+                    {
+                        w =  worldOrientAc.w,
+                        x = -worldOrientAc.y,
+                        y = -worldOrientAc.x,
+                        z = -worldOrientAc.z,
+                    },
+                });
+            }
+        }
+
+        var doc = new
+        {
+            schema_version = 1,
+            landblock_id = $"0x{lbHigh16:X4}",
+            coordinate_system = "UE-ready: left-handed Z-up, centimetres. World-space positions; stab.local has been composed with cell.world before the AC->UE transform.",
+            instance_count = allInstances.Count,
+            unique_setup_count = uniqueSetups.Count,
+            cells_with_statics = cellsWithStatics,
+            unique_setups = uniqueSetups.OrderBy(x => x).Select(x => $"0x{x:X8}").ToList(),
+            instances = allInstances,
+        };
+
+        var json = JsonSerializer.Serialize(doc, new JsonSerializerOptions { WriteIndented = true });
+        var dir = Path.GetDirectoryName(outPath);
+        if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+        File.WriteAllText(outPath, json);
+
+        Console.WriteLine($"Wrote statics JSON to {outPath}");
+        Console.WriteLine($"  {allInstances.Count} instances across {cellsWithStatics} cells");
+        Console.WriteLine($"  {uniqueSetups.Count} unique setups");
+        return 0;
+    }
+
+    /// <summary>
+    /// Export a SetupModel (0x02xxxxxx) as a single merged OBJ.
+    /// Each Part (a GfxObj 0x01) is pre-transformed by its PlacementFrame
+    /// (key = Placement.Resting = 0x65) and DefaultScale before emission, so
+    /// the resulting OBJ is in setup-local UE coords (cm, left-handed Z-up).
+    /// </summary>
+    public static int ExportSetup(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 3) { Console.Error.WriteLine("export-setup: missing <datDir> <hexSetupId> <out.obj>"); return 1; }
+        var datDir = args[0];
+        if (!TryParseLandblockHex(args[1], out var setupId)) { Console.Error.WriteLine($"Bad hex setup id: {args[1]}"); return 1; }
+        var outPath = args[2];
+
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: false);
+        var portalDb = DatManager.PortalDat ?? throw new InvalidOperationException("PortalDat unavailable.");
+
+        if (!portalDb.AllFiles.ContainsKey(setupId))
+        {
+            Console.Error.WriteLine($"Setup 0x{setupId:X8} not in PortalDat.");
+            return 3;
+        }
+
+        // Stab.Id can reference either:
+        //   0x02xxxxxx — SetupModel (multi-part container)
+        //   0x01xxxxxx — GfxObj (raw single mesh, no setup wrapper)
+        // For the GfxObj case we synthesize a 1-part "virtual setup" with
+        // identity placement and unit scale so the rest of the loop just
+        // works.
+        uint typeNibble = (setupId >> 24) & 0xFFu;
+
+        List<uint> parts;
+        ACE.DatLoader.Entity.PlacementType? placement;
+        List<System.Numerics.Vector3>? defaultScales;
+
+        if (typeNibble == 0x02)
+        {
+            var setup = portalDb.ReadFromDat<SetupModel>(setupId);
+            if (setup.Parts == null || setup.Parts.Count == 0)
+            {
+                Console.Error.WriteLine($"Setup 0x{setupId:X8} has no Parts.");
+                return 4;
+            }
+            parts = setup.Parts;
+            const int RestingPlacement = 0x65;
+            placement = setup.PlacementFrames.TryGetValue(RestingPlacement, out var pf) ? pf : null;
+            defaultScales = (setup.DefaultScale != null && setup.DefaultScale.Count == parts.Count) ? setup.DefaultScale : null;
+        }
+        else if (typeNibble == 0x01)
+        {
+            // Bare GfxObj — wrap as one-part synthetic setup.
+            parts = new List<uint> { setupId };
+            placement = null;
+            defaultScales = null;
+        }
+        else
+        {
+            Console.Error.WriteLine($"Id 0x{setupId:X8} is not a SetupModel (0x02) or GfxObj (0x01).");
+            return 5;
+        }
+
+        var outDir = Path.GetDirectoryName(outPath);
+        if (!string.IsNullOrEmpty(outDir)) Directory.CreateDirectory(outDir);
+        var texDir = Path.Combine(string.IsNullOrEmpty(outDir) ? "." : outDir, "textures");
+        Directory.CreateDirectory(texDir);
+
+        const float kCmPerMetre = 100.0f;
+        var objBaseName = Path.GetFileNameWithoutExtension(outPath);
+        var mtlPath = Path.Combine(outDir ?? ".", objBaseName + ".mtl");
+
+        var hasDefaultScale = defaultScales != null;
+
+        using var sw = new StreamWriter(outPath);
+        sw.WriteLine($"# Exported by acdat from 0x{setupId:X8} (type 0x{typeNibble:X2}: {(typeNibble == 0x02 ? "SetupModel" : "GfxObj")})");
+        sw.WriteLine($"# {parts.Count} parts, merged into one OBJ");
+        sw.WriteLine($"# UE-ready coords: left-handed Z-up, centimetres. Setup-local origin.");
+        sw.WriteLine($"mtllib {objBaseName}.mtl");
+        sw.WriteLine($"o setup_{setupId:X8}");
+
+        int globalVertOffset = 0;
+        var allMtls = new Dictionary<string, (uint surfaceId, uint? textureId)>();
+        int totalTris = 0;
+
+        for (int partIdx = 0; partIdx < parts.Count; partIdx++)
+        {
+            uint gfxId = parts[partIdx];
+            if (!portalDb.AllFiles.ContainsKey(gfxId))
+            {
+                Console.Error.WriteLine($"  WARN: GfxObj 0x{gfxId:X8} (part {partIdx}) not in PortalDat — skipping");
+                continue;
+            }
+            var gfx = portalDb.ReadFromDat<GfxObj>(gfxId);
+            if (gfx.VertexArray.Vertices.Count == 0 || gfx.Polygons.Count == 0)
+                continue;
+
+            float fx = 0, fy = 0, fz = 0;
+            float qx = 0, qy = 0, qz = 0, qw = 1;
+            if (placement != null && partIdx < placement.AnimFrame.Frames.Count)
+            {
+                var f = placement.AnimFrame.Frames[partIdx];
+                fx = f.Origin.X; fy = f.Origin.Y; fz = f.Origin.Z;
+                qx = f.Orientation.X; qy = f.Orientation.Y; qz = f.Orientation.Z; qw = f.Orientation.W;
+            }
+            float sx = 1, sy = 1, sz = 1;
+            if (hasDefaultScale && defaultScales != null)
+            {
+                var s = defaultScales[partIdx];
+                sx = s.X; sy = s.Y; sz = s.Z;
+            }
+
+            static (float x, float y, float z) RotAcQ(float qx, float qy, float qz, float qw, float vx, float vy, float vz)
+            {
+                float tx = 2 * (qy * vz - qz * vy);
+                float ty = 2 * (qz * vx - qx * vz);
+                float tz = 2 * (qx * vy - qy * vx);
+                return (
+                    vx + qw * tx + (qy * tz - qz * ty),
+                    vy + qw * ty + (qz * tx - qx * tz),
+                    vz + qw * tz + (qx * ty - qy * tx));
+            }
+
+            var vertOrder = gfx.VertexArray.Vertices.Keys.OrderBy(k => k).ToList();
+            var idToObjIndex = new Dictionary<ushort, int>(vertOrder.Count);
+
+            for (int i = 0; i < vertOrder.Count; i++)
+            {
+                var sv = gfx.VertexArray.Vertices[vertOrder[i]];
+                float lx = sv.Origin.X * sx, ly = sv.Origin.Y * sy, lz = sv.Origin.Z * sz;
+                var rotated = RotAcQ(qx, qy, qz, qw, lx, ly, lz);
+                float ax = rotated.x + fx, ay = rotated.y + fy, az = rotated.z + fz;
+                sw.WriteLine($"v {ay * kCmPerMetre:R} {ax * kCmPerMetre:R} {az * kCmPerMetre:R}");
+                idToObjIndex[vertOrder[i]] = globalVertOffset + i + 1;
+            }
+            for (int i = 0; i < vertOrder.Count; i++)
+            {
+                var sv = gfx.VertexArray.Vertices[vertOrder[i]];
+                var rn = RotAcQ(qx, qy, qz, qw, sv.Normal.X, sv.Normal.Y, sv.Normal.Z);
+                sw.WriteLine($"vn {rn.y:R} {rn.x:R} {rn.z:R}");
+            }
+            for (int i = 0; i < vertOrder.Count; i++)
+            {
+                var sv = gfx.VertexArray.Vertices[vertOrder[i]];
+                if (sv.UVs != null && sv.UVs.Count > 0)
+                    sw.WriteLine($"vt {sv.UVs[0].U:R} {sv.UVs[0].V:R}");
+                else
+                    sw.WriteLine($"vt 0 0");
+            }
+
+            var groups = gfx.Polygons.Values
+                .GroupBy(p => (int)p.PosSurface)
+                .OrderBy(g => g.Key);
+
+            foreach (var grp in groups)
+            {
+                int surfIdx = grp.Key;
+                string mtlName = $"part{partIdx:D2}_surf{surfIdx}";
+                if (!allMtls.ContainsKey(mtlName))
+                {
+                    uint surfaceId = (surfIdx >= 0 && surfIdx < gfx.Surfaces.Count) ? gfx.Surfaces[surfIdx] : 0u;
+                    uint? textureId = null;
+                    if (surfaceId != 0 && portalDb.AllFiles.ContainsKey(surfaceId))
+                    {
+                        var surface = portalDb.ReadFromDat<Surface>(surfaceId);
+                        var isImage = surface.Type.HasFlag(ACE.Entity.Enum.SurfaceType.Base1Image)
+                                   || surface.Type.HasFlag(ACE.Entity.Enum.SurfaceType.Base1ClipMap);
+                        if (isImage && surface.OrigTextureId != 0
+                            && portalDb.AllFiles.ContainsKey(surface.OrigTextureId))
+                        {
+                            var sfcTex = portalDb.ReadFromDat<SurfaceTexture>(surface.OrigTextureId);
+                            if (sfcTex.Textures.Count > 0)
+                                textureId = sfcTex.Textures[sfcTex.Textures.Count - 1];
+                        }
+                    }
+                    allMtls[mtlName] = (surfaceId, textureId);
+                }
+
+                sw.WriteLine($"g {mtlName}");
+                sw.WriteLine($"usemtl {mtlName}");
+                foreach (var poly in grp)
+                {
+                    if (poly.NumPts < 3) continue;
+                    if (poly.VertexIds == null || poly.VertexIds.Count < poly.NumPts) continue;
+
+                    int v0 = idToObjIndex[(ushort)poly.VertexIds[0]];
+                    for (int i = 1; i + 1 < poly.NumPts; i++)
+                    {
+                        int va = idToObjIndex[(ushort)poly.VertexIds[i]];
+                        int vb = idToObjIndex[(ushort)poly.VertexIds[i + 1]];
+                        sw.WriteLine($"f {v0}/{v0}/{v0} {vb}/{vb}/{vb} {va}/{va}/{va}");
+                        totalTris++;
+                    }
+                }
+            }
+
+            globalVertOffset += vertOrder.Count;
+        }
+        sw.Flush();
+
+        int texturesWritten = 0;
+        using (var mtl = new StreamWriter(mtlPath))
+        {
+            mtl.WriteLine($"# Materials for setup_{setupId:X8}");
+            mtl.WriteLine();
+            foreach (var kvp in allMtls)
+            {
+                mtl.WriteLine($"newmtl {kvp.Key}");
+                mtl.WriteLine("Ka 0.1 0.1 0.1");
+                mtl.WriteLine("Kd 1.0 1.0 1.0");
+                mtl.WriteLine("d  1.0");
+                mtl.WriteLine("illum 1");
+                if (kvp.Value.textureId.HasValue && portalDb.AllFiles.ContainsKey(kvp.Value.textureId.Value))
+                {
+                    var tex = portalDb.ReadFromDat<Texture>(kvp.Value.textureId.Value);
+                    string ext = tex.Format == ACE.Entity.Enum.SurfacePixelFormat.PFID_CUSTOM_RAW_JPEG ? ".jpg" : ".png";
+                    string texFileName = $"{kvp.Value.textureId.Value:X8}{ext}";
+                    string texPath = Path.Combine(texDir, texFileName);
+                    if (!File.Exists(texPath))
+                    {
+                        try { tex.ExportTexture(texDir); texturesWritten++; }
+                        catch (Exception ex) { mtl.WriteLine($"# (texture export failed: {ex.Message})"); }
+                    }
+                    mtl.WriteLine($"# Texture 0x{kvp.Value.textureId.Value:X8} {tex.Width}x{tex.Height} {tex.Format}");
+                    mtl.WriteLine($"map_Kd textures/{texFileName}");
+                }
+                else
+                {
+                    mtl.WriteLine($"# Surface 0x{kvp.Value.surfaceId:X8} (no extractable texture)");
+                }
+                mtl.WriteLine();
+            }
+        }
+
+        Console.WriteLine($"Wrote {new FileInfo(outPath).Length} bytes to {outPath}");
+        Console.WriteLine($"  0x{setupId:X8}: {parts.Count} parts -> {totalTris} triangles, {allMtls.Count} mtls, {texturesWritten} new textures");
+        return 0;
+    }
+
+    /// <summary>
+    /// Bulk-export every unique SetupModel referenced by an academy's statics
+    /// JSON. Generates one OBJ per setup under outDir, sharing the textures/
+    /// directory. Pair with dump-academy-statics.
+    /// </summary>
+    public static int ExportAcademyStatics(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 3) { Console.Error.WriteLine("export-academy-statics: missing <datDir> <statics.json> <outDir>"); return 1; }
+        var datDir = args[0];
+        var staticsJson = args[1];
+        var outDir = args[2];
+        Directory.CreateDirectory(outDir);
+
+        if (!File.Exists(staticsJson))
+        {
+            Console.Error.WriteLine($"Statics JSON not found: {staticsJson}");
+            return 1;
+        }
+        using var stream = File.OpenRead(staticsJson);
+        var doc = JsonSerializer.Deserialize<JsonElement>(stream);
+        var unique = doc.GetProperty("unique_setups").EnumerateArray()
+            .Select(e => e.GetString()!).ToList();
+
+        Console.WriteLine($"Exporting {unique.Count} unique setups to {outDir}");
+        int ok = 0, failed = 0;
+        foreach (var setupHex in unique)
+        {
+            var clean = setupHex.StartsWith("0x") ? setupHex.Substring(2) : setupHex;
+            var path = Path.Combine(outDir, $"setup_{clean}.obj");
+            int rc;
+            try { rc = ExportSetup(new[] { datDir, clean, path }); }
+            catch (Exception ex) { Console.Error.WriteLine($"  FAILED {setupHex}: {ex.Message}"); rc = 99; }
+            if (rc == 0) ok++; else failed++;
+        }
+        Console.WriteLine($"Done. {ok} OK, {failed} failed.");
+        return failed == 0 ? 0 : 1;
+    }
+
 
     public static int DumpStarterAreas(ReadOnlySpan<string> args)
     {
