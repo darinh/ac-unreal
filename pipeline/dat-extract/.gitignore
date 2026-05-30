@@ -1,0 +1,7 @@
+# Build output
+bin/
+obj/
+
+# CLI samples / scratch
+out/
+*.aclb
