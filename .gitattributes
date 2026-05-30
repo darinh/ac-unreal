@@ -58,3 +58,12 @@
 # Reference traces from the original client can be large; keep them in LFS.
 *.bin    filter=lfs diff=lfs merge=lfs -text
 harness/traces/**/*.csv filter=lfs diff=lfs merge=lfs -text
+
+# --- Intermediate exchange formats (Phase 1 asset-ingest) -------------
+# .aclb landblock binaries are small (hundreds of bytes for the v1
+# synthetic sample) but they ARE binary. Mark them so git doesn't try
+# text conversion / line-ending normalization. Not in LFS yet — sizes
+# stay manageable. Revisit if a real-world export pushes individual
+# files into MB territory.
+*.aclb binary
+*.actx binary

@@ -54,14 +54,20 @@ ac-unreal/
 │       ├── AcUnreal.Build.cs
 │       ├── Public/
 │       │   ├── AcUnreal.h
-│       │   └── CoordCore/         AC↔UE coord transform (CANONICAL)
-│       │       ├── CoordTransform.h         pure C++17 core
-│       │       └── AcCoordLibrary.h         UE wrapper (UCLASS)
+│       │   ├── CoordCore/         AC↔UE coord transform (CANONICAL)
+│       │   │   ├── CoordTransform.h         pure C++17 core
+│       │   │   └── AcCoordLibrary.h         UE wrapper (UCLASS)
+│       │   └── AssetIngest/       intermediate-format readers
+│       │       ├── AcIntermediateLandblock.h   pure C++17 .aclb parser
+│       │       └── AcLandblockImporter.h       UE wrapper (UCLASS)
 │       └── Private/
 │           ├── AcUnreal.cpp       IMPLEMENT_PRIMARY_GAME_MODULE
-│           └── CoordCore/
-│               ├── CoordTransform.cpp
-│               └── AcCoordLibrary.cpp
+│           ├── CoordCore/
+│           │   ├── CoordTransform.cpp
+│           │   └── AcCoordLibrary.cpp
+│           └── AssetIngest/
+│               ├── AcIntermediateLandblock.cpp
+│               └── AcLandblockImporter.cpp
 │
 ├── Content/                       UE assets (most via Git LFS)
 │   ├── Data/                      tunable DataAssets (movement params, timing tables)
@@ -73,7 +79,13 @@ ac-unreal/
 │   │   ├── README.md
 │   │   ├── tests/CoordTransformTests.cpp
 │   │   └── build.ps1              vcvars64 + cl.exe; no UE required
-│   └── asset-ingest/              importer + sample assets (Phase 1)
+│   └── asset-ingest/              v1 intermediate-format spec + parser test rig + samples
+│       ├── README.md
+│       ├── FORMAT.md              .aclb on-disk binary schema (Phase 1)
+│       ├── samples/               committed synthetic fixtures (gen_sample.ps1 reproducible)
+│       ├── gen_sample.ps1         deterministic generator for samples/
+│       ├── tests/LandblockImporterTests.cpp
+│       └── build.ps1
 │
 └── harness/                       parity harness (Phase 3)
     ├── traces/                    recorded reference + UE traces
@@ -155,6 +167,41 @@ not edit history.
 - Phase 1 intermediate format choice (FBX vs glTF) — leaning glTF for
   skeletal + animation fidelity in modern PBR pipelines; revisit when
   sample assets arrive.
+
+### 2026-05-29 — Phase 1 (asset-ingest scaffolding)
+
+10. **Landblock intermediate format is binary, not JSON or glTF.** A
+    landblock heightfield is a dense regular numeric grid. JSON would
+    bloat a 437-byte payload to several KB; glTF would impose a graph
+    representation that doesn't fit a regular grid. The v1 `.aclb`
+    format is a 32-byte header + raw `float32[]` heights + raw `uint8[]`
+    texture-layer indices. Full spec at
+    [`pipeline/asset-ingest/FORMAT.md`](pipeline/asset-ingest/FORMAT.md).
+    Mesh import (when added) WILL use glTF — different asset class,
+    different right tool.
+11. **Sample fixtures are synthetic, not "hand-exported" per the
+    brief.** In an autonomous setup there is no human to do a hand
+    export, and shipping AC binary content from the original client
+    would be a copyright risk. `pipeline/asset-ingest/gen_sample.ps1`
+    procedurally generates a 9×9 synthetic landblock conforming to the
+    v1 format. The bytes are deterministic and committed. When the
+    decompile agent starts dropping real exports, the parser tests
+    will accept those too — the format is the contract, not the
+    fixture origin.
+12. **`.aclb` parser uses typed status enum, not bool / exception.**
+    Every reader entry point returns an `EAcLbParseStatus`. Invalid
+    input (bad magic, unsupported version, out-of-range fields,
+    NaN/Inf heights, size mismatch) produces a specific status code so
+    callers can react meaningfully. No silent fallback; no UB.
+13. **Asset-ingest module deferrals (called out, not skipped).** v1
+    covers the landblock heightfield path only. Skeletal meshes
+    (glTF), textures (PNG/EXR — standard, no custom format),
+    particle definitions (Phase 4 timing concern), and the texture
+    table mapping (byte → asset path) are forward-declared in
+    `FORMAT.md` as `Pending formats`. The mesh path specifically
+    requires UE's Interchange framework, which is editor-side; that
+    work is gated on installing NetFxSDK 4.6+ for the Editor target
+    build.
 
 ---
 
