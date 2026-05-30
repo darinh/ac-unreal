@@ -25,7 +25,8 @@ set MAP=/Game/Academy/Maps/AcademyMap
 if "%EXTRA%"=="" (
     set CMDS=HighResShot %RESX%x%RESY%
 ) else (
-    set CMDS=%EXTRA%; HighResShot %RESX%x%RESY%
+    REM UE -ExecCmds uses COMMA as command separator, not semicolon.
+    set CMDS=%EXTRA%, HighResShot %RESX%x%RESY%
 )
 
 %UE% %PROJ% %MAP% -game -ResX=%RESX% -ResY=%RESY% -ExecCmds="%CMDS%" -RenderOffscreen -NoLoadingScreen -nosplash -nocrashreports

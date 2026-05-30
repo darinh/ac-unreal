@@ -1,71 +1,41 @@
 # =====================================================================
-# move_player_start.py
+# move_player_start.py    -- ⚠️ DANGER — DO NOT USE ⚠️
 #
-# Updates the PlayerStart actor's location/rotation in AcademyMap so
-# the next -game launch's HighResShot captures from a chosen viewpoint.
-# Used by render_academy.ps1 to do multi-viewpoint capture without
-# needing a C++ rig actor.
+# CATASTROPHIC BUG: in a headless `-run=pythonscript` commandlet the
+# editor world does NOT auto-load World Partition / External Actor
+# files. `load_level()` brings in the .umap stub (132 bytes) but
+# leaves the ExternalActors/ uassets on disk unloaded. The subsequent
+# `save_current_level()` then writes back ONLY the few actors that
+# were loaded, deleting the External Actor files for everything that
+# wasn't in memory.
 #
-# Args via env vars (powershell sets these before running this script):
-#   AC_VP_X, AC_VP_Y, AC_VP_Z  — location in UE world coords (cm)
-#   AC_VP_PITCH, AC_VP_YAW, AC_VP_ROLL — rotation in degrees
+# Symptom: 1487 academy actors silently vanish from
+# Content/Academy/Maps/__ExternalActors__/AcademyMap/.../*.uasset.
+# Since those files were never committed to git (only the umap stub
+# was), the loss is unrecoverable except by re-running every spawn
+# script (import_academy.py, import_statics.py, import_lights.py,
+# import_npcs.py, restore_lighting.py, add_sky_atmosphere.py,
+# brighten_academy.py).
 #
-# Idempotent: looks up the first PlayerStart actor in the level and
-# mutates it in place; if none exists, spawns one.
+# Hit this once on 2026-05-30 mid-render-iteration. Hours of work lost.
+#
+# Safe replacements for "move where the screenshot is taken from":
+#   1. Add a C++ AAcAcademyRenderRig actor that on BeginPlay sets the
+#      player camera through a list of viewpoints + HighResShots each.
+#      Multi-shot per -game launch. No level mutation needed.
+#   2. Add a cheat-manager `teleport X Y Z` console command, then chain
+#      it via -ExecCmds before HighResShot.
+#   3. Spawn multiple PlayerStarts with PlayerStartTags and pick via
+#      -ExecCmds=Open AcademyMap?PlayerStartTag=foo before HighResShot.
+#
+# All three keep the level itself read-only at runtime.
 # =====================================================================
 
-import os
 import sys
 import unreal
 
-
-def log(m): unreal.log(f"[move-ps] {m}")
-def warn(m): unreal.log_warning(f"[move-ps] {m}")
-
-
-LEVEL_PATH = "/Game/Academy/Maps/AcademyMap"
-
-
-def main():
-    try:
-        x = float(os.environ["AC_VP_X"])
-        y = float(os.environ["AC_VP_Y"])
-        z = float(os.environ["AC_VP_Z"])
-        pitch = float(os.environ.get("AC_VP_PITCH", "0"))
-        yaw = float(os.environ.get("AC_VP_YAW", "0"))
-        roll = float(os.environ.get("AC_VP_ROLL", "0"))
-    except KeyError as e:
-        unreal.log_error(f"missing env var: {e}")
-        return 1
-    except ValueError as e:
-        unreal.log_error(f"bad env var value: {e}")
-        return 1
-
-    unreal.EditorLevelLibrary.load_level(LEVEL_PATH)
-    eas = unreal.EditorActorSubsystem()
-    all_actors = eas.get_all_level_actors()
-    ps = next((a for a in all_actors if isinstance(a, unreal.PlayerStart)), None)
-    if ps is None:
-        log("no PlayerStart in level — spawning new one")
-        ps = eas.spawn_actor_from_class(
-            unreal.PlayerStart,
-            unreal.Vector(x, y, z),
-            unreal.Rotator(roll=roll, pitch=pitch, yaw=yaw))
-        if ps is None:
-            unreal.log_error("failed to spawn PlayerStart")
-            return 2
-    else:
-        old_loc = ps.get_actor_location()
-        old_rot = ps.get_actor_rotation()
-        ps.set_actor_location(unreal.Vector(x, y, z), False, False)
-        ps.set_actor_rotation(unreal.Rotator(roll=roll, pitch=pitch, yaw=yaw), False)
-        log(f"moved PlayerStart from {old_loc} {old_rot} -> ({x},{y},{z}) pitch={pitch} yaw={yaw}")
-
-    # Save the level so the change persists into -game mode.
-    unreal.EditorLevelLibrary.save_current_level()
-    log("level saved")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main() or 0)
+unreal.log_error(
+    "move_player_start.py is DISABLED. It silently wipes the level "
+    "in commandlet mode (World Partition + save_current_level). "
+    "See the file header for safe alternatives.")
+sys.exit(99)
