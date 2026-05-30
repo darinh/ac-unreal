@@ -1,0 +1,19 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.7",
+	"Category": "",
+	"Description": "Asheron's Call simulation parity + modernized presentation in Unreal Engine 5. See README.md and contract/physics-feel-spec-request.md.",
+	"Modules": [
+		{
+			"Name": "AcUnreal",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		}
+	]
+}
