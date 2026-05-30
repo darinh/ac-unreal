@@ -2,6 +2,14 @@
 bin/
 obj/
 
-# CLI samples / scratch
+# CLI samples / scratch — bulk extraction dirs are regenerable from
+# the CLI, so they don't belong in git. Run:
+#   acdat export-academy <datDir> 8602 ./out/academy_8602
+#   acdat dump-academy-layout <datDir> 8602 ./out/academy_8602/layout.json
+# to reproduce.
 out/
 *.aclb
+
+# Committed reference fixtures live in samples/ (allowed).
+!samples/
+!samples/**
