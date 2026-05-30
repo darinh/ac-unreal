@@ -24,7 +24,6 @@ Usage:
         <aceworld_dir>
         <landblock_hex>
         <out_json>
-        [--layout LAYOUT_JSON]
 """
 import argparse
 import json
@@ -63,28 +62,6 @@ def categorize(t):
 
 
 CM_PER_M = 100.0
-
-
-def quat_mul_ac(a, b):
-    ax, ay, az, aw = a; bx, by, bz, bw = b
-    return (
-        aw*bx + ax*bw + ay*bz - az*by,
-        aw*by - ax*bz + ay*bw + az*bx,
-        aw*bz + ax*by - ay*bx + az*bw,
-        aw*bw - ax*bx - ay*by - az*bz,
-    )
-
-
-def rotate_ac_vec(q, v):
-    qx, qy, qz, qw = q; vx, vy, vz = v
-    tx = 2 * (qy * vz - qz * vy)
-    ty = 2 * (qz * vx - qx * vz)
-    tz = 2 * (qx * vy - qy * vx)
-    return (
-        vx + qw * tx + (qy * tz - qz * ty),
-        vy + qw * ty + (qz * tx - qx * tz),
-        vz + qw * tz + (qx * ty - qy * tx),
-    )
 
 
 def ac_to_ue_pos(ac_xyz):
@@ -198,20 +175,6 @@ class WeenieIndex:
         return result
 
 
-# --- Layout JSON -----------------------------------------------------
-
-def load_cell_frames(layout_json):
-    data = json.loads(Path(layout_json).read_text(encoding="utf-8"))
-    out = {}
-    for c in data["cells"]:
-        ue = c["position"]
-        pos_ac = (ue["y"] / CM_PER_M, ue["x"] / CM_PER_M, ue["z"] / CM_PER_M)
-        ue_q = c["orientation"]
-        orient_ac = (-ue_q["y"], -ue_q["x"], -ue_q["z"], ue_q["w"])
-        out[c["cell_id_decimal"]] = {"pos_ac": pos_ac, "orient_ac": orient_ac}
-    return out
-
-
 # --- Main ------------------------------------------------------------
 
 def main():
@@ -219,7 +182,6 @@ def main():
     ap.add_argument("aceworld", help="Path to the ACE-World repo root")
     ap.add_argument("landblock_hex")
     ap.add_argument("out_json")
-    ap.add_argument("--layout", help="Optional layout JSON for world-space composition.")
     args = ap.parse_args()
 
     lb_hi16 = int(args.landblock_hex, 16)
@@ -242,8 +204,6 @@ def main():
     idx = WeenieIndex(weenie_root)
     print(f"  indexed {len(idx.by_wcid)} weenie files", flush=True)
 
-    cell_frames = load_cell_frames(args.layout) if args.layout else None
-
     out = []
     missing = 0
     for inst in instances:
@@ -264,19 +224,27 @@ def main():
             "cell_id": f"0x{inst['cell_id']:08X}",
             "landblock_comment": inst["comment"],
         }
-        if cell_frames is not None and inst["cell_id"] in cell_frames:
-            cf = cell_frames[inst["cell_id"]]
-            rotated = rotate_ac_vec(cf["orient_ac"], inst["origin"])
-            world_pos_ac = (cf["pos_ac"][0] + rotated[0],
-                             cf["pos_ac"][1] + rotated[1],
-                             cf["pos_ac"][2] + rotated[2])
-            world_orient_ac = quat_mul_ac(cf["orient_ac"], inst["orient"])
-            ue_x, ue_y, ue_z = ac_to_ue_pos(world_pos_ac)
-            qx, qy, qz, qw = ac_to_ue_quat(world_orient_ac)
-            entry["position"] = {"x": ue_x, "y": ue_y, "z": ue_z}
-            entry["orientation"] = {"x": qx, "y": qy, "z": qz, "w": qw}
-        else:
-            entry["origin_cell_local"] = {"x": inst["origin"][0], "y": inst["origin"][1], "z": inst["origin"][2]}
+        # ACE landblock_instance origin/angles semantics (verified against
+        # ACE.Entity.Position):
+        #   - For INDOOR cells (EnvCells; cell_id low-16 >= 0x100), origin
+        #     is LANDBLOCK-LOCAL metres. Position.cs line 410 confirms
+        #     this — it uses `LandblockX*192 + PositionX` for cross-
+        #     landblock distance. The cell_id is just a visibility/physics
+        #     index; it does NOT define an additional frame to rotate by.
+        #   - For OUTDOOR cells (low-16 < 0x100), origin is ALSO landblock-
+        #     local (the cell is just a 24m x 24m sub-grid of the 192m
+        #     landblock).
+        # So we never apply a cell-local rotation. The cell-frame Stab
+        # transform in our Phase 5f extractor is for the .dat-side Stab
+        # records (which ARE cell-local) — these landblock_instance rows
+        # are a different thing entirely, despite living "in" a cell.
+        ox, oy, oz = inst["origin"]
+        ax, ay, az, aw = inst["orient"]
+        ue_x, ue_y, ue_z = ac_to_ue_pos((ox, oy, oz))
+        qx, qy, qz, qw = ac_to_ue_quat((ax, ay, az, aw))
+        entry["position"] = {"x": ue_x, "y": ue_y, "z": ue_z}
+        entry["orientation"] = {"x": qx, "y": qy, "z": qz, "w": qw}
+        entry["origin_ac_landblock"] = {"x": ox, "y": oy, "z": oz}
         out.append(entry)
 
     cats = {cat: sum(1 for e in out if e["category"] == cat)

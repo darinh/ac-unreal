@@ -40,7 +40,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 NPC_JSON = os.environ.get(
     "AC_NPC_JSON",
-    str(REPO_ROOT / "pipeline" / "dat-extract" / "samples" / "academy_8602_npcs.json"),
+    str(REPO_ROOT / "pipeline" / "ace-world" / "out" / "instances_8602.json"),
 )
 # Same setups directory used by import_statics.py. NPC setups extracted by
 # `acdat export-setup ...` land alongside the prop setups.
@@ -63,16 +63,54 @@ def log(msg):
 
 # Visual configuration per category for the *placeholder fallback*.
 # When a real SetupModel mesh is available the placeholder is skipped.
+# Fields: (engine_mesh_path, scale_xyz_metres, z_offset_cm, rgb_color).
+# RGB chosen to be vibrant + distinct so categories pop in the editor.
 CATEGORY_CONFIG = {
-    "npc":     ("/Engine/BasicShapes/Cylinder", unreal.Vector(0.40, 0.40, 1.80), 90.0),
-    "portal":  ("/Engine/BasicShapes/Cube",     unreal.Vector(1.50, 1.50, 2.00), 100.0),
-    "door":    ("/Engine/BasicShapes/Cube",     unreal.Vector(0.10, 1.20, 2.20), 110.0),
-    "fixture": ("/Engine/BasicShapes/Cube",     unreal.Vector(0.60, 0.60, 0.50), 25.0),
-    "scenery": ("/Engine/BasicShapes/Cube",     unreal.Vector(0.05, 0.60, 0.80), 40.0),
-    "weapon":  ("/Engine/BasicShapes/Sphere",   unreal.Vector(0.20, 0.20, 0.20), 50.0),
-    "item":    ("/Engine/BasicShapes/Sphere",   unreal.Vector(0.10, 0.10, 0.10), 20.0),
-    "other":   ("/Engine/BasicShapes/Cylinder", unreal.Vector(0.20, 0.20, 0.30), 15.0),
+    "npc":     ("/Engine/BasicShapes/Cylinder", unreal.Vector(0.40, 0.40, 1.80),  90.0, (0.95, 0.65, 0.20)),
+    "portal":  ("/Engine/BasicShapes/Cube",     unreal.Vector(1.50, 1.50, 2.00), 100.0, (0.30, 0.85, 1.00)),
+    "door":    ("/Engine/BasicShapes/Cube",     unreal.Vector(0.10, 1.20, 2.20), 110.0, (0.55, 0.35, 0.20)),
+    "fixture": ("/Engine/BasicShapes/Cube",     unreal.Vector(0.60, 0.60, 0.50),  25.0, (0.85, 0.30, 0.30)),
+    "scenery": ("/Engine/BasicShapes/Cube",     unreal.Vector(0.05, 0.60, 0.80),  40.0, (0.95, 0.90, 0.65)),
+    "weapon":  ("/Engine/BasicShapes/Sphere",   unreal.Vector(0.20, 0.20, 0.20),  50.0, (0.65, 0.65, 0.95)),
+    "item":    ("/Engine/BasicShapes/Sphere",   unreal.Vector(0.10, 0.10, 0.10),  20.0, (0.60, 0.95, 0.60)),
+    "other":   ("/Engine/BasicShapes/Cylinder", unreal.Vector(0.20, 0.20, 0.30),  15.0, (0.80, 0.80, 0.80)),
 }
+
+
+# ---- per-category color MI ------------------------------------------------
+# Reuses M_AcademyColor master from Phase 5e. Creates one MI per category
+# and parents it. Cached so we only create each MI once per run.
+_category_mi_cache = {}
+
+def _get_category_mi(category, rgb):
+    if category in _category_mi_cache:
+        return _category_mi_cache[category]
+    master_path = "/Game/Academy/Materials/M_AcademyColor"
+    if not unreal.EditorAssetLibrary.does_asset_exist(master_path):
+        return None
+    master = unreal.EditorAssetLibrary.load_asset(master_path)
+    asset_name = f"MI_NpcPlaceholder_{category}"
+    asset_path = f"/Game/Academy/Materials/{asset_name}"
+    if unreal.EditorAssetLibrary.does_asset_exist(asset_path):
+        mi = unreal.EditorAssetLibrary.load_asset(asset_path)
+    else:
+        at = unreal.AssetToolsHelpers.get_asset_tools()
+        factory = unreal.MaterialInstanceConstantFactoryNew()
+        mi = at.create_asset(
+            asset_name=asset_name,
+            package_path="/Game/Academy/Materials",
+            asset_class=unreal.MaterialInstanceConstant,
+            factory=factory)
+        if mi is None:
+            return None
+        mel = unreal.MaterialEditingLibrary
+        mel.set_material_instance_parent(mi, master)
+        mel.set_material_instance_vector_parameter_value(
+            mi, unreal.Name("BaseColor"),
+            unreal.LinearColor(rgb[0], rgb[1], rgb[2], 1.0))
+        unreal.EditorAssetLibrary.save_asset(asset_path)
+    _category_mi_cache[category] = mi
+    return mi
 
 
 def main():
@@ -101,8 +139,8 @@ def main():
 
     # Pre-load placeholder meshes once.
     placeholders = {}
-    for cat, (path, *_rest) in CATEGORY_CONFIG.items():
-        placeholders[cat] = unreal.EditorAssetLibrary.load_asset(path)
+    for cat, cfg in CATEGORY_CONFIG.items():
+        placeholders[cat] = unreal.EditorAssetLibrary.load_asset(cfg[0])
 
     # Build/cache one StaticMesh per unique Setup ID referenced by an NPC.
     # Sources from the OBJ files extracted by `acdat export-setup ...` into
@@ -156,6 +194,18 @@ def main():
             continue
         actor.static_mesh_component.set_static_mesh(real_mesh)
         actor.set_actor_scale3d(scale)
+
+        # Tint placeholders by category so they're obvious in the editor.
+        # Skip tinting for real meshes so we don't override their materials.
+        if not use_real:
+            cfg = CATEGORY_CONFIG.get(cat, CATEGORY_CONFIG["other"])
+            rgb = cfg[3]
+            mic = _get_category_mi(cat, rgb)
+            if mic is not None:
+                smc = actor.static_mesh_component
+                for i in range(smc.get_num_materials()):
+                    smc.set_material(i, mic)
+                smc.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
 
         actor.tags = [
             unreal.Name("AcInstance"),
