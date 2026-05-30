@@ -198,6 +198,23 @@ def ensure_mi_for_color(color_master, rgb):
     r8 = int(round(clamped[0] * 255))
     g8 = int(round(clamped[1] * 255))
     b8 = int(round(clamped[2] * 255))
+
+    # ---- AC pure-black sentinel substitution ------------------------
+    # AC's Surface 0x08000034 (and a handful of similar pure-black solid
+    # surfaces) is used heavily as a base for ceilings, archway frames,
+    # portal cutouts and other surfaces that AC's real renderer paints
+    # via per-vertex Gouraud lighting (SWVertex.Color) at runtime. With
+    # ColorValue=0xFF000000 (BGRA: A=0xFF, RGB=0,0,0) and no vertex
+    # lighting baked yet (deferred to Phase 5g), those surfaces render
+    # as literal black — invisible against any dark background. To keep
+    # the academy walkable in the meantime, swap pure black for a warm
+    # stone grey so the AC layout is at least readable. The asset is
+    # still named MI_Color_000000 so its provenance is obvious; the
+    # stored color diverges deliberately from the name. Revert in 5g
+    # once vertex lighting modulates these surfaces properly.
+    if (r8, g8, b8) == (0, 0, 0):
+        clamped = (0.60, 0.50, 0.45)
+
     key = ("color", r8, g8, b8)
     if key in _mi_cache:
         return _mi_cache[key]
