@@ -91,8 +91,19 @@ void UAcCharacterMovementComponent::ApplyParamsToStockProperties(const ac_sim::F
 	MaxAcceleration    = 99999.0f; // AC's motion-state model = instant target velocity
 	JumpZVelocity      = static_cast<float>(Core.DefaultJumpVzCmPerSec);
 	GravityScale       = static_cast<float>(std::fabs(Core.GravityCmPerSecSq) / 980.0); // UE gravity is -980; this is the scale factor
-	GroundFriction     = 0.0f;     // we model friction in our own integrator, not CMC's
-	BrakingDecelerationWalking = 0.0f; // ditto
+	// Braking + ground friction: the original intent of zeroing these
+	// is "the custom ac_sim integrator models friction itself, so we
+	// don't want CMC adding its own on top". But Phase 2.x hasn't
+	// landed the PhysWalking override yet, so the stock CMC physics
+	// are still running — and stock CMC with zero braking/friction
+	// produces an ice-skating feel where releasing WASD doesn't slow
+	// the character. Until PhysWalking is actually overridden we keep
+	// UE's stock defaults so the player decelerates normally.
+	// TODO Phase 2.x: when PhysWalking is routed through
+	// ac_sim::IntegrateMovement, set these back to 0 so CMC doesn't
+	// double-apply friction on top of the custom integrator.
+	GroundFriction              = 8.0f;     // UE default
+	BrakingDecelerationWalking  = 2048.0f;  // UE default
 	MaxStepHeight      = static_cast<float>(Core.StepHeightCm);
 	// WalkableFloorZ is "cos of max slope angle". CMC's default is 0.71 (45°).
 	SetWalkableFloorZ(static_cast<float>(Core.WalkableSlopeCosine));
