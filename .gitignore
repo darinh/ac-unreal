@@ -77,3 +77,4 @@ desktop.ini
 contract/decompile-artifacts/*
 !contract/decompile-artifacts/.gitkeep
 !contract/decompile-artifacts/README.md
+!contract/decompile-artifacts/physics-feel-spec-response.md

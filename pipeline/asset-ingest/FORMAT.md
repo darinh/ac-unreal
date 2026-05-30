@@ -81,6 +81,17 @@ This format pins the choice: **v1 writers MUST emit `0x0000` in the
 low 16 bits**, and **v1 readers MUST reject any other value** with the
 `InvalidLandblockId` status.
 
+> **ACE-specific exporter note:** ACE encodes addressed cells as
+> `(block << 16) | (cell + 1)` where `cell = (x & 7) << 3 | (y & 7)`
+> (see `ACE.Server\Physics\Common\LandDefs.cs:227-239` and
+> `ACE.Entity\Position.cs:379-390`). That means an ACE Position's
+> `LandblockId` ALWAYS has non-zero low 16 bits when it addresses a
+> specific cell. An ACE-driven exporter producing a `.aclb` for the
+> outdoor surface MUST mask the low 16 bits (`id & 0xFFFF0000`) before
+> writing the header. The Phase 2 spec response document
+> (`contract/decompile-artifacts/physics-feel-spec-response.md`, §0)
+> covers this convention.
+
 If a decompile-side exporter is starting from a raw AC LandblockId
 that has `0xFFFF` (or any other non-zero low 16) in the source data,
 it MUST mask the low 16 bits before writing the `.aclb` header.

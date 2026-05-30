@@ -203,6 +203,115 @@ not edit history.
     work is gated on installing NetFxSDK 4.6+ for the Editor target
     build.
 
+### 2026-05-29 — Phase 2 (simulation core + ACE physics spec)
+
+14. **Sim core uses ACE-derived values, not original-client-derived.**
+    The user clarified mid-build: the UE client talks to ACEmulator
+    as the server, so ACE's physics constants are the source of truth
+    (anything the client predicts that diverges from ACE will get
+    server-corrected, ruining feel). Spec response document at
+    `contract/decompile-artifacts/physics-feel-spec-response.md`
+    encodes the ACE values per spec section with provenance cited.
+    The AC client decomp is used to inform the **client-side
+    prediction model** (what the original predicted locally vs waited
+    on server for), not for the values themselves.
+15. **Pure-C++17 sim core, UE wrapper for binding.** Same dual-build
+    pattern as coord-transform + asset-ingest: sim math (gravity,
+    friction, jump impulse, accumulator) lives in pure C++ at
+    `Source/AcUnreal/{Public,Private}/SimCore/AcSim*.{h,cpp}` and
+    compiles into both the UE module via UBT AND a standalone test
+    rig at `pipeline/sim-core/build.ps1`. 27 standalone assertions
+    prove determinism (3 bit-equal runs of a 600-tick varied
+    sequence), gravity arc matches semi-implicit Euler, jump arc
+    matches V₀²/(2g) peak height + 2V₀/g airtime, friction decays
+    geometrically, ACE speed constants (312/400/125 cm/s) produce
+    correct velocity, accumulator catches up safely after long
+    pauses.
+16. **Fixed 30 Hz simulation tick (= ACE MinQuantum), decoupled from
+    render.** Neither the original AC client nor ACE use a strict
+    fixed-Hz loop — they integrate with caller-supplied dt clamped to
+    `[MinQuantum=1/30, MaxQuantum=0.1, HugeQuantum=2.0]`. Our client
+    uses a fixed 30 Hz step (= MinQuantum) so the position updates
+    we send match ACE's smallest expected integration step. The
+    accumulator pattern (`FFixedStepAccumulator`) decouples sim ticks
+    from render frames per the brief invariant; `Alpha()` exposes the
+    `[0,1]` interpolation factor for visual smoothing.
+17. **`UAcCharacterMovementComponent` subclasses `UCharacterMovementComponent`
+    (not a from-scratch `UMovementComponent`).** Preserves CMC's
+    move-history / replication scaffolding which the future
+    server-authoritative reconciliation against ACE will need. Phase
+    2 scaffold pushes ACE-derived numeric params into CMC's stock
+    properties (MaxWalkSpeed, GravityScale, MaxStepHeight,
+    WalkableFloorZ, GroundFriction=0, BrakingDeceleration=0); the
+    full `PhysWalking` / `PhysFalling` override (using
+    `ac_sim::IntegrateMovement` end-to-end) is Phase 2.x work and is
+    explicitly TODO in source. `RunSimTickDebug` is the
+    verification seam — calls the pure C++ integrator from a
+    `BlueprintCallable` so the path is exercised under UE compile.
+18. **AC LandblockId encoding clarification added to FORMAT.md.** ACE
+    encodes `(block << 16) | (cell + 1)` (cell is `(x&7)<<3 |
+    (y&7)`); our `.aclb` format requires low-16 = 0. An ACE-driven
+    exporter MUST mask the low 16 bits. Phase 1 follow-up.
+
+### 2026-05-29 — Phase 4 (presentation scaffolding)
+
+19. **Lumen GI + Lumen Reflections + hardware ray tracing enabled in
+    `Config/DefaultEngine.ini`.** This is the "modern client"
+    presentation foundation per the user's stated purpose. DX12 RHI
+    is required for HW RT and is pinned here. SM6 enables Nanite +
+    Lumen HW-RT pipelines. RTX 4090 on the dev box supports this
+    comfortably; a future contributor on weaker hardware can drop
+    `r.Lumen.HardwareRayTracing=0` and Lumen falls back to its
+    software-RT path.
+20. **Nanite enabled at project level, with the honest caveat.**
+    Nanite won't meaningfully help 1999-era ~200-tri AC source
+    meshes. It's enabled now for forward-compat with re-authored
+    high-poly replacements (the actual visual upgrade lands when the
+    art does). Decision documented in both
+    `Content/Presentation/README.md` and the brief's "Honest
+    expectation to encode" line.
+21. **PBR master-material + instance pattern documented at
+    `Content/Presentation/Materials/README.md`.** No master materials
+    exist yet — they're authored in the editor when the first
+    re-authored asset lands. The pattern (one master per shading
+    style, many instances overriding parameters) is the rule because
+    UE5 batches by shader; per-asset shader divergence kills draw
+    perf.
+22. **TSR (Temporal Super Resolution) over TAA.** UE5's modern
+    temporal upscaler. Better edge stability and motion handling
+    than legacy TAA, especially important once we're rendering at
+    high resolution with Lumen + RT.
+23. **Niagara gameplay-timing rule (`Content/Presentation/Niagara/README.md`).**
+    Re-authored visual FX may diverge freely from the original, but
+    cast windows, projectile launch frames, and damage-application
+    frames are simulation concerns and stay in `Content/Data/` + the
+    C++ sim core — NOT in Niagara timelines. A 60 FPS render and a
+    30 Hz sim will desync; visual lerps, sim ticks discretely.
+24. **Editor target build requires .NET Framework 4.8 Developer Pack (one-time prereq).**
+    SwarmInterface (UE's distributed lighting build helper) depends
+    on the .NET Framework SDK via the `NETFXSDKDir` registry key at
+    `HKLM\SOFTWARE\WOW6432Node\Microsoft\Microsoft SDKs\NETFXSDK\<ver>\KitsInstallationFolder`.
+    VS BuildTools 2022 on the dev box did not ship with this, and the
+    VS Installer's `Microsoft.Net.Component.4.6.2.SDK` component does
+    not exist in current catalogs (only the Targeting Pack does, which
+    UBT rejects as insufficient — it needs the SDK proper). The
+    correct fix is the **standalone .NET Framework Developer Pack**
+    from Microsoft. Either 4.6.2 (UE's minimum) or 4.8 (newer / more
+    likely still hosted) works:
+    1. Download from <https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48> — "Download .NET Framework 4.8 Developer Pack" (offline installer, ~70 MB).
+    2. Run the installer (UAC prompts; takes ~1 min).
+    3. Verify with `reg query "HKLM\SOFTWARE\WOW6432Node\Microsoft\Microsoft SDKs\NETFXSDK\4.8" /v KitsInstallationFolder` — should print a path.
+    4. Then `Build.bat AcUnrealEditor Win64 Development -Project=...AcUnreal.uproject` succeeds and `UnrealEditor.exe AcUnreal.uproject` opens.
+
+    > **Why not just use VS Installer?** Tried it; the SDK component
+    > doesn't actually populate the files / registry that UBT requires.
+    > Only the Targeting Pack installs, and UBT explicitly rejects
+    > targeting-pack-only as insufficient ("Could not find NetFxSDK
+    > install dir" — `Engine\Source\Editor\SwarmInterface\SwarmInterface.Build.cs`
+    > checks `Target.WindowsPlatform.NetFxSdkDir` which reads the
+    > `NETFXSDK\<ver>\KitsInstallationFolder` registry value, not the
+    > targeting-pack reference-assembly dir).
+
 ---
 
 ## Reproduce from a clean checkout
