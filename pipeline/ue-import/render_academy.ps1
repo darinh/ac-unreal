@@ -70,11 +70,23 @@ $RendersDir = Join-Path $RepoRoot "pipeline\renders"
 $Timestamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
 $OutDir = Join-Path $RendersDir $Timestamp
 
-# 1. Kill stale UE
-Get-Process -Name "UnrealEditor*" -ErrorAction SilentlyContinue | ForEach-Object {
-    Stop-Process -Id $_.Id -Force
-    Write-Host "killed stale UE PID $($_.Id)"
+# Ensure ALL UE processes are terminated even if the script exits
+# abnormally (terminating error / Ctrl-C / pipeline failure). Without
+# this trap the .bat wrapper can leave UnrealEditor-Cmd.exe running
+# in the background holding the project file lock.
+function Stop-AllUE {
+    Get-Process -Name "UnrealEditor*" -ErrorAction SilentlyContinue | ForEach-Object {
+        try { Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue } catch {}
+    }
 }
+trap {
+    Write-Host "TRAP: script terminating — cleaning up any UE processes"
+    Stop-AllUE
+    break
+}
+
+# 1. Kill stale UE
+Stop-AllUE
 Start-Sleep -Seconds 1
 
 # 2. Clean prior screenshots
@@ -94,19 +106,36 @@ if ($null -ne $X -and $null -ne $Y -and $null -ne $Z) {
     $env:AC_VP_ROLL = "$Roll"
     $moveScript = Join-Path $PSScriptRoot "move_player_start.py"
     $UeCmdExe = "C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
-    & $UeCmdExe $Project "-run=pythonscript" "-script=$moveScript" "-nop4" "-nosplash" "-stdout" "-RenderOffScreen" "-nocrashreports" 2>&1 | Out-Null
-    Get-Process -Name "UnrealEditor*" -ErrorAction SilentlyContinue | ForEach-Object {
-        Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
-    }
-    Start-Sleep -Seconds 1
-    # Sanity-check: grep the log for the [move-ps] success line.
+    # Capture log size BEFORE the move so we can scope the log scan
+    # to lines added during this run — prevents picking up an old
+    # "[move-ps] level saved" from a previous successful invocation.
     $logFile = Join-Path $RepoRoot "Saved\Logs\AcUnreal.log"
-    $moveOk = Select-String -Path $logFile -Pattern "\[move-ps\] level saved" -ErrorAction SilentlyContinue | Select-Object -Last 1
-    if (-not $moveOk) {
-        Write-Host "WARN: move_player_start may not have succeeded; rendering anyway"
-    } else {
-        Write-Host "PlayerStart moved + level saved"
+    $logSizeBefore = if (Test-Path $logFile) { (Get-Item $logFile).Length } else { 0 }
+    $moveProc = Start-Process -FilePath $UeCmdExe -ArgumentList @(
+        $Project, "-run=pythonscript", "-script=$moveScript",
+        "-nop4", "-nosplash", "-stdout", "-RenderOffScreen", "-nocrashreports"
+    ) -PassThru -NoNewWindow -Wait
+    Stop-AllUE
+    Start-Sleep -Seconds 1
+    # Scope log scan to bytes written after the run started.
+    $moveOk = $false
+    if (Test-Path $logFile) {
+        $logSizeAfter = (Get-Item $logFile).Length
+        if ($logSizeAfter -gt $logSizeBefore) {
+            $stream = [System.IO.File]::Open($logFile, 'Open', 'Read', 'ReadWrite')
+            try {
+                $stream.Seek($logSizeBefore, 'Begin') | Out-Null
+                $reader = New-Object System.IO.StreamReader($stream)
+                $newLogText = $reader.ReadToEnd()
+                if ($newLogText -match '\[move-ps\] level saved') { $moveOk = $true }
+            } finally { $stream.Dispose() }
+        }
     }
+    if ($moveProc.ExitCode -ne 0 -or -not $moveOk) {
+        Write-Host "ERROR: move_player_start failed (exit=$($moveProc.ExitCode) logOk=$moveOk)"
+        exit 2
+    }
+    Write-Host "PlayerStart moved + level saved"
 }
 
 # 3. Launch the .bat. PowerShell's argument splitter mangles UE's
@@ -118,34 +147,48 @@ $batArgs = @($ResX.ToString(), $ResY.ToString())
 if ($ExtraCmds -ne "") { $batArgs += $ExtraCmds }
 $proc = Start-Process -FilePath $bat -ArgumentList $batArgs -PassThru -NoNewWindow
 
-# 4. Watch for the screenshot to appear. UE writes
+# 4. Watch for the screenshot to appear and finish writing. UE writes
 #    HighresScreenshot00000.png to Saved/Screenshots/WindowsEditor/.
+#    We require TWO consecutive identical sizes ≥1KB before considering
+#    the file complete — otherwise we can kill UE mid-write and end up
+#    with a truncated PNG.
 $found = $null
 $elapsed = 0
+$lastSize = -1
+$stableCount = 0
 while ($elapsed -lt $TimeoutSec) {
     Start-Sleep -Seconds 5
     $elapsed += 5
     if (Test-Path $ScreenshotsDir) {
-        $found = Get-ChildItem $ScreenshotsDir -Filter "HighresScreenshot*.png" -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($found) {
-            Write-Host "[${elapsed}s] screenshot appeared: $($found.Name) ($($found.Length) bytes)"
-            break
+        $candidate = Get-ChildItem $ScreenshotsDir -Filter "HighresScreenshot*.png" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($candidate -and $candidate.Length -ge 1024) {
+            if ($candidate.Length -eq $lastSize) {
+                $stableCount++
+                if ($stableCount -ge 2) {
+                    $found = $candidate
+                    Write-Host "[${elapsed}s] screenshot stable: $($found.Name) ($($found.Length) bytes)"
+                    break
+                }
+                Write-Host "[${elapsed}s] screenshot present + stable poll $stableCount/2 ($($candidate.Length) bytes)"
+            } else {
+                Write-Host "[${elapsed}s] screenshot growing: $($candidate.Length) bytes (was $lastSize)"
+                $lastSize = $candidate.Length
+                $stableCount = 0
+            }
+            continue
         }
     }
     Write-Host "[${elapsed}s] waiting for screenshot..."
 }
 
 # 5. Kill UE — -game mode doesn't auto-exit after HighResShot.
-Get-Process -Name "UnrealEditor*" -ErrorAction SilentlyContinue | ForEach-Object {
-    Stop-Process -Id $_.Id -Force
-    Write-Host "killed UE PID $($_.Id)"
-}
+Stop-AllUE
 if (-not $proc.HasExited) {
     Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
 }
 
 if (-not $found) {
-    Write-Host "ERROR: no screenshot produced in ${TimeoutSec}s"
+    Write-Host "ERROR: no stable screenshot produced in ${TimeoutSec}s"
     exit 1
 }
 

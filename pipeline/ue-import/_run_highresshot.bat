@@ -6,8 +6,8 @@ REM
 REM Args (positional, optional):
 REM   %1 = ResX (default 1280)
 REM   %2 = ResY (default 720)
-REM   %3 = extra console commands prepended to HighResShot (default empty)
-REM        e.g. "r.EyeAdaptationQuality 0; r.HDR.EnableHDROutput 0"
+REM   %3 = extra console commands prepended to HighResShot, COMMA-separated
+REM        e.g. "r.EyeAdaptationQuality 0, r.HDR.EnableHDROutput 0"
 REM
 REM Output: Saved\Screenshots\WindowsEditor\HighresScreenshot00000.png
 
@@ -19,7 +19,9 @@ if "%RESY%"=="" set RESY=720
 set EXTRA=%~3
 
 set UE="C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
-set PROJ="C:\Users\darin\repos\ac-unreal\AcUnreal.uproject"
+REM Derive project path from the .bat file's own location: <repo>\pipeline\ue-import\_run_highresshot.bat
+REM -> <repo>\AcUnreal.uproject. This keeps the script portable across machines/checkouts.
+set PROJ="%~dp0..\..\AcUnreal.uproject"
 set MAP=/Game/Academy/Maps/AcademyMap
 
 if "%EXTRA%"=="" (
