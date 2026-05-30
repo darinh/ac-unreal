@@ -65,15 +65,21 @@ def log(msg):
 # ---------------------------------------------------------------------
 
 def list_existing_textures() -> set:
-    """Return {texture_hex_uppercase} that exist under /Game/Academy/Textures/."""
+    """Return {texture_hex_uppercase} that exist under /Game/Academy/Textures/.
+    Accepts both naming conventions UE may produce:
+      T_06003C9A.uasset  (when user adds the prefix)
+      06003C9A.uasset    (when UE uses the source filename verbatim)"""
     out = set()
     if not unreal.EditorAssetLibrary.does_directory_exist(TEXTURES_PACKAGE):
         return out
     for asset_path in unreal.EditorAssetLibrary.list_assets(TEXTURES_PACKAGE, recursive=True, include_folder=False):
-        # asset_path looks like "/Game/Academy/Textures/T_06003C9A.T_06003C9A"
+        # asset_path looks like "/Game/Academy/Textures/06003C9A.06003C9A" or ".T_06003C9A.T_06003C9A"
         name = asset_path.rsplit("/", 1)[-1].split(".")[0]
         if name.startswith("T_"):
-            out.add(name[2:].upper())
+            name = name[2:]
+        # Filter to 8-hex-character names (texture IDs); skip anything else.
+        if len(name) == 8 and all(c in "0123456789ABCDEFabcdef" for c in name):
+            out.add(name.upper())
     return out
 
 
@@ -135,12 +141,17 @@ def ensure_mi_for_texture(master, tex_hex):
         _mi_cache[tex_hex] = mi
         return mi
 
-    tex_path = f"{TEXTURES_PACKAGE}/T_{tex_hex}"
-    if not unreal.EditorAssetLibrary.does_asset_exist(tex_path):
-        _mi_cache[tex_hex] = None
-        return None
-    tex = unreal.EditorAssetLibrary.load_asset(tex_path)
+    # Try both UE naming conventions: T_<hex> (when user added the
+    # prefix at import time) and bare <hex> (UE's default — derived
+    # straight from the source filename).
+    tex = None
+    for candidate in (f"{TEXTURES_PACKAGE}/T_{tex_hex}", f"{TEXTURES_PACKAGE}/{tex_hex}"):
+        if unreal.EditorAssetLibrary.does_asset_exist(candidate):
+            tex = unreal.EditorAssetLibrary.load_asset(candidate)
+            if tex is not None:
+                break
     if tex is None:
+        _mi_cache[tex_hex] = None
         return None
 
     at = unreal.AssetToolsHelpers.get_asset_tools()
