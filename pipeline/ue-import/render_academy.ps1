@@ -45,15 +45,20 @@ param(
     [int]$ResX = 1280,
     [int]$ResY = 720,
     [int]$TimeoutSec = 180,
+    # Optional viewpoint override. If provided, the PlayerStart is moved
+    # to this UE world position + rotation before rendering. Otherwise
+    # the existing PlayerStart is used.
+    [Nullable[double]]$X = $null,
+    [Nullable[double]]$Y = $null,
+    [Nullable[double]]$Z = $null,
+    [double]$Pitch = 0.0,
+    [double]$Yaw = 0.0,
+    [double]$Roll = 0.0,
     # Extra console commands to inject before HighResShot. Useful for
-    # forcing exposure (e.g. "r.EyeAdaptationQuality 0; r.HDR.EnableHDROutput 0").
+    # forcing exposure (e.g. "r.EyeAdaptationQuality 0, r.HDR.EnableHDROutput 0").
+    # NOTE: separator is COMMA, not semicolon — UE -ExecCmds requires it.
     [string]$ExtraCmds = ""
 )
-# NOTE: The -X/-Y/-Z PlayerStart-move parameters that used to live
-# here have been REMOVED. move_player_start.py wiped the entire level
-# in commandlet mode (World Partition + save_current_level pitfall).
-# Use a C++ render rig actor for multi-viewpoint capture instead.
-# See the move_player_start.py file header for full diagnosis.
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
@@ -77,10 +82,32 @@ if (Test-Path $ScreenshotsDir) {
     Remove-Item (Join-Path $ScreenshotsDir "*") -Force -Recurse -ErrorAction SilentlyContinue
 }
 
-# 2b. (Removed) The PlayerStart-move step that used to live here
-#     called save_current_level() in commandlet mode, which silently
-#     wipes World-Partition External Actor files. See
-#     move_player_start.py header for the full incident report.
+# 2b. If a viewpoint override was supplied, move PlayerStart to that
+#    position before rendering. Uses a Python commandlet (~5-15s).
+if ($null -ne $X -and $null -ne $Y -and $null -ne $Z) {
+    Write-Host "moving PlayerStart to ($X, $Y, $Z) pitch=$Pitch yaw=$Yaw..."
+    $env:AC_VP_X = "$X"
+    $env:AC_VP_Y = "$Y"
+    $env:AC_VP_Z = "$Z"
+    $env:AC_VP_PITCH = "$Pitch"
+    $env:AC_VP_YAW = "$Yaw"
+    $env:AC_VP_ROLL = "$Roll"
+    $moveScript = Join-Path $PSScriptRoot "move_player_start.py"
+    $UeCmdExe = "C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
+    & $UeCmdExe $Project "-run=pythonscript" "-script=$moveScript" "-nop4" "-nosplash" "-stdout" "-RenderOffScreen" "-nocrashreports" 2>&1 | Out-Null
+    Get-Process -Name "UnrealEditor*" -ErrorAction SilentlyContinue | ForEach-Object {
+        Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
+    }
+    Start-Sleep -Seconds 1
+    # Sanity-check: grep the log for the [move-ps] success line.
+    $logFile = Join-Path $RepoRoot "Saved\Logs\AcUnreal.log"
+    $moveOk = Select-String -Path $logFile -Pattern "\[move-ps\] level saved" -ErrorAction SilentlyContinue | Select-Object -Last 1
+    if (-not $moveOk) {
+        Write-Host "WARN: move_player_start may not have succeeded; rendering anyway"
+    } else {
+        Write-Host "PlayerStart moved + level saved"
+    }
+}
 
 # 3. Launch the .bat. PowerShell's argument splitter mangles UE's
 #    `-ExecCmds="HighResShot 1280x720"` (it sees the space and splits).
