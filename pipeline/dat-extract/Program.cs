@@ -69,6 +69,7 @@ internal static class Program
                 "list-envcells"      => Commands.ListEnvCells(args.AsSpan(1)),
                 "envcell-info"       => Commands.EnvCellInfo(args.AsSpan(1)),
                 "export-envcell"     => Commands.ExportEnvCell(args.AsSpan(1)),
+                "dump-poly-uvs"      => Commands.DumpPolyUVs(args.AsSpan(1)),
                 "export-academy"     => Commands.ExportAcademy(args.AsSpan(1)),
                 "dump-academy-layout" => Commands.DumpAcademyLayout(args.AsSpan(1)),
                 "dump-academy-statics" => Commands.DumpAcademyStatics(args.AsSpan(1)),
@@ -325,6 +326,65 @@ internal static class Commands
         Console.WriteLine($"  RestrictionObj: 0x{ec.RestrictionObj:X8}");
         Console.WriteLine($"  Surfaces:       {ec.Surfaces?.Count ?? 0}");
         Console.WriteLine($"  VisibleCells:   {ec.VisibleCells?.Count ?? 0}");
+        return 0;
+    }
+
+    /// <summary>
+    /// Verification tool: report each polygon's VertexIds + PosUVIndices and
+    /// how many UVs each vertex carries, for one EnvCell. If PosUVIndices are
+    /// all 0 and every vertex has a single UV, the old UVs[0] export happened
+    /// to be correct for this cell; otherwise per-corner UV selection matters.
+    /// </summary>
+    public static int DumpPolyUVs(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 2) { Console.Error.WriteLine("dump-poly-uvs: missing <datDir> <fullCellId>"); return 1; }
+        var datDir = args[0];
+        if (!TryParseLandblockHex(args[1], out var fullId)) { Console.Error.WriteLine($"Bad hex cell id: {args[1]}"); return 1; }
+
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: true);
+        var cellDb = DatManager.CellDat ?? throw new InvalidOperationException("CellDat unavailable.");
+        var portalDb = DatManager.PortalDat ?? throw new InvalidOperationException("PortalDat unavailable.");
+        if (!cellDb.AllFiles.ContainsKey(fullId)) { Console.Error.WriteLine($"No cell at 0x{fullId:X8}."); return 3; }
+        var ec = cellDb.ReadFromDat<EnvCell>(fullId);
+        var env = portalDb.ReadFromDat<ACE.DatLoader.FileTypes.Environment>(ec.EnvironmentId);
+        if (!env.Cells.TryGetValue(ec.CellStructure, out var cs))
+        { Console.Error.WriteLine($"No CellStructure {ec.CellStructure}."); return 5; }
+
+        int multiUvVerts = 0, maxUVs = 0;
+        foreach (var kv in cs.VertexArray.Vertices)
+        {
+            int n = kv.Value.UVs?.Count ?? 0;
+            if (n > 1) multiUvVerts++;
+            if (n > maxUVs) maxUVs = n;
+        }
+        int nonZeroCorners = 0, totalCorners = 0, maxIdx = 0;
+        foreach (var poly in cs.Polygons.Values)
+        {
+            var ids = poly.PosUVIndices;
+            int corners = poly.VertexIds?.Count ?? 0;
+            for (int i = 0; i < corners; i++)
+            {
+                totalCorners++;
+                int uvi = (ids != null && i < ids.Count) ? ids[i] : 0;
+                if (uvi != 0) nonZeroCorners++;
+                if (uvi > maxIdx) maxIdx = uvi;
+            }
+        }
+        Console.WriteLine($"EnvCell 0x{fullId:X8}  Env 0x{ec.EnvironmentId:X8}  CellStruct {ec.CellStructure}");
+        Console.WriteLine($"  vertices={cs.VertexArray.Vertices.Count}  polys={cs.Polygons.Count}");
+        Console.WriteLine($"  verts with >1 UV: {multiUvVerts}  (max UVs on a vertex: {maxUVs})");
+        Console.WriteLine($"  polygon corners with non-zero PosUVIndex: {nonZeroCorners}/{totalCorners}  (max index: {maxIdx})");
+        Console.WriteLine(nonZeroCorners == 0 && maxUVs <= 1
+            ? "  => UVs[0] export was CORRECT for this cell (no per-corner UV selection needed)."
+            : "  => per-corner PosUVIndices MATTER for this cell; the old UVs[0] export would mismap.");
+        int shown = 0;
+        foreach (var poly in cs.Polygons.Values)
+        {
+            if (shown++ >= 8) break;
+            var vids = poly.VertexIds != null ? string.Join(",", poly.VertexIds) : "";
+            var uvis = poly.PosUVIndices != null ? string.Join(",", poly.PosUVIndices) : "(none)";
+            Console.WriteLine($"  poly surf={poly.PosSurface} V=[{vids}] PosUV=[{uvis}]");
+        }
         return 0;
     }
 

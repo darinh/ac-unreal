@@ -9,7 +9,7 @@ these change; record the change in the README §6 changelog.
 | .NET SDK (build) | **8.0** target (`net8.0-windows`) | `acdat` targets net8.0-windows; local `dotnet` CLI was 10.0.300 (SDK ok, project pins net8.0). |
 | Python | **3.11.9** | used by the UE headless import scripts (UE's bundled interpreter at runtime). |
 | ACEmulator (`ACE.DatLoader`) | SHA **`9bc20cbd`** | clone at `~/repos/ACE`; referenced by `AcDatExtract.csproj` via relative path. License: AGPL-family - see [LEGAL.md](../../LEGAL.md) / ADR-0003. |
-| ACViewer | **TBD** | reference documentation only; record SHA if/when used. |
+| ACViewer | SHA **`ef94ce6`** | clone at `~/repos/ACViewer`; the independent reference for cell geometry/UV/texture interpretation (its `FileExport.cs` confirmed the `PosUVIndices` UV-selection fix). Read-as-reference; GPL-family (see LEGAL.md / ADR-0006). |
 | AC DAT iteration | portal **2072** / cell **982** | the retail install we validated against; *provenance, not a spec* (read from each DAT header). |
 | GPU / driver | **TBD** | record for render-determinism debugging (dev box: RTX 4090 per root README). |
 

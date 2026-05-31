@@ -112,6 +112,7 @@ acdat list-envcells <dat> <LLLL>
 acdat envcell-info <dat> <fullCellId>
 acdat dump-starterareas <dat>
 acdat export-envcell <dat> <fullCellId> <out.obj>
+acdat dump-poly-uvs <dat> <fullCellId>                    # verify per-face PosUVIndices / multi-UV verts for a cell
 acdat export-academy <dat> <LLLL> <outDir>                # all indoor cells -> per-cell OBJ/MTL
 acdat dump-academy-layout <dat> <LLLL> <out.json>         # per-cell world transforms
 acdat dump-academy-statics <dat> <LLLL> <out.json>        # StaticObjects (props) per cell
@@ -168,7 +169,7 @@ into UE at Import Scale = 1.0.
    - Triangulate as a **fan from vertex 0** (`v0, vi, vi+1`).
    - `PosSurface` / `NegSurface` are signed indices into `EnvCell.Surfaces` (front / back face). Honor `CullMode` for one- vs two-sided faces.
    - UVs come from `PosUVIndices[k]` selecting which entry of vertex `VertexIds[k]`'s UV list to use (NOT vertex-index = UV-index). A single `SWVertex` can carry several UVs, so the exporter emits one `vt` per (vertex, UV-index) and each polygon corner references `PosUVIndices[k]`, falling back to index 0 only when the array is absent (`NoPos` stippling). This mirrors ACViewer `FileExport.cs` (`vertexUVs[(v, i < PosUVIndices.Count ? PosUVIndices[i] : 0)]`). `[PROVEN]` cell `0x86020100`: 13 verts but 20 UVs, and faces now decouple the position index from the UV index. The earlier collapse to `UVs[0]` (vertex-index = UV-index) was a confirmed bug, now fixed in `ExportEnvCell`.
-   - **Confirmed blocking symptom (Step 0, 2026-05-30):** in the first-room candidate `0x860201AD` the walls render the wrong texture identity (brown `06003C9C` where the reference shows grey-blue masonry; `06003C9A` blue-grey blocks appear mapped to the floor). This must be resolved before any room can be visually matched to a reference. Suspects to check in order: (1) per-surface `surf_N -> EnvCell.Surfaces[]` resolution and the `Textures[last]` mip pick; (2) `PosUVIndices` per-face UV selection; (3) which polygon group is wall vs floor. Verify against the source PNGs in `out/academy_8602/textures/`.
+   - **Resolved (Step 1, 2026-05-31):** the earlier "walls are the wrong, grey-blue texture" alarm was a **false alarm** - a misread of the low-res original reference plus a stale `M_HotPinkDiagnostic` bound to the wall slot (rendered magenta). Texture *identity* was always correct: `0x860201AD` walls = `06003C9C` (brown stone with a masonry baseboard course), floor = `06003C9A` (blue tile), confirmed vs the clearer answer-key starting view. The genuine defect was UV *mapping*: the exporter ignored `PosUVIndices` (`dump-poly-uvs 860201AD` shows 12/54 corners non-zero, 6 verts with >1 UV). Fixed per ACViewer; re-exported + re-imported; the room shell now renders faithfully. **Lesson:** distinguish texture *identity* (which surf->which texture) from texture *mapping* (which UV per corner) - they are separate failure modes; verify both, and never trust a low-res reference over the data + a clean render.
 5. Emit OBJ (transform per §4) + `.mtl` mapping `surf_N` -> texture/color.
 
 ### Textures & materials `[PARTIAL]`
