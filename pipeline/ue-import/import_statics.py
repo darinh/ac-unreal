@@ -93,7 +93,11 @@ def build_setup_mesh(obj_path: Path, asset_name: str) -> unreal.StaticMesh:
                 vi = desc.create_vertex_instance(v)
                 if 0 <= ti < len(obj_mesh.uvs):
                     u, vv = obj_mesh.uvs[ti]
-                    desc.set_vertex_instance_uv(vi, unreal.Vector2D(u, 1.0 - vv), 0)
+                    # AC UVs are top-left origin (V down), same as UE: do NOT
+                    # flip V. Matches the import_academy.py fix; the old
+                    # `1.0 - vv` rendered textures upside-down. (Props still
+                    # need a re-import for this to take effect.)
+                    desc.set_vertex_instance_uv(vi, unreal.Vector2D(u, vv), 0)
                 vi_ids.append(vi)
             desc.create_triangle(pg_id, vi_ids)
 

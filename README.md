@@ -1,5 +1,12 @@
 # ac-unreal
 
+> **Planning docs:** the world-migration plan and methodology live in
+> [`docs/migration/`](docs/migration/) (master plan, extraction methodology,
+> glossary). IP posture: [`LEGAL.md`](LEGAL.md) (read before contributing).
+> Note: decision #19 below (Lumen enabled) is currently **stale** - the live
+> `Config/DefaultEngine.ini` disables Lumen/Nanite/HW-RT; see the migration
+> methodology §7.
+
 Asheron's Call simulation parity + modernized presentation in Unreal
 Engine 5. Two strictly separate lanes:
 

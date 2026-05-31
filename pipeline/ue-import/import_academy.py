@@ -305,16 +305,23 @@ def build_static_mesh(obj_mesh: ObjMesh, mtl_map: dict, asset_name: str,
     No material binding in this pass — geometry only. Materials are
     assigned by the follow-up assign_materials.py script."""
     asset_path = f"{CELLS_PACKAGE}/{asset_name}"
+    # Rebuild in place if the asset already exists (so a re-run actually
+    # applies geometry/UV fixes) instead of early-returning. Capture any
+    # existing material-slot bindings so the rebuild preserves them rather
+    # than wiping them back to WorldGridMaterial.
+    prev_mats = {}
     if unreal.EditorAssetLibrary.does_asset_exist(asset_path):
-        return unreal.EditorAssetLibrary.load_asset(asset_path)
-
-    unreal.EditorAssetLibrary.make_directory(CELLS_PACKAGE)
-    at = unreal.AssetToolsHelpers.get_asset_tools()
-    sm = at.create_asset(
-        asset_name=asset_name,
-        package_path=CELLS_PACKAGE,
-        asset_class=unreal.StaticMesh,
-        factory=None)
+        sm = unreal.EditorAssetLibrary.load_asset(asset_path)
+        for s in (sm.get_editor_property("static_materials") or []):
+            prev_mats[str(s.material_slot_name)] = s.material_interface
+    else:
+        unreal.EditorAssetLibrary.make_directory(CELLS_PACKAGE)
+        at = unreal.AssetToolsHelpers.get_asset_tools()
+        sm = at.create_asset(
+            asset_name=asset_name,
+            package_path=CELLS_PACKAGE,
+            asset_class=unreal.StaticMesh,
+            factory=None)
     if sm is None:
         unreal.log_error(f"create_asset returned None for {asset_path}")
         return None
@@ -356,17 +363,24 @@ def build_static_mesh(obj_mesh: ObjMesh, mtl_map: dict, asset_name: str,
                 vi = desc.create_vertex_instance(v)
                 if 0 <= ti < len(obj_mesh.uvs):
                     u, vv = obj_mesh.uvs[ti]
-                    desc.set_vertex_instance_uv(vi, unreal.Vector2D(u, 1.0 - vv), 0)
+                    # AC uses a DirectX-style top-left UV origin (V increasing
+                    # downward), same as UE — so do NOT flip V. The previous
+                    # `1.0 - vv` rendered every wall texture upside-down
+                    # (verified: the brick trim band sat at the top instead of
+                    # the floor). Use vv directly.
+                    desc.set_vertex_instance_uv(vi, unreal.Vector2D(u, vv), 0)
                 vi_ids.append(vi)
             desc.create_triangle(pg_id, vi_ids)
 
     sm.build_from_static_mesh_descriptions([desc])
 
-    # Stamp empty material slots so the assign_materials.py follow-up
-    # can populate them by slot_name. Material is None for now → UE
-    # falls back to WorldGridMaterial.
+    # Stamp material slots by slot_name, preserving any binding the mesh
+    # already had (prev_mats) so a geometry/UV rebuild doesn't wipe assigned
+    # materials. Newly-built meshes get None → WorldGridMaterial until the
+    # material-assignment pass runs.
     sm.set_editor_property("static_materials",
-        [unreal.StaticMaterial(material_interface=None, material_slot_name=n)
+        [unreal.StaticMaterial(material_interface=prev_mats.get(str(n)),
+                               material_slot_name=n)
          for n in slot_names])
 
     unreal.EditorAssetLibrary.save_asset(asset_path)

@@ -83,12 +83,19 @@ def main():
             continue
 
         c = L["color_rgb"]
-        # AC intensity values are pretty small (often < 1); scale up
-        # so UE's PointLight (default 5000 cd) reads visually similar.
-        # Falloff in AC is "radius" in metres — we convert to UE cm.
+        # AC's per-light Intensity is a flat 100 for every academy light
+        # (the dat stores a constant; real brightness is driven by Falloff/
+        # radius + the surface's own Luminosity). So scaling that constant is
+        # just a global brightness knob. A UNITLESS UE intensity around a few
+        # thousand reads like an indoor torch, so the default multiplier maps
+        # AC-100 -> ~3000. Override with AC_LIGHT_MULT to retune without
+        # re-extracting. (Was a flat *2500 = 250000, which is ~50x too hot now
+        # that the 2x-coord bug is fixed and the lights actually sit inside the
+        # cells they light.)
+        light_mult = float(os.environ.get("AC_LIGHT_MULT", "30.0"))
         ac_intensity = max(float(L.get("intensity", 1.0)), 0.01)
         ac_falloff_m = max(float(L.get("falloff", 5.0)), 0.5)
-        ue_intensity = ac_intensity * 2500.0   # tuned to feel right at indoor scale
+        ue_intensity = ac_intensity * light_mult
         ue_attenuation_cm = ac_falloff_m * 100.0
 
         lc = actor.get_editor_property("light_component")

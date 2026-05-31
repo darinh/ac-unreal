@@ -901,14 +901,8 @@ internal static class Commands
 
         const float kCmPerMetre = 100.0f;
 
-        static (float x, float y, float z, float w) QuatMulAc((float x, float y, float z, float w) a, (float x, float y, float z, float w) b)
-        {
-            return (
-                a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
-                a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
-                a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
-                a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z);
-        }
+        // (Lights use only RotateAcVec — the stab frame is landblock-absolute,
+        // so there is no cell-orientation quaternion to compose here.)
         static (float x, float y, float z) RotateAcVec((float x, float y, float z, float w) q, (float x, float y, float z) v)
         {
             float qx = q.x, qy = q.y, qz = q.z, qw = q.w;
@@ -967,29 +961,25 @@ internal static class Commands
             var ec = cellDb.ReadFromDat<EnvCell>(cellId);
             if (ec.StaticObjects == null || ec.StaticObjects.Count == 0) continue;
 
-            var cellPos = (x: ec.Position.Origin.X, y: ec.Position.Origin.Y, z: ec.Position.Origin.Z);
-            var cellOrient = (
-                x: ec.Position.Orientation.X,
-                y: ec.Position.Orientation.Y,
-                z: ec.Position.Orientation.Z,
-                w: ec.Position.Orientation.W);
-
             foreach (var stab in ec.StaticObjects)
             {
                 var lights = GetLights(stab.Id);
                 if (lights.Count == 0) continue;
 
-                var stabLocalPos = (x: stab.Frame.Origin.X, y: stab.Frame.Origin.Y, z: stab.Frame.Origin.Z);
-                var stabLocalOrient = (
+                // BUGFIX 2026-05-30: stab.Frame is ALREADY landblock-absolute
+                // for EnvCell StaticObjects -- it is NOT cell-local. Verified:
+                // for identity-orientation cells stab.Frame.Origin equals the
+                // cell's EnvCell.Position.Origin, and the previous
+                // "cellPos + RotateAcVec(cellOrient, stabLocalPos)" form placed
+                // every light at exactly 2x the cell position (doubling cellPos).
+                // So use the stab frame directly -- do NOT re-add cellPos or
+                // re-apply cellOrient. (ec.Position is intentionally unused now.)
+                var stabWorldPos = (x: stab.Frame.Origin.X, y: stab.Frame.Origin.Y, z: stab.Frame.Origin.Z);
+                var stabWorldOrient = (
                     x: stab.Frame.Orientation.X,
                     y: stab.Frame.Orientation.Y,
                     z: stab.Frame.Orientation.Z,
                     w: stab.Frame.Orientation.W);
-
-                // Stab world frame
-                var stabWorldPos = RotateAcVec(cellOrient, stabLocalPos);
-                stabWorldPos = (cellPos.x + stabWorldPos.x, cellPos.y + stabWorldPos.y, cellPos.z + stabWorldPos.z);
-                var stabWorldOrient = QuatMulAc(cellOrient, stabLocalOrient);
 
                 foreach (var light in lights)
                 {
