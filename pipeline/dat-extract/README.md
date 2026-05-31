@@ -98,6 +98,18 @@ $acdat = ".\bin\Release\net8.0\acdat.exe"
 ### Indoor EnvCell (`export-envcell`, `export-academy`)
 - Triangulated Wavefront OBJ with positions + normals + UV0.
 - One OBJ group per material surface (`g surf_<idx>` / `usemtl surf_<idx>`).
+- **Portal polygons are skipped** (`Stippling == NoPos`). In AC an EnvCell
+  connects to its neighbours through *portal* polygons — the see-through
+  doorway / floor-ceiling openings. AC's renderer never draws them (verified
+  against ACViewer `Render/R_CellStruct.cs` `Draw()`: `if (polygon.Stippling
+  == StipplingType.NoPos) continue;`); the adjacent cell is what you see
+  through the opening. Emitting them as solid surfaces baked an opaque face
+  over every opening (e.g. a black "ceiling" hiding the wood-beam cell above
+  the first academy room). The export now drops `NoPos` polygons. This is a
+  general, academy-wide rule, not a per-room patch — see ADR-0008. Diagnostics:
+  `dump-poly-stippling <datDir> <cellId>` (per-polygon stippling + the portal
+  list) and `audit-portals <datDir> <landblock>` (proves every skipped polygon
+  is a declared portal; 568/568 academy cells hold the invariant, 0 violations).
 - **UE-ready coordinates** — left-handed Z-up, centimetres. The Phase 0
   coord transform is baked in at export time: `UE.X = AC.Y * 100`,
   `UE.Y = AC.X * 100`, `UE.Z = AC.Z * 100`. Triangle winding is flipped

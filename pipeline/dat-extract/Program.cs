@@ -30,6 +30,7 @@ using System.Text;
 using System.Text.Json;
 using ACE.DatLoader;
 using ACE.DatLoader.FileTypes;
+using ACE.Entity.Enum;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
@@ -70,11 +71,14 @@ internal static class Program
                 "envcell-info"       => Commands.EnvCellInfo(args.AsSpan(1)),
                 "export-envcell"     => Commands.ExportEnvCell(args.AsSpan(1)),
                 "dump-poly-uvs"      => Commands.DumpPolyUVs(args.AsSpan(1)),
+                "dump-poly-stippling" => Commands.DumpPolyStippling(args.AsSpan(1)),
+                "audit-portals"      => Commands.AuditPortals(args.AsSpan(1)),
                 "export-academy"     => Commands.ExportAcademy(args.AsSpan(1)),
                 "dump-academy-layout" => Commands.DumpAcademyLayout(args.AsSpan(1)),
                 "dump-academy-statics" => Commands.DumpAcademyStatics(args.AsSpan(1)),
                 "dump-academy-lights" => Commands.DumpAcademyLights(args.AsSpan(1)),
                 "export-setup"       => Commands.ExportSetup(args.AsSpan(1)),
+                "export-npc"         => Commands.ExportNpc(args.AsSpan(1)),
                 "export-academy-statics" => Commands.ExportAcademyStatics(args.AsSpan(1)),
                 "dump-starterareas"  => Commands.DumpStarterAreas(args.AsSpan(1)),
                 "export-landblock"   => Commands.ExportLandblock(args.AsSpan(1)),
@@ -330,6 +334,109 @@ internal static class Commands
     }
 
     /// <summary>
+    /// Academy-wide invariant check: for every EnvCell in a landblock, verify that
+    /// the set of polygons with Stippling == NoPos equals CellStruct.Portals equals
+    /// the set of EnvCell.CellPortals PolygonIds. Proves the render-skip criterion
+    /// (Stippling == NoPos, used by ExportEnvCell, mirroring ACViewer) is exactly the
+    /// portal set, so skipping NoPos drops portals and only portals — academy-wide,
+    /// not just for one room. Read-only.
+    /// </summary>
+    public static int AuditPortals(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 2) { Console.Error.WriteLine("audit-portals: missing <datDir> <hexLandblockId>"); return 1; }
+        var datDir = args[0];
+        if (!TryParseLandblockHex(args[1], out var lbHigh16)) { Console.Error.WriteLine($"Bad hex landblock id: {args[1]}"); return 1; }
+
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: true);
+        var cellDb = DatManager.CellDat ?? throw new InvalidOperationException("CellDat unavailable.");
+        var portalDb = DatManager.PortalDat ?? throw new InvalidOperationException("PortalDat unavailable.");
+
+        var minId = (lbHigh16 << 16) | 0x0100u;
+        var maxId = (lbHigh16 << 16) | 0xFFFDu;
+        var ids = cellDb.AllFiles.Keys.Where(id => id >= minId && id <= maxId).OrderBy(id => id).ToList();
+
+        int cells = 0, notSubset = 0, totalNoPos = 0, totalPortals = 0, renderedPortals = 0;
+        foreach (var id in ids)
+        {
+            var ec = cellDb.ReadFromDat<EnvCell>(id);
+            var env = portalDb.ReadFromDat<ACE.DatLoader.FileTypes.Environment>(ec.EnvironmentId);
+            if (!env.Cells.TryGetValue(ec.CellStructure, out var cs)) continue;
+            cells++;
+
+            var noPos = cs.Polygons.Where(kv => kv.Value.Stippling == StipplingType.NoPos)
+                                   .Select(kv => kv.Key).OrderBy(k => k).ToList();
+            var structPortals = new HashSet<ushort>(cs.Portals);
+            totalNoPos += noPos.Count;
+            totalPortals += structPortals.Count;
+            // Every NoPos polygon must be a declared portal. (The reverse need NOT
+            // hold: a portal has two sides — the see-through side is NoPos and is
+            // skipped; the opposite side is a normal rendered surface, e.g. the
+            // wood-beam floor of the cell above appears through the room's ceiling.)
+            renderedPortals += structPortals.Count(p => !noPos.Contains(p));
+            var notPortal = noPos.Where(p => !structPortals.Contains(p)).ToList();
+            if (notPortal.Count > 0)
+            {
+                notSubset++;
+                Console.WriteLine($"  NOT-A-PORTAL 0x{id:X8}: NoPos polys not in Portals = [{string.Join(",", notPortal)}]");
+            }
+        }
+        Console.WriteLine($"Audited {cells} EnvCells in landblock 0x{lbHigh16:X4}: {totalNoPos} NoPos(skipped) polys, {totalPortals} portal polys ({renderedPortals} rendered portal sides), {notSubset} cell(s) where a skipped poly is NOT a portal.");
+        Console.WriteLine(notSubset == 0
+            ? "  INVARIANT HOLDS: every skipped (NoPos) polygon is a declared portal — the fix never drops real geometry. (Portals are a superset; their rendered sides are kept.)"
+            : "  INVARIANT VIOLATED: some NoPos polygons are NOT portals (see above) — skipping them could drop real geometry.");
+        return notSubset == 0 ? 0 : 2;
+    }
+
+    /// <summary>
+    /// Verification tool: dump each polygon's Stippling flag, sidedness,
+    /// surfaces, and vertex Z-range (AC native coords) for one EnvCell, plus
+    /// the CellStruct.Portals list (portal polygon ids) and EnvCell.CellPortals
+    /// (PolygonId -> OtherCellId). Used to confirm which polygons are the
+    /// see-through portal faces that ACViewer's renderer skips
+    /// (Stippling == NoPos). Read-only; no files written.
+    /// </summary>
+    public static int DumpPolyStippling(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 2) { Console.Error.WriteLine("dump-poly-stippling: missing <datDir> <fullCellId>"); return 1; }
+        var datDir = args[0];
+        if (!TryParseLandblockHex(args[1], out var fullId)) { Console.Error.WriteLine($"Bad hex cell id: {args[1]}"); return 1; }
+
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: true);
+        var cellDb = DatManager.CellDat ?? throw new InvalidOperationException("CellDat unavailable.");
+        var portalDb = DatManager.PortalDat ?? throw new InvalidOperationException("PortalDat unavailable.");
+        if (!cellDb.AllFiles.ContainsKey(fullId)) { Console.Error.WriteLine($"No cell at 0x{fullId:X8}."); return 3; }
+        var ec = cellDb.ReadFromDat<EnvCell>(fullId);
+        var env = portalDb.ReadFromDat<ACE.DatLoader.FileTypes.Environment>(ec.EnvironmentId);
+        if (!env.Cells.TryGetValue(ec.CellStructure, out var cs))
+        { Console.Error.WriteLine($"No CellStructure {ec.CellStructure}."); return 5; }
+
+        Console.WriteLine($"EnvCell 0x{fullId:X8}  Env 0x{ec.EnvironmentId:X8}  CellStruct {ec.CellStructure}");
+        Console.WriteLine($"  polys={cs.Polygons.Count}  verts={cs.VertexArray.Vertices.Count}");
+        Console.WriteLine($"  CellStruct.Portals (portal polygon ids): [{string.Join(",", cs.Portals)}]");
+        if (ec.CellPortals != null && ec.CellPortals.Count > 0)
+        {
+            Console.WriteLine($"  EnvCell.CellPortals ({ec.CellPortals.Count}):");
+            foreach (var cp in ec.CellPortals)
+                Console.WriteLine($"    Flags={cp.Flags} PolygonId={cp.PolygonId} OtherCellId=0x{cp.OtherCellId:X4} OtherPortalId={cp.OtherPortalId}");
+        }
+        Console.WriteLine($"  per-polygon (key id : Stippling SidesType PosSurf NegSurf NumPts Zrange[AC]):");
+        foreach (var kv in cs.Polygons.OrderBy(k => k.Key))
+        {
+            var p = kv.Value;
+            float zmin = float.MaxValue, zmax = float.MinValue;
+            foreach (var vid in p.VertexIds)
+            {
+                var z = cs.VertexArray.Vertices[(ushort)vid].Origin.Z;
+                if (z < zmin) zmin = z;
+                if (z > zmax) zmax = z;
+            }
+            bool isPortal = cs.Portals.Contains(kv.Key);
+            Console.WriteLine($"    id={kv.Key,-3} Stippling={p.Stippling}(0x{(int)p.Stippling:X}) Sides={p.SidesType} PosSurf={p.PosSurface} NegSurf={p.NegSurface} NumPts={p.NumPts} Z=[{zmin:F1},{zmax:F1}]{(isPortal ? "  <-- in Portals" : "")}");
+        }
+        return 0;
+    }
+
+    /// <summary>
     /// Verification tool: report each polygon's VertexIds + PosUVIndices and
     /// how many UVs each vertex carries, for one EnvCell. If PosUVIndices are
     /// all 0 and every vertex has a single UV, the old UVs[0] export happened
@@ -517,9 +624,24 @@ internal static class Commands
         }
 
         // Group polygons by PosSurface (index into EnvCell.Surfaces) and emit each group.
+        // Skip portal polygons: a polygon whose Stippling == NoPos has no positive
+        // surface to draw — it is a see-through cell-to-cell connection (doorway /
+        // floor-ceiling opening). AC's renderer never draws these; the adjacent
+        // EnvCell is what you see through the opening. Confirmed against ACViewer
+        // Render/R_CellStruct.cs Draw(): `if (polygon._polygon.Stippling ==
+        // StipplingType.NoPos) continue;`. Cross-checked against the DAT: for cell
+        // 0x860201AD the only NoPos polys (ids 12,13, surface "surf_2") are exactly
+        // CellStruct.Portals=[12,13] — poly 12 -> OtherCellId 0x01B4 (hallway), poly
+        // 13 -> OtherCellId 0x02E2 (the wood-beam cell above). Emitting them as solid
+        // surfaces was occluding the adjacent cells (the black "ceiling"/doorway bug).
+        // This is the GENERAL rule for every academy cell, not a per-room patch.
         int triEmitted = 0;
         int polysSkipped = 0;
-        var groups = cs.Polygons.Values
+        var renderPolys = cs.Polygons.Values
+            .Where(p => p.Stippling != StipplingType.NoPos)
+            .ToList();
+        int portalPolysSkipped = cs.Polygons.Count - renderPolys.Count;
+        var groups = renderPolys
             .GroupBy(p => (int)p.PosSurface)
             .OrderBy(g => g.Key);
         var surfaceIndicesUsed = new HashSet<int>();
@@ -685,7 +807,7 @@ internal static class Commands
 
         var bytes = new FileInfo(outPath).Length;
         Console.WriteLine($"Wrote {bytes} bytes to {outPath}");
-        Console.WriteLine($"  Cell 0x{fullId:X8}: {vertCount} verts, {polyCount} polys -> {triEmitted} triangles ({polysSkipped} skipped)");
+        Console.WriteLine($"  Cell 0x{fullId:X8}: {vertCount} verts, {polyCount} polys -> {triEmitted} triangles ({polysSkipped} degenerate skipped, {portalPolysSkipped} portal/NoPos skipped)");
         Console.WriteLine($"  Materials: {surfaceIndicesUsed.Count} unique surfaces  ({texturesWritten} new textures, {solidColors} solid colors, {missing} missing/failed)");
         Console.WriteLine($"  Sidecar: {mtlPath}");
         return 0;
@@ -1332,6 +1454,303 @@ internal static class Commands
 
         Console.WriteLine($"Wrote {new FileInfo(outPath).Length} bytes to {outPath}");
         Console.WriteLine($"  0x{setupId:X8}: {parts.Count} parts -> {totalTris} triangles, {allMtls.Count} mtls, {texturesWritten} new textures");
+        return 0;
+    }
+
+    /// <summary>
+    /// Assemble an NPC body OBJ from a base SetupModel plus a weenie-derived
+    /// appearance overlay (anim_part GfxObj overrides + per-part texture_map
+    /// substitution). Mirrors ExportSetup's geometry emission but applies the
+    /// ACE/ACViewer ObjDesc model:
+    ///   * for each base part index, the weenie AnimationId (anim_parts)
+    ///     replaces the base GfxObj at that index;
+    ///   * GfxObj 0x010001EC is the empty/invisible placeholder and is skipped
+    ///     (ACViewer Model/Setup.cs);
+    ///   * each part's Surface.OrigTextureId (a 0x05 SurfaceTexture id) is
+    ///     remapped via texture_map[partIndex] old->new before the SurfaceTexture
+    ///     is read (ACViewer Render/TextureCache.cs 0x08 branch).
+    /// Palette recolours are intentionally NOT applied (tracked as Phase-9).
+    /// Usage: export-npc &lt;datDir&gt; &lt;appearanceJson&gt; &lt;out.obj&gt;
+    /// </summary>
+    public static int ExportNpc(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 3) { Console.Error.WriteLine("export-npc: missing <datDir> <appearanceJson> <out.obj>"); return 1; }
+        var datDir = args[0];
+        var jsonPath = args[1];
+        var outPath = args[2];
+
+        if (!File.Exists(jsonPath)) { Console.Error.WriteLine($"Appearance JSON not found: {jsonPath}"); return 1; }
+
+        static bool TryParseHexId(string? s, out uint id)
+        {
+            id = 0;
+            if (string.IsNullOrEmpty(s)) return false;
+            var t = s.Trim();
+            if (t.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) t = t.Substring(2);
+            return uint.TryParse(t, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out id);
+        }
+
+        // Parse the appearance overlay.
+        uint setupId;
+        var partOverrides = new Dictionary<int, uint>();
+        var texMap = new Dictionary<int, Dictionary<uint, uint>>();
+        try
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(jsonPath));
+            var root = doc.RootElement;
+            if (!TryParseHexId(root.GetProperty("setup_id").GetString(), out setupId))
+            {
+                Console.Error.WriteLine($"Bad setup_id in {jsonPath}"); return 1;
+            }
+            if (root.TryGetProperty("anim_parts", out var ap) && ap.ValueKind == System.Text.Json.JsonValueKind.Object)
+            {
+                foreach (var prop in ap.EnumerateObject())
+                {
+                    if (int.TryParse(prop.Name, out var idx) && TryParseHexId(prop.Value.GetString(), out var gid))
+                        partOverrides[idx] = gid;
+                }
+            }
+            if (root.TryGetProperty("texture_map", out var tm) && tm.ValueKind == System.Text.Json.JsonValueKind.Array)
+            {
+                foreach (var entry in tm.EnumerateArray())
+                {
+                    int idx = entry.GetProperty("index").GetInt32();
+                    if (TryParseHexId(entry.GetProperty("old").GetString(), out var oldId)
+                        && TryParseHexId(entry.GetProperty("new").GetString(), out var newId))
+                    {
+                        if (!texMap.TryGetValue(idx, out var sub)) { sub = new Dictionary<uint, uint>(); texMap[idx] = sub; }
+                        sub[oldId] = newId;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to parse appearance JSON: {ex.Message}");
+            return 2;
+        }
+
+        // GfxObj id used by AC as the empty/invisible part placeholder.
+        const uint EmptyPartGfx = 0x010001EC;
+
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: false);
+        var portalDb = DatManager.PortalDat ?? throw new InvalidOperationException("PortalDat unavailable.");
+
+        if (((setupId >> 24) & 0xFFu) != 0x02)
+        {
+            Console.Error.WriteLine($"setup_id 0x{setupId:X8} is not a SetupModel (0x02)."); return 3;
+        }
+        if (!portalDb.AllFiles.ContainsKey(setupId))
+        {
+            Console.Error.WriteLine($"Setup 0x{setupId:X8} not in PortalDat."); return 3;
+        }
+
+        var setup = portalDb.ReadFromDat<SetupModel>(setupId);
+        if (setup.Parts == null || setup.Parts.Count == 0)
+        {
+            Console.Error.WriteLine($"Setup 0x{setupId:X8} has no Parts."); return 4;
+        }
+        var parts = setup.Parts;
+        // Match ACViewer (Model/Setup.cs): prefer the Resting (0x65) placement,
+        // but fall back to Default (0x00) when Resting is absent. Character
+        // setups (e.g. 0x02000001) often have only Default; without this
+        // fallback every part collapses to the setup origin, producing a tiny
+        // jumbled blob instead of a full-height standing body.
+        const int RestingPlacement = 0x65;
+        const int DefaultPlacement = 0x00;
+        ACE.DatLoader.Entity.PlacementType? placement = null;
+        if (setup.PlacementFrames.TryGetValue(RestingPlacement, out var pfRest))
+            placement = pfRest;
+        else if (setup.PlacementFrames.TryGetValue(DefaultPlacement, out var pfDef))
+            placement = pfDef;
+        var defaultScales = (setup.DefaultScale != null && setup.DefaultScale.Count == parts.Count) ? setup.DefaultScale : null;
+        var hasDefaultScale = defaultScales != null;
+
+        var outDir = Path.GetDirectoryName(outPath);
+        if (!string.IsNullOrEmpty(outDir)) Directory.CreateDirectory(outDir);
+        var texDir = Path.Combine(string.IsNullOrEmpty(outDir) ? "." : outDir, "textures");
+        Directory.CreateDirectory(texDir);
+
+        const float kCmPerMetre = 100.0f;
+        var objBaseName = Path.GetFileNameWithoutExtension(outPath);
+        var mtlPath = Path.Combine(outDir ?? ".", objBaseName + ".mtl");
+
+        using var sw = new StreamWriter(outPath);
+        sw.WriteLine($"# Exported by acdat export-npc from base setup 0x{setupId:X8} + appearance overlay");
+        sw.WriteLine($"# {parts.Count} base parts, {partOverrides.Count} anim_part overrides, {texMap.Count} textured part-maps");
+        sw.WriteLine($"# Palette recolours NOT applied (Phase-9). UE-ready coords: left-handed Z-up, cm. Setup-local origin.");
+        sw.WriteLine($"mtllib {objBaseName}.mtl");
+        sw.WriteLine($"o npc_{setupId:X8}");
+
+        int globalVertOffset = 0;
+        var allMtls = new Dictionary<string, (uint surfaceId, uint? textureId)>();
+        int totalTris = 0;
+        int partsEmitted = 0, partsSkipped = 0;
+
+        for (int partIdx = 0; partIdx < parts.Count; partIdx++)
+        {
+            uint gfxId = partOverrides.TryGetValue(partIdx, out var ov) ? ov : parts[partIdx];
+            if (gfxId == EmptyPartGfx) { partsSkipped++; continue; }
+            if (!portalDb.AllFiles.ContainsKey(gfxId))
+            {
+                Console.Error.WriteLine($"  WARN: GfxObj 0x{gfxId:X8} (part {partIdx}) not in PortalDat — skipping");
+                partsSkipped++;
+                continue;
+            }
+            var gfx = portalDb.ReadFromDat<GfxObj>(gfxId);
+            if (gfx.VertexArray.Vertices.Count == 0 || gfx.Polygons.Count == 0) { partsSkipped++; continue; }
+
+            float fx = 0, fy = 0, fz = 0;
+            float qx = 0, qy = 0, qz = 0, qw = 1;
+            if (placement != null && partIdx < placement.AnimFrame.Frames.Count)
+            {
+                var f = placement.AnimFrame.Frames[partIdx];
+                fx = f.Origin.X; fy = f.Origin.Y; fz = f.Origin.Z;
+                qx = f.Orientation.X; qy = f.Orientation.Y; qz = f.Orientation.Z; qw = f.Orientation.W;
+            }
+            float sx = 1, sy = 1, sz = 1;
+            if (hasDefaultScale && defaultScales != null)
+            {
+                var s = defaultScales[partIdx];
+                sx = s.X; sy = s.Y; sz = s.Z;
+            }
+
+            static (float x, float y, float z) RotAcQ(float qx, float qy, float qz, float qw, float vx, float vy, float vz)
+            {
+                float tx = 2 * (qy * vz - qz * vy);
+                float ty = 2 * (qz * vx - qx * vz);
+                float tz = 2 * (qx * vy - qy * vx);
+                return (
+                    vx + qw * tx + (qy * tz - qz * ty),
+                    vy + qw * ty + (qz * tx - qx * tz),
+                    vz + qw * tz + (qx * ty - qy * tx));
+            }
+
+            var vertOrder = gfx.VertexArray.Vertices.Keys.OrderBy(k => k).ToList();
+            var idToObjIndex = new Dictionary<ushort, int>(vertOrder.Count);
+
+            for (int i = 0; i < vertOrder.Count; i++)
+            {
+                var sv = gfx.VertexArray.Vertices[vertOrder[i]];
+                float lx = sv.Origin.X * sx, ly = sv.Origin.Y * sy, lz = sv.Origin.Z * sz;
+                var rotated = RotAcQ(qx, qy, qz, qw, lx, ly, lz);
+                float ax = rotated.x + fx, ay = rotated.y + fy, az = rotated.z + fz;
+                sw.WriteLine($"v {ay * kCmPerMetre:R} {ax * kCmPerMetre:R} {az * kCmPerMetre:R}");
+                idToObjIndex[vertOrder[i]] = globalVertOffset + i + 1;
+            }
+            for (int i = 0; i < vertOrder.Count; i++)
+            {
+                var sv = gfx.VertexArray.Vertices[vertOrder[i]];
+                var rn = RotAcQ(qx, qy, qz, qw, sv.Normal.X, sv.Normal.Y, sv.Normal.Z);
+                sw.WriteLine($"vn {rn.y:R} {rn.x:R} {rn.z:R}");
+            }
+            for (int i = 0; i < vertOrder.Count; i++)
+            {
+                var sv = gfx.VertexArray.Vertices[vertOrder[i]];
+                if (sv.UVs != null && sv.UVs.Count > 0)
+                    sw.WriteLine($"vt {sv.UVs[0].U:R} {sv.UVs[0].V:R}");
+                else
+                    sw.WriteLine($"vt 0 0");
+            }
+
+            var partTexMap = texMap.TryGetValue(partIdx, out var ptm) ? ptm : null;
+
+            var groups = gfx.Polygons.Values
+                .GroupBy(p => (int)p.PosSurface)
+                .OrderBy(g => g.Key);
+
+            foreach (var grp in groups)
+            {
+                int surfIdx = grp.Key;
+                // MTL name is per-part so substituted textures never collide
+                // with another part that shares a base surface index.
+                string mtlName = $"part{partIdx:D2}_surf{surfIdx}";
+                if (!allMtls.ContainsKey(mtlName))
+                {
+                    uint surfaceId = (surfIdx >= 0 && surfIdx < gfx.Surfaces.Count) ? gfx.Surfaces[surfIdx] : 0u;
+                    uint? textureId = null;
+                    if (surfaceId != 0 && portalDb.AllFiles.ContainsKey(surfaceId))
+                    {
+                        var surface = portalDb.ReadFromDat<Surface>(surfaceId);
+                        var isImage = surface.Type.HasFlag(ACE.Entity.Enum.SurfaceType.Base1Image)
+                                   || surface.Type.HasFlag(ACE.Entity.Enum.SurfaceType.Base1ClipMap);
+                        if (isImage && surface.OrigTextureId != 0)
+                        {
+                            // Apply weenie texture_map substitution at the
+                            // SurfaceTexture (0x05) level before reading it.
+                            uint sfcTexId = surface.OrigTextureId;
+                            if (partTexMap != null && partTexMap.TryGetValue(sfcTexId, out var sub))
+                                sfcTexId = sub;
+                            if (portalDb.AllFiles.ContainsKey(sfcTexId))
+                            {
+                                var sfcTex = portalDb.ReadFromDat<SurfaceTexture>(sfcTexId);
+                                if (sfcTex.Textures.Count > 0)
+                                    textureId = sfcTex.Textures[sfcTex.Textures.Count - 1];
+                            }
+                        }
+                    }
+                    allMtls[mtlName] = (surfaceId, textureId);
+                }
+
+                sw.WriteLine($"g {mtlName}");
+                sw.WriteLine($"usemtl {mtlName}");
+                foreach (var poly in grp)
+                {
+                    if (poly.NumPts < 3) continue;
+                    if (poly.VertexIds == null || poly.VertexIds.Count < poly.NumPts) continue;
+
+                    int v0 = idToObjIndex[(ushort)poly.VertexIds[0]];
+                    for (int i = 1; i + 1 < poly.NumPts; i++)
+                    {
+                        int va = idToObjIndex[(ushort)poly.VertexIds[i]];
+                        int vb = idToObjIndex[(ushort)poly.VertexIds[i + 1]];
+                        sw.WriteLine($"f {v0}/{v0}/{v0} {vb}/{vb}/{vb} {va}/{va}/{va}");
+                        totalTris++;
+                    }
+                }
+            }
+
+            globalVertOffset += vertOrder.Count;
+            partsEmitted++;
+        }
+        sw.Flush();
+
+        int texturesWritten = 0;
+        using (var mtl = new StreamWriter(mtlPath))
+        {
+            mtl.WriteLine($"# Materials for npc_{setupId:X8} (appearance overlay applied; palettes NOT applied)");
+            mtl.WriteLine();
+            foreach (var kvp in allMtls)
+            {
+                mtl.WriteLine($"newmtl {kvp.Key}");
+                mtl.WriteLine("Ka 0.1 0.1 0.1");
+                mtl.WriteLine("Kd 1.0 1.0 1.0");
+                mtl.WriteLine("d  1.0");
+                mtl.WriteLine("illum 1");
+                if (kvp.Value.textureId.HasValue && portalDb.AllFiles.ContainsKey(kvp.Value.textureId.Value))
+                {
+                    var tex = portalDb.ReadFromDat<Texture>(kvp.Value.textureId.Value);
+                    string ext = tex.Format == ACE.Entity.Enum.SurfacePixelFormat.PFID_CUSTOM_RAW_JPEG ? ".jpg" : ".png";
+                    string texFileName = $"{kvp.Value.textureId.Value:X8}{ext}";
+                    string texPath = Path.Combine(texDir, texFileName);
+                    if (!File.Exists(texPath))
+                    {
+                        try { tex.ExportTexture(texDir); texturesWritten++; }
+                        catch (Exception ex) { mtl.WriteLine($"# (texture export failed: {ex.Message})"); }
+                    }
+                    mtl.WriteLine($"# Texture 0x{kvp.Value.textureId.Value:X8} {tex.Width}x{tex.Height} {tex.Format}");
+                    mtl.WriteLine($"map_Kd textures/{texFileName}");
+                }
+                else
+                {
+                    mtl.WriteLine($"# Surface 0x{kvp.Value.surfaceId:X8} (no extractable texture)");
+                }
+                mtl.WriteLine();
+            }
+        }
+
+        Console.WriteLine($"Wrote {new FileInfo(outPath).Length} bytes to {outPath}");
+        Console.WriteLine($"  npc 0x{setupId:X8}: {partsEmitted} parts emitted, {partsSkipped} skipped -> {totalTris} triangles, {allMtls.Count} mtls, {texturesWritten} new textures");
         return 0;
     }
 

@@ -305,23 +305,25 @@ def build_static_mesh(obj_mesh: ObjMesh, mtl_map: dict, asset_name: str,
     No material binding in this pass — geometry only. Materials are
     assigned by the follow-up assign_materials.py script."""
     asset_path = f"{CELLS_PACKAGE}/{asset_name}"
-    # Rebuild in place if the asset already exists (so a re-run actually
-    # applies geometry/UV fixes) instead of early-returning. Capture any
-    # existing material-slot bindings so the rebuild preserves them rather
-    # than wiping them back to WorldGridMaterial.
+    # Build FRESH (delete + recreate); never rebuild in place. Re-running
+    # build_from_static_mesh_descriptions on an EXISTING StaticMesh corrupts its
+    # bounds to garbage (~3.7e48 / NaN) -> UE frustum-culls the mesh and it
+    # renders invisible (the "no walls" bug). A fresh create_asset computes
+    # correct bounds (verified: -500..600 vs nan). Capture existing material
+    # slot bindings first so they can be restored after the rebuild.
     prev_mats = {}
     if unreal.EditorAssetLibrary.does_asset_exist(asset_path):
-        sm = unreal.EditorAssetLibrary.load_asset(asset_path)
-        for s in (sm.get_editor_property("static_materials") or []):
+        old = unreal.EditorAssetLibrary.load_asset(asset_path)
+        for s in (old.get_editor_property("static_materials") or []):
             prev_mats[str(s.material_slot_name)] = s.material_interface
-    else:
-        unreal.EditorAssetLibrary.make_directory(CELLS_PACKAGE)
-        at = unreal.AssetToolsHelpers.get_asset_tools()
-        sm = at.create_asset(
-            asset_name=asset_name,
-            package_path=CELLS_PACKAGE,
-            asset_class=unreal.StaticMesh,
-            factory=None)
+        unreal.EditorAssetLibrary.delete_asset(asset_path)
+    unreal.EditorAssetLibrary.make_directory(CELLS_PACKAGE)
+    at = unreal.AssetToolsHelpers.get_asset_tools()
+    sm = at.create_asset(
+        asset_name=asset_name,
+        package_path=CELLS_PACKAGE,
+        asset_class=unreal.StaticMesh,
+        factory=None)
     if sm is None:
         unreal.log_error(f"create_asset returned None for {asset_path}")
         return None

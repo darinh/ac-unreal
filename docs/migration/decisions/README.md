@@ -30,6 +30,7 @@ never edit history away.
 | [0004](0004-obj-transitional-gltf.md) | OBJ is a transitional intermediate; glTF for skinned/multi-UV | Proposed |
 | [0006](0006-ace-linking-stance.md) | ACE.DatLoader linking stance (AGPL obligations) | Accepted |
 | [0007](0007-indoor-lighting-unlit-emissive.md) | Indoor lighting: unlit emissive textures (point-light accents deferred) | Accepted |
+| [0008](0008-skip-portal-polygons-on-export.md) | Skip portal polygons (`Stippling == NoPos`) on EnvCell export | Accepted |
 
 Option analysis for the lighting decision is at
 [`../notes/lighting-options.md`](../notes/lighting-options.md); the call is

@@ -25,7 +25,8 @@ set UE="C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor-Cm
 REM Derive project path from the .bat file's own location: <repo>\pipeline\ue-import\_run_highresshot.bat
 REM -> <repo>\AcUnreal.uproject. This keeps the script portable across machines/checkouts.
 set PROJ="%~dp0..\..\AcUnreal.uproject"
-set MAP=/Game/Academy/Maps/AcademyMap
+REM Map defaults to the academy; override with AC_MAP for isolated-cell inspection.
+if "%AC_MAP%"=="" (set MAP=/Game/Academy/Maps/AcademyMap) else (set MAP=%AC_MAP%)
 
 if "%AC_EXTRA_CMDS%"=="" (
     set CMDS=HighResShot %RESX%x%RESY%

@@ -48,6 +48,15 @@ SETUPS_DIR = os.environ.get(
     "AC_SETUPS_DIR",
     str(REPO_ROOT / "pipeline" / "dat-extract" / "out" / "academy_8602_statics"),
 )
+# Assembled NPC body meshes from `acdat export-npc ...`, keyed by wcid
+# (npc_<wcid>.obj). Keyed by wcid — not setup id — because two NPCs can share
+# the same base SetupModel (e.g. 0x02000001, the generic male skeleton) yet
+# differ entirely by their weenie appearance overlay (anim_part GfxObj
+# swaps + texture_map). Keying on setup id would collide their meshes.
+NPC_OBJ_DIR = os.environ.get(
+    "AC_NPC_OBJ_DIR",
+    str(REPO_ROOT / "pipeline" / "dat-extract" / "out" / "academy_8602_npcs"),
+)
 
 LEVEL_PATH = "/Game/Academy/Maps/AcademyMap"
 
@@ -59,6 +68,41 @@ from import_statics import build_setup_mesh  # noqa: E402
 
 def log(msg):
     unreal.log(f"[npcs] {msg}")
+
+
+TEXTURES_PACKAGE = "/Game/Academy/Textures"
+
+def import_npc_textures(tex_dir):
+    """Headlessly import every PNG in an NPC's textures/ dir into
+    /Game/Academy/Textures as T_<hex>, matching the naming convention
+    import_materials.py expects. Idempotent: skips assets that already
+    exist. Uses the same AssetImportTask pattern proven in import_academy.py.
+    """
+    tex_dir = Path(tex_dir)
+    if not tex_dir.exists():
+        return 0
+    pngs = sorted(tex_dir.glob("*.png")) + sorted(tex_dir.glob("*.jpg")) + sorted(tex_dir.glob("*.jpeg"))
+    if not pngs:
+        return 0
+    unreal.EditorAssetLibrary.make_directory(TEXTURES_PACKAGE)
+    at = unreal.AssetToolsHelpers.get_asset_tools()
+    tasks = []
+    for png in pngs:
+        asset_name = "T_" + png.stem
+        if unreal.EditorAssetLibrary.does_asset_exist(f"{TEXTURES_PACKAGE}/{asset_name}"):
+            continue
+        task = unreal.AssetImportTask()
+        task.set_editor_property("filename", str(png))
+        task.set_editor_property("destination_path", TEXTURES_PACKAGE)
+        task.set_editor_property("destination_name", asset_name)
+        task.set_editor_property("automated", True)
+        task.set_editor_property("replace_existing", True)
+        task.set_editor_property("save", True)
+        tasks.append(task)
+    if tasks:
+        at.import_asset_tasks(tasks)
+    log(f"imported {len(tasks)} new NPC textures ({len(pngs)} total in {tex_dir.name})")
+    return len(tasks)
 
 
 # Visual configuration per category for the *placeholder fallback*.
@@ -142,10 +186,19 @@ def main():
     for cat, cfg in CATEGORY_CONFIG.items():
         placeholders[cat] = unreal.EditorAssetLibrary.load_asset(cfg[0])
 
+    # NOTE: NPC body textures are imported in the separate interactive-Editor
+    # material pass (run_npc_textures.ps1 -> import_npc_textures), NOT here.
+    # Headless `-run=pythonscript` has no valid Slate application, so the
+    # Interchange/AssetTools image import path asserts (CurrentApplication.
+    # IsValid()) and crashes the commandlet. Same reason import_materials.py
+    # is a separate interactive pass. Geometry + placement happen headless;
+    # textures + slot binding happen interactively.
+
     # Build/cache one StaticMesh per unique Setup ID referenced by an NPC.
     # Sources from the OBJ files extracted by `acdat export-setup ...` into
     # SETUPS_DIR. Falls back to placeholder if the OBJ isn't on disk.
     setups_dir = Path(SETUPS_DIR)
+    npc_obj_dir = Path(NPC_OBJ_DIR)
     setup_mesh_cache = {}
     def get_real_mesh(setup_hex):
         if setup_hex in setup_mesh_cache:
@@ -157,6 +210,28 @@ def main():
             return None
         sm = build_setup_mesh(obj_path, f"SM_Setup_{clean}")
         setup_mesh_cache[setup_hex] = sm
+        return sm
+
+    # Assembled NPC body mesh, keyed by wcid. Takes precedence over the bare
+    # base-setup mesh for npc-category instances: it carries the weenie
+    # appearance overlay (correct GfxObj parts + body/head textures) that a
+    # raw setup export lacks.
+    npc_mesh_cache = {}
+    def get_npc_mesh(wcid):
+        if wcid in npc_mesh_cache:
+            return npc_mesh_cache[wcid]
+        obj_path = npc_obj_dir / f"npc_{wcid}.obj"
+        if not obj_path.exists():
+            npc_mesh_cache[wcid] = None
+            return None
+        # Force a fresh rebuild: build_setup_mesh short-circuits if the asset
+        # already exists, which would silently render a STALE mesh when the
+        # OBJ has changed between runs. Delete first so the OBJ is reparsed.
+        asset_path = f"/Game/Academy/Setups/SM_NPC_{wcid}"
+        if unreal.EditorAssetLibrary.does_asset_exist(asset_path):
+            unreal.EditorAssetLibrary.delete_asset(asset_path)
+        sm = build_setup_mesh(obj_path, f"SM_NPC_{wcid}")
+        npc_mesh_cache[wcid] = sm
         return sm
 
     spawned_real = 0
@@ -171,8 +246,14 @@ def main():
         pos = inst["position"]
         q = inst["orientation"]
 
-        # Try to get a real mesh first; falls back to placeholder.
-        real_mesh = get_real_mesh(inst["setup_id"]) if inst.get("setup_id") else None
+        # Prefer the assembled NPC body mesh (wcid-keyed) for npc-category
+        # instances; otherwise fall back to the bare base-setup mesh, then to
+        # the category placeholder.
+        real_mesh = None
+        if cat == "npc":
+            real_mesh = get_npc_mesh(wcid)
+        if real_mesh is None and inst.get("setup_id"):
+            real_mesh = get_real_mesh(inst["setup_id"])
         use_real = real_mesh is not None
 
         if use_real:

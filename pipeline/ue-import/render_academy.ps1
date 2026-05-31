@@ -54,6 +54,10 @@ param(
     [double]$Pitch = 0.0,
     [double]$Yaw = 0.0,
     [double]$Roll = 0.0,
+    # Which level to move-PlayerStart-in and render. Defaults to the full
+    # academy; pass an isolated test level (e.g. the first-room shell) to
+    # render fast + reliably without loading 1487 actors.
+    [string]$Level = "/Game/Academy/Maps/AcademyMap",
     # Extra console commands to inject before HighResShot. Useful for
     # forcing exposure (e.g. "r.EyeAdaptationQuality 0, r.HDR.EnableHDROutput 0").
     # NOTE: separator is COMMA, not semicolon — UE -ExecCmds requires it.
@@ -64,7 +68,11 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 $UeCmd = "C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
 $Project = Join-Path $RepoRoot "AcUnreal.uproject"
-$MapPath = "/Game/Academy/Maps/AcademyMap"
+$MapPath = $Level
+# Derive the .umap path from the /Game/... package path so the saved-check
+# below targets the right file when an isolated level is used.
+$umapRel = ($Level -replace "^/Game/", "Content/") + ".umap"
+$umapPath = Join-Path $RepoRoot ($umapRel -replace "/", "\")
 $ScreenshotsDir = Join-Path $RepoRoot "Saved\Screenshots\WindowsEditor"
 $RendersDir = Join-Path $RepoRoot "pipeline\renders"
 $Timestamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
@@ -107,12 +115,13 @@ if ($hasViewpoint) {
     $env:AC_VP_PITCH = "$Pitch"
     $env:AC_VP_YAW = "$Yaw"
     $env:AC_VP_ROLL = "$Roll"
+    $env:AC_LEVEL = $Level
     $moveScript = Join-Path $PSScriptRoot "move_player_start.py"
     $UeCmdExe = "C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
     # Capture umap LastWriteTime BEFORE the move. We'll verify the
     # commandlet actually re-wrote it (rather than grepping the async
     # editor log which buffers and may not flush before exit).
-    $umapPath = Join-Path $RepoRoot "Content\Academy\Maps\AcademyMap.umap"
+    # ($umapPath was derived from $Level near the top of the script.)
     $umapTimeBefore = if (Test-Path $umapPath) { (Get-Item $umapPath).LastWriteTime } else { [DateTime]::MinValue }
     $moveProc = Start-Process -FilePath $UeCmdExe -ArgumentList @(
         $Project, "-run=pythonscript", "-script=$moveScript",
@@ -144,6 +153,7 @@ Write-Host "launching UE -game via $bat (timeout ${TimeoutSec}s)..."
 # positional args, which would silently drop the cmds after the first
 # comma. Env var preserves the full string.
 $env:AC_EXTRA_CMDS = $ExtraCmds
+$env:AC_MAP = $Level
 $batArgs = @($ResX.ToString(), $ResY.ToString())
 $proc = Start-Process -FilePath $bat -ArgumentList $batArgs -PassThru -NoNewWindow
 

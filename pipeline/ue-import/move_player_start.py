@@ -32,7 +32,7 @@ def log(m): unreal.log(f"[move-ps] {m}")
 def warn(m): unreal.log_warning(f"[move-ps] {m}")
 
 
-LEVEL_PATH = "/Game/Academy/Maps/AcademyMap"
+LEVEL_PATH = os.environ.get("AC_LEVEL", "/Game/Academy/Maps/AcademyMap")
 
 
 def main():

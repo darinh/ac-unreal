@@ -46,6 +46,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 CELL_OBJ_DIR    = REPO_ROOT / "pipeline" / "dat-extract" / "out" / "academy_8602"
 SETUP_OBJ_DIR   = REPO_ROOT / "pipeline" / "dat-extract" / "out" / "academy_8602_statics"
+NPC_OBJ_DIR     = REPO_ROOT / "pipeline" / "dat-extract" / "out" / "academy_8602_npcs"
 
 TEXTURES_PACKAGE  = "/Game/Academy/Textures"
 MATERIALS_PACKAGE = "/Game/Academy/Materials"
@@ -349,12 +350,15 @@ def parse_mtl(path: Path) -> dict:
 
 def asset_name_for_obj(obj_path: Path) -> str:
     """cell_86020100.obj  -> SM_86020100
-       setup_02000001.obj -> SM_Setup_02000001"""
+       setup_02000001.obj -> SM_Setup_02000001
+       npc_30997.obj      -> SM_NPC_30997"""
     stem = obj_path.stem
     if stem.startswith("cell_"):
         return "SM_" + stem[len("cell_"):]
     if stem.startswith("setup_"):
         return "SM_Setup_" + stem[len("setup_"):]
+    if stem.startswith("npc_"):
+        return "SM_NPC_" + stem[len("npc_"):]
     return "SM_" + stem
 
 
@@ -370,6 +374,7 @@ def rebind_meshes(master, color_master):
     for mtl_iter, package in [
         (sorted(CELL_OBJ_DIR.glob("cell_*.mtl")),   CELLS_PACKAGE),
         (sorted(SETUP_OBJ_DIR.glob("setup_*.mtl")), SETUPS_PACKAGE),
+        (sorted(NPC_OBJ_DIR.glob("npc_*.mtl")),     SETUPS_PACKAGE),
     ]:
         for p in mtl_iter:
             obj_path = p.with_suffix(".obj")
