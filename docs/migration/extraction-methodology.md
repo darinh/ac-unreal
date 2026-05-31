@@ -206,8 +206,9 @@ Template for "verify against known-good geometry, then fix the exporter."
 - **Symptom:** placed torch lights rendered far outside their cells.
 - **Cause:** the dump treated `Stab.Frame.Origin` as cell-local and computed `world = cellPos + rotate(cellOrient, stabLocal)`. But `EnvCell.StaticObjects[].Frame` is already **landblock-absolute** (ACE assigns `Stab.Frame` directly as the object's `Position.Frame` with no composition against the cell frame), so adding `cellPos` doubled every coordinate.
 - **Fix:** use `Stab.Frame` directly (no `cellPos` add, no `cellOrient` re-rotation).
-- **Status:** `DumpAcademyLights` is fixed; re-exported to `pipeline/dat-extract/samples/academy_8602_lights.json` (the **canonical** artifact), where median light-to-cell distance is **~2.7 m**, all 132 lights inside their cells. `[PROVEN, this artifact]`
-  - **Do not trust `pipeline/dat-extract/out/*` for lights:** `out/` is git-ignored build output and a stale Python-patched copy there read ~232 m off. It has been deleted; regenerate from the fixed CLI (`acdat dump-academy-lights`) when needed.
+- **Status:** `DumpAcademyLights` is fixed; the **canonical** artifact `pipeline/dat-extract/samples/academy_8602_lights.json` (sha `e2ab7553…`) has median light-to-cell-origin **2.7 m, 125/132 within 6 m**. `[PARTIAL]` (placement only; the lit *render* is not done, and see caveats below).
+  - **Regression note (do not repeat):** the canonical file silently regressed to the doubled-coord data twice during iteration; the correct data only survived in a `_fixed` sibling. Always **recompute** the median against `samples/academy_8602_layout.json` after touching this file; do not trust the prose. Regenerate cleanly with `acdat dump-academy-lights`. (Git-ignored `out/*` copies are not canonical and were stale ~232 m off.)
+  - **Garbage field:** `cone_angle_degrees` reads ~-2.5e10 for every entry (uninitialized/leaked ConeAngle). Ignore it; gate spot-cone emission on `is_point_light == false` and fix the decode before using cone angles.
 - **Still OPEN:** `DumpAcademyStatics` (props) has the *same* doubling bug unfixed (`Program.cs` ~line 828-833: `cellPos + RotateAcVec(cellOrient, localPos)`). Apply the identical fix, then rebuild `acdat` and re-export before the furniture milestone.
 
 ---
@@ -221,4 +222,4 @@ Template for "verify against known-good geometry, then fix the exporter."
 - **Headless material edits** must avoid `recompile_material` (crashes Slate under `-RenderOffScreen`); UE compiles lazily on load.
 - **Texture import** through Interchange crashes headless (ContentBrowser refresh asserts); import textures once in the interactive editor, then bind headlessly.
 - **`-ExecCmds` separator is a comma**, not a semicolon; pass via env var to dodge cmd.exe arg-splitting.
-- **No em-dashes** in repo files: historical PowerShell parsing hazards. Use hyphens/commas.
+- **No em-dashes in code, scripts, or PowerShell string literals**: they have caused cp1252/PowerShell parsing failures here. Prose markdown is exempt (it never goes through PowerShell), but prefer hyphens for consistency.

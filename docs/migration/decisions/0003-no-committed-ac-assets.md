@@ -17,9 +17,15 @@ legally own.
 
 ## Consequences
 - Reviewers/CI need their own DATs to regenerate assets; the repo stays clean and publishable-adjacent.
-- **Known conflict to resolve:** prior commits already track AC-derived
-  `Content/Academy/**` UAssets/UMaps. Reconciling that history (purge vs.
-  accept) is an open item; do not add *new* AC assets meanwhile.
+- **Known conflict to resolve (grandfather clause):** prior commits already
+  track AC-derived content in **two** places: ~1,364 `Content/Academy/**`
+  UAssets/UMaps (some via Git LFS), *and* bulk `pipeline/dat-extract/samples/`
+  (`academy_8602_layout.json` ~274 KB, `academy_8602_statics.json` ~221 KB,
+  `academy_8602_lights.json`, `academy_8602_npcs.json`, `cell_860201AD.obj/.mtl`,
+  `textures/*.png`). Per LEGAL.md current-state rules: no *new* AC content;
+  existing is grandfathered and may be *updated*; full removal + history scrub
+  is a **pending decision** (strict purge vs. accept-with-grandfather), to be
+  recorded as its own ADR when the user calls it. Do not purge unilaterally.
 
 ## Alternatives
 - Commit assets for convenience: rejected (legal risk; LEGAL.md posture).

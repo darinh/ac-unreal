@@ -20,18 +20,29 @@ rights holder.
 
 ## Hard rules for this repository
 
-1. **No Turbine/WB game assets are committed to this repo.** No extracted
+1. **Target state: no Turbine/WB game assets committed.** No extracted
    models, textures, sounds, animations, world geometry, or UI assets from
    the DAT files — not as binaries, not as derived OBJ/PNG/JSON, not in
    Git LFS. The pipeline is designed so each user extracts from *their own*
    legally-obtained client install at build time.
    - `pipeline/**/out/` is git-ignored and is the **only** place extracted
-     assets may live (locally, uncommitted).
-   - Committed `samples/` fixtures must be limited to tiny, non-substitutable
+     assets *should* live (locally, uncommitted).
+   - Committed `samples/` fixtures should be limited to tiny, non-substitutable
      technical artifacts needed to test the *pipeline* (e.g. a few-vertex
      cell layout), never bulk content. When in doubt, leave it out.
    - Reference screenshots used for visual comparison are **not committed**;
      they live outside the repo (e.g. `~/repos/ac-screenshots/`).
+
+   **Current state (grandfather clause, 2026-05-30):** the repo does NOT yet
+   meet the target state. Prior commits already track ~1,364 AC-derived
+   `Content/Academy/**` UAssets/UMaps (some via Git LFS) and bulk
+   `pipeline/dat-extract/samples/academy_8602_*.json` + `cell_*.obj/.mtl` +
+   `textures/*.png`. Until removal is decided (see ADR-0003), the rules are:
+   **(a)** do not add *new* AC-derived content; **(b)** existing tracked
+   AC-derived content is grandfathered, and *updating* it (e.g. the corrected
+   lights JSON) is allowed; **(c)** full removal + history scrub is a pending
+   decision, not a silent inconsistency. A rights-holder request overrides all
+   of this immediately (see below).
 
 2. **Each user supplies their own DAT files.** The methodology references a
    retail install at `C:\Turbine\Asheron's Call\`. You must legally own the

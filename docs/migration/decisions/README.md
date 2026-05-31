@@ -28,4 +28,8 @@ never edit history away.
 | [0002](0002-lumen-nanite-rt-disabled.md) | Lumen / Nanite / HW ray tracing disabled for now | Accepted |
 | [0003](0003-no-committed-ac-assets.md) | No AC-derived assets committed; users supply their own DATs | Accepted |
 | [0004](0004-obj-transitional-gltf.md) | OBJ is a transitional intermediate; glTF for skinned/multi-UV | Proposed |
-| [0005](0005-indoor-lighting-approach.md) | Indoor lighting approach (unlit vs dynamic vs baked) | Proposed |
+| [0006](0006-ace-linking-stance.md) | ACE.DatLoader linking stance (AGPL obligations) | Accepted |
+
+Lighting approach is **not yet a decision**; the option analysis lives at
+[`../notes/lighting-options.md`](../notes/lighting-options.md) and becomes an
+ADR once chosen.

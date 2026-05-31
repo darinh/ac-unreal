@@ -92,7 +92,11 @@ def main():
         # re-extracting. (Was a flat *2500 = 250000, which is ~50x too hot now
         # that the 2x-coord bug is fixed and the lights actually sit inside the
         # cells they light.)
-        light_mult = float(os.environ.get("AC_LIGHT_MULT", "30.0"))
+        try:
+            light_mult = float(os.environ.get("AC_LIGHT_MULT", "30.0"))
+        except ValueError:
+            unreal.log_warning(f"AC_LIGHT_MULT={os.environ.get('AC_LIGHT_MULT')!r} unparseable; using 30.0")
+            light_mult = 30.0
         ac_intensity = max(float(L.get("intensity", 1.0)), 0.01)
         ac_falloff_m = max(float(L.get("falloff", 5.0)), 0.5)
         ue_intensity = ac_intensity * light_mult

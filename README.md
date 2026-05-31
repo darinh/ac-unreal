@@ -262,8 +262,11 @@ not edit history.
 
 ### 2026-05-29 — Phase 4 (presentation scaffolding)
 
-19. **Lumen GI + Lumen Reflections + hardware ray tracing enabled in
-    `Config/DefaultEngine.ini`.** This is the "modern client"
+19. **[SUPERSEDED 2026-05-30 by ADR-0002 — Lumen/Nanite/HW-RT are now
+    DISABLED in `Config/DefaultEngine.ini` after load crashes on the
+    procedural academy; see `docs/migration/decisions/0002-*`.]**
+    ~~Lumen GI + Lumen Reflections + hardware ray tracing enabled in
+    `Config/DefaultEngine.ini`.~~ This was the "modern client"
     presentation foundation per the user's stated purpose. DX12 RHI
     is required for HW RT and is pinned here. SM6 enables Nanite +
     Lumen HW-RT pipelines. RTX 4090 on the dev box supports this

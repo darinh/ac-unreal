@@ -23,6 +23,8 @@ strictest that applies to the task):
 
 **Companion docs:** [`extraction-methodology.md`](extraction-methodology.md)
 (how to extract) - [`glossary.md`](glossary.md) (terms) -
+[`decisions/`](decisions/) (ADRs) - [`versions.md`](versions.md) (pins) -
+[`recovery.md`](recovery.md) (backup/restore before destructive ops) -
 [`../../LEGAL.md`](../../LEGAL.md) (IP posture, read first) - the *simulation*
 lane lives in [`../../contract/`](../../contract/) (physics/feel parity is
 data-driven there; this plan is the *presentation* lane).
@@ -196,6 +198,7 @@ For each task an agent should:
 5. **Document** the recipe: append the technique + any new gotcha to the methodology doc; update the §5 status ledger.
 6. **Never** start unrelated categories opportunistically — finish the current milestone step or hand it back.
 7. **Stop the line.** If you discover a blocker that lives in *another* category, file it in §5/§7 and stop — do **not** fix it in place. Re-sequence at the next planning pass. (The lighting investigation derailing the geometry work is exactly the failure this prevents.)
+8. **Guard destructive ops.** Before any bulk delete/regenerate, follow [`recovery.md`](recovery.md) (stash + restore tag). This project has lost work before.
 
 A future `runbook/` will hold one step-by-step file per milestone step as it
 is executed, so the *next* zone can be built by replay.
@@ -213,7 +216,7 @@ PROVEN.
 - EnvCell geometry extraction + UE import of the full 568-cell academy (II) - T0.
 - Coordinate transform AC->UE (see methodology) - geometry lands in the right place (I).
 - **UV orientation fix** (cells): AC UVs are top-left origin; `import_academy.py`'s `1.0 - vv` rendered walls upside-down - corrected to `vv`, all 568 cells rebuilt, verified on a wall face-on (T1 orientation). `import_statics.py` has the same fix now but props need a re-import to take effect. (III)
-- **Light-position fix** (lights only): `EnvCell.StaticObjects[].Frame` is landblock-absolute; the dump was doubling coordinates. Fixed in `DumpAcademyLights`. **Canonical artifact = `pipeline/dat-extract/samples/academy_8602_lights.json`** (median light->cell ~2.7 m, all 132 inside). The git-ignored stale `out/` copy (~232 m off) has been deleted; regenerate via `acdat dump-academy-lights`. (IV)
+- **Light-position fix** (lights only): `EnvCell.StaticObjects[].Frame` is landblock-absolute; the dump was doubling coordinates. Fixed in `DumpAcademyLights`. **Canonical artifact = `pipeline/dat-extract/samples/academy_8602_lights.json`** (sha `e2ab7553…`): median light->cell-origin **2.7 m, 125/132 within 6 m** (recompute to verify, do not trust the prose). Regenerate via `acdat dump-academy-lights`. Two known caveats in this artifact: (a) the `cone_angle_degrees` field is **garbage** (~-2.5e10) and must be ignored until the decode is fixed; (b) it is AC-derived data committed under the grandfather clause (see [LEGAL.md](../../LEGAL.md) / ADR-0003), not a new asset. (IV)
 - Bright **unlit** textured materials render the academy clearly (interim look; not the final lit look). (III)
 - Headless render-verification harness, with caveats (XIII).
 
@@ -230,7 +233,8 @@ Lumen/Nanite/HW-RT currently disabled in the ini (root README #19 is stale).
 
 ## 6. Changelog (chronological; newest first)
 
-- **2026-05-30** Multi-agent review of these docs. Fixed this pass: legal posture ([`../../LEGAL.md`](../../LEGAL.md)); glossary; tiered acceptance bars; corrected DAT taxonomy (cell range `0x0001-0x0040`, Font=Portal, mip=`Textures[last]`, quaternion order `W,X,Y,Z`, ClothingTable=substitution, added KeyMap/String/EnumMapper/StringState/CombatTable/ItemMutation/MasterProperty/ChatPoseTable + RegionDesc/Scene/DegradeInfo + texture formats incl. P8/INDEX16 trailing-palette caveat); Cat XI network decomposed; Step 8 reframed (no stub); status downgrades (I, IX, XIII -> PARTIAL/OPEN); `import_statics.py` UV bug fixed; stale `out/` lights artifact deleted; Lumen contradiction reconciled (ini authoritative).
+- **2026-05-30 (review round 2)** Verified first-hand that the canonical lights JSON had **regressed** to the doubled-coord data (median 140 m); promoted the correct data back (median 2.7 m, 125/132 within 6 m, sha `e2ab7553…`), removed the `_fixed`/`.bak_2x` siblings, flagged the `cone_angle_degrees` garbage. Governance: added [`recovery.md`](recovery.md) (backup/restore) and ADR-0006 (ACE linking stance) per LEGAL rule #3; reconciled LEGAL rule #1 to an explicit grandfather clause naming `Content/**` + `samples/`; ADR-0003 names `samples/`; demoted lighting "ADR-0005" to [`notes/lighting-options.md`](notes/lighting-options.md). Mechanical: root README #19 marked SUPERSEDED inline; fixed the `r.AllowStaticLighting` "Lumen handles it" comment; pinned UE 5.7.4 + dropped the self-stale branch row in versions.md; `AC_LIGHT_MULT` parse made crash-safe; em-dash gotcha rescoped to code/PowerShell. **Still open (user decision):** strict purge + history scrub of grandfathered AC assets; `DumpAcademyStatics` doubling fix; owners on `[OPEN]`s.
+- **2026-05-30 (review round 1)** Multi-agent review of these docs. Fixed this pass: legal posture ([`../../LEGAL.md`](../../LEGAL.md)); glossary; tiered acceptance bars; corrected DAT taxonomy (cell range `0x0001-0x0040`, Font=Portal, mip=`Textures[last]`, quaternion order `W,X,Y,Z`, ClothingTable=substitution, added KeyMap/String/EnumMapper/StringState/CombatTable/ItemMutation/MasterProperty/ChatPoseTable + RegionDesc/Scene/DegradeInfo + texture formats incl. P8/INDEX16 trailing-palette caveat); Cat XI network decomposed; Step 8 reframed (no stub); status downgrades (I, IX, XIII -> PARTIAL/OPEN); `import_statics.py` UV bug fixed; stale `out/` lights artifact deleted; Lumen contradiction reconciled (ini authoritative).
 - **2026-05-30** UV V-flip discovered + fixed; all 568 cell meshes rebuilt.
 - **2026-05-30** Light doubling-bug found + fixed in `DumpAcademyLights`; lights re-exported.
 - *(Earlier session incidents to fold in from git history: the ~387-actor NaN-bounds purge, the ~1487-actor false-alarm wipe scare, two data-loss events. See §7.)*
