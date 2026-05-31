@@ -428,16 +428,31 @@ internal static class Commands
             // Normals: same X↔Y swap, no scale (normals are unitless directions).
             sw.WriteLine($"vn {sv.Normal.Y:R} {sv.Normal.X:R} {sv.Normal.Z:R}");
         }
+        // UVs: emit one vt per (vertex, UV-index). An SWVertex can carry several
+        // UVs; each polygon corner selects which one via PosUVIndices. The old
+        // code emitted only UVs[0] per vertex and ignored PosUVIndices, which
+        // mismaps any face referencing a non-zero UV index. Correct behavior
+        // confirmed against ACViewer FileExport.cs (it emits vt per v.UVs[j]
+        // and indexes faces by poly.PosUVIndices[i]). Position/normal stay
+        // indexed by vertex id; only vt uses uvKeyToObjVt.
+        var uvKeyToObjVt = new Dictionary<(ushort vid, int uvi), int>();
+        int nextVt = 1;
         for (int i = 0; i < vertOrder.Count; i++)
         {
-            var sv = cs.VertexArray.Vertices[vertOrder[i]];
+            ushort vid = vertOrder[i];
+            var sv = cs.VertexArray.Vertices[vid];
             if (sv.UVs != null && sv.UVs.Count > 0)
             {
-                sw.WriteLine($"vt {sv.UVs[0].U:R} {sv.UVs[0].V:R}");
+                for (int j = 0; j < sv.UVs.Count; j++)
+                {
+                    sw.WriteLine($"vt {sv.UVs[j].U:R} {sv.UVs[j].V:R}");
+                    uvKeyToObjVt[(vid, j)] = nextVt++;
+                }
             }
             else
             {
                 sw.WriteLine($"vt 0 0");
+                uvKeyToObjVt[(vid, 0)] = nextVt++;
             }
         }
 
@@ -458,14 +473,34 @@ internal static class Commands
                 if (poly.NumPts < 3) { polysSkipped++; continue; }
                 if (poly.VertexIds == null || poly.VertexIds.Count < poly.NumPts) { polysSkipped++; continue; }
 
-                int v0 = idToObjIndex[(ushort)poly.VertexIds[0]];
+                // Resolve the OBJ vt slot for polygon corner c. AC selects the
+                // per-corner UV via PosUVIndices[c] (parallel to VertexIds); when
+                // that array is absent (NoPos stippling) the vertex's sole UV
+                // (index 0) is used. Position/normal stay indexed by vertex id;
+                // only the texture coordinate uses uvKeyToObjVt. Mirrors ACViewer
+                // FileExport.cs: vertexUVs[(v, i < PosUVIndices.Count ? PosUVIndices[i] : 0)].
+                int VtForCorner(int c)
+                {
+                    ushort cvid = (ushort)poly.VertexIds[c];
+                    int uvi = (poly.PosUVIndices != null && c < poly.PosUVIndices.Count)
+                        ? poly.PosUVIndices[c]
+                        : 0;
+                    if (!uvKeyToObjVt.TryGetValue((cvid, uvi), out int vt))
+                        vt = uvKeyToObjVt[(cvid, 0)]; // fallback to first UV emitted for this vertex
+                    return vt;
+                }
+
+                int p0 = idToObjIndex[(ushort)poly.VertexIds[0]];
+                int t0 = VtForCorner(0);
                 for (int i = 1; i + 1 < poly.NumPts; i++)
                 {
-                    int va = idToObjIndex[(ushort)poly.VertexIds[i]];
-                    int vb = idToObjIndex[(ushort)poly.VertexIds[i + 1]];
+                    int pa = idToObjIndex[(ushort)poly.VertexIds[i]];
+                    int pb = idToObjIndex[(ushort)poly.VertexIds[i + 1]];
+                    int ta = VtForCorner(i);
+                    int tb = VtForCorner(i + 1);
                     // Winding swap: emit (v0, vb, va) instead of (v0, va, vb)
                     // to compensate for the chirality flip from the X-Y axis swap.
-                    sw.WriteLine($"f {v0}/{v0}/{v0} {vb}/{vb}/{vb} {va}/{va}/{va}");
+                    sw.WriteLine($"f {p0}/{t0}/{p0} {pb}/{tb}/{pb} {pa}/{ta}/{pa}");
                     triEmitted++;
                 }
             }

@@ -167,7 +167,7 @@ into UE at Import Scale = 1.0.
 4. `CellStruct.Polygons` -> each `Polygon{ NumPts, VertexIds, PosUVIndices, NegUVIndices, PosSurface, NegSurface, CullMode }`.
    - Triangulate as a **fan from vertex 0** (`v0, vi, vi+1`).
    - `PosSurface` / `NegSurface` are signed indices into `EnvCell.Surfaces` (front / back face). Honor `CullMode` for one- vs two-sided faces.
-   - UVs come from `PosUVIndices[k]` selecting which entry of vertex `VertexIds[k]`'s UV list to use (NOT vertex-index = UV-index). Cells often use index 0, but this is not guaranteed. `[OPEN]` in the exporter today (it uses `UVs[0]`).
+   - UVs come from `PosUVIndices[k]` selecting which entry of vertex `VertexIds[k]`'s UV list to use (NOT vertex-index = UV-index). A single `SWVertex` can carry several UVs, so the exporter emits one `vt` per (vertex, UV-index) and each polygon corner references `PosUVIndices[k]`, falling back to index 0 only when the array is absent (`NoPos` stippling). This mirrors ACViewer `FileExport.cs` (`vertexUVs[(v, i < PosUVIndices.Count ? PosUVIndices[i] : 0)]`). `[PROVEN]` cell `0x86020100`: 13 verts but 20 UVs, and faces now decouple the position index from the UV index. The earlier collapse to `UVs[0]` (vertex-index = UV-index) was a confirmed bug, now fixed in `ExportEnvCell`.
    - **Confirmed blocking symptom (Step 0, 2026-05-30):** in the first-room candidate `0x860201AD` the walls render the wrong texture identity (brown `06003C9C` where the reference shows grey-blue masonry; `06003C9A` blue-grey blocks appear mapped to the floor). This must be resolved before any room can be visually matched to a reference. Suspects to check in order: (1) per-surface `surf_N -> EnvCell.Surfaces[]` resolution and the `Textures[last]` mip pick; (2) `PosUVIndices` per-face UV selection; (3) which polygon group is wall vs floor. Verify against the source PNGs in `out/academy_8602/textures/`.
 5. Emit OBJ (transform per §4) + `.mtl` mapping `surf_N` -> texture/color.
 
@@ -241,7 +241,7 @@ Per-layer verification (status as of 2026-05-30, exemplar cell `0x860201AD`):
 | Geometry + coord transform | vertex/poly counts vs `EnvCell.CellStruct`; cell lands at the right world pos | CONFIRMED (renders coherent, correct place) |
 | Surface->texture identity | `analyze_surfaces.py` derives role+texture per surface; confirm vs answer key | CONFIRMED (`860201AD`: walls `06003C9C` brown, floor `06003C9A` blue = starting-view screenshot) |
 | UV orientation | top-left origin, no V-flip | CONFIRMED (fixed + face-on test) |
-| UV per-face selection (`PosUVIndices`) | exporter still uses `UVs[0]`; dump indices, confirm all 0 else fix | **UNVERIFIED** (needs `dump-poly-uvs`) |
+| UV per-face selection (`PosUVIndices`) | exporter emits one `vt` per (vertex, UV-index) and indexes faces by `PosUVIndices[k]` | CONFIRMED (cell `0x86020100`: 13 verts -> 20 UVs; old `UVs[0]` collapse fixed, matches ACViewer) |
 | Texture decode (format/palette) | PNGs plausible; audit P8/INDEX16 + palette overrides | PARTIAL |
 | Two-sided / `CullMode` / `NegSurface` | not consumed by importer | UNVERIFIED |
 | Ceiling surface | `0x08000034` solid-black sentinel; real ceiling is wood-beam **statics** | needs the statics pass |
