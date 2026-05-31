@@ -1,8 +1,10 @@
-# Note: indoor lighting options (decision pending)
+# Note: indoor lighting options (DECIDED - see ADR-0007)
 
-This is a **research note, not a decision** (an ADR records a decision; this
-records the open options). When a call is made, write it as an ADR and link
-back here.
+**Decision made 2026-05-31: Unlit emissive textures** (the bright/even/
+deterministic option below). Recorded in
+[`../decisions/0007-indoor-lighting-unlit-emissive.md`](../decisions/0007-indoor-lighting-unlit-emissive.md).
+Dynamic point-light accents are deferred there. The option analysis below is
+retained for context.
 
 ## Why it's open
 AC computes per-vertex Gouraud lighting at runtime (`dot(N,-L)+ambient`)

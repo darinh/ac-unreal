@@ -29,7 +29,8 @@ never edit history away.
 | [0003](0003-no-committed-ac-assets.md) | No AC-derived assets committed; users supply their own DATs | Accepted |
 | [0004](0004-obj-transitional-gltf.md) | OBJ is a transitional intermediate; glTF for skinned/multi-UV | Proposed |
 | [0006](0006-ace-linking-stance.md) | ACE.DatLoader linking stance (AGPL obligations) | Accepted |
+| [0007](0007-indoor-lighting-unlit-emissive.md) | Indoor lighting: unlit emissive textures (point-light accents deferred) | Accepted |
 
-Lighting approach is **not yet a decision**; the option analysis lives at
-[`../notes/lighting-options.md`](../notes/lighting-options.md) and becomes an
-ADR once chosen.
+Option analysis for the lighting decision is at
+[`../notes/lighting-options.md`](../notes/lighting-options.md); the call is
+recorded in ADR-0007.
