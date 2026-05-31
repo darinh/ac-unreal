@@ -220,17 +220,21 @@ PROVEN.
 - Bright **unlit** textured materials render the academy clearly (interim look; not the final lit look). (III)
 - Headless render-verification harness, with caveats (XIII).
 
-**Step 0 result (2026-05-30):** first room identified to **`0x860201AD`**
-(primary) / `0x860201B6` by texture+fixture method ([runbook](runbook/step0-identify-first-room.md)).
-Visual confirmation is `[BLOCKED on Step 1]`: candidate walls render the wrong
-texture (brown `06003C9C` vs the reference's grey-blue masonry; `06003C9A`
-blue-grey blocks appear mis-assigned to the floor). So Step 0 ↔ Step 1 are
-coupled.
+**Step 0 result (2026-05-30) — CONFIRMED:** first room = **`0x860201AD`**
+(spawn) / `0x860201B6` (same room template), by the texture+fixture method
+([runbook](runbook/step0-identify-first-room.md)). **Textures verified correct
+against the answer key:** the room's shell is brown stone walls (`06003C9C`) +
+blue tile floor (`06003C9A`) + dark ceiling — exactly what the data produces
+(confirmed via `analyze_surfaces.py` + the starting-view screenshot). The
+earlier "walls are the wrong (grey-blue) texture" entry was a **false alarm**:
+a reference misread of the low-res original *plus* a stale `M_HotPinkDiagnostic`
+bound to the wall slot (which made it render magenta). Both corrected; the
+diagnostic material is deleted.
 
-**Open / next:**
-- **Step 1 (now the unblocker): texture identity.** Honor per-polygon `PosUVIndices` in the exporter and audit each surf's surface->texture resolution against the reference; re-render `0x860201AD` and confirm walls/floor match (T1). This also closes Step 0's visual confirmation.
-- Fix the **magenta error-material** seen in `0x860201B6` (a MaterialInstance binding fault).
-- Step 2: choose + record (ADR) the lighting approach.
+**Open / next (Step 1 finish + Step 3 prep):**
+- **Verify the remaining extraction layers** (see methodology §7): dump `PosUVIndices` to confirm UV per-face selection (exporter still uses `UVs[0]`); audit texture decode/palette; `CullMode`/`NegSurface`. T1/T3 face-on compare vs the answer key.
+- Step 3 prep: re-import statics (the wood ceiling beams, bookshelf, tapestry, map are **furniture/decoration**, not the cell shell) — needs the `DumpAcademyStatics` doubling fix first.
+- Step 2: choose + record (ADR) the lighting approach (room currently renders dark under LIT masters; see notes/lighting-options).
 
 **Known gotchas** (full list in [`extraction-methodology.md`](extraction-methodology.md) §7):
 stale `UnrealEditor-Cmd.exe` holds the project lock and makes scripts fail
@@ -240,6 +244,7 @@ Lumen/Nanite/HW-RT currently disabled in the ini (root README #19 is stale).
 
 ## 6. Changelog (chronological; newest first)
 
+- **2026-05-30 (Step 1 + verification mandate)** Built `analyze_surfaces.py` (reusable per-cell wall/floor/ceiling texture derivation from data). Used it to **verify** rather than trust the extraction: confirmed `0x860201AD`'s shell textures (brown walls `06003C9C` + blue floor `06003C9A`) match the answer key — the prior "wrong texture" finding was a false alarm (reference misread + a stale `M_HotPinkDiagnostic` bound to the wall slot, now fixed and the diagnostic deleted). Added methodology §7 "Verifying extraction is correct AND UE-compatible" (per-layer checklist; trust nothing). Open verification: per-face `PosUVIndices`, texture decode/palette, CullMode.
 - **2026-05-30 (Step 0 executed, doc-vetting)** Ran Step 0 against the docs. Identified the first room to `0x860201AD`/`0x860201B6` by a texture+fixture method (not the assumed "spawn cell"/"NPC cell"; the screenshot has no NPC, the green object is an urn). Surfaced that **Step 0 is coupled to Step 1** (walls render wrong texture identity, so the room can't be visually confirmed yet) and that texture-identity is a **confirmed blocking defect** (not a footnote); logged a magenta error-material in `0x860201B6`. Added [`runbook/step0-identify-first-room.md`](runbook/step0-identify-first-room.md); updated §3 step 0, §5, methodology §5.
 - **2026-05-30 (review round 2)** Verified first-hand that the canonical lights JSON had **regressed** to the doubled-coord data (median 140 m); promoted the correct data back (median 2.7 m, 125/132 within 6 m, sha `e2ab7553…`), removed the `_fixed`/`.bak_2x` siblings, flagged the `cone_angle_degrees` garbage. Governance: added [`recovery.md`](recovery.md) (backup/restore) and ADR-0006 (ACE linking stance) per LEGAL rule #3; reconciled LEGAL rule #1 to an explicit grandfather clause naming `Content/**` + `samples/`; ADR-0003 names `samples/`; demoted lighting "ADR-0005" to [`notes/lighting-options.md`](notes/lighting-options.md). Mechanical: root README #19 marked SUPERSEDED inline; fixed the `r.AllowStaticLighting` "Lumen handles it" comment; pinned UE 5.7.4 + dropped the self-stale branch row in versions.md; `AC_LIGHT_MULT` parse made crash-safe; em-dash gotcha rescoped to code/PowerShell. **Still open (user decision):** strict purge + history scrub of grandfathered AC assets; `DumpAcademyStatics` doubling fix; owners on `[OPEN]`s.
 - **2026-05-30 (review round 1)** Multi-agent review of these docs. Fixed this pass: legal posture ([`../../LEGAL.md`](../../LEGAL.md)); glossary; tiered acceptance bars; corrected DAT taxonomy (cell range `0x0001-0x0040`, Font=Portal, mip=`Textures[last]`, quaternion order `W,X,Y,Z`, ClothingTable=substitution, added KeyMap/String/EnumMapper/StringState/CombatTable/ItemMutation/MasterProperty/ChatPoseTable + RegionDesc/Scene/DegradeInfo + texture formats incl. P8/INDEX16 trailing-palette caveat); Cat XI network decomposed; Step 8 reframed (no stub); status downgrades (I, IX, XIII -> PARTIAL/OPEN); `import_statics.py` UV bug fixed; stale `out/` lights artifact deleted; Lumen contradiction reconciled (ini authoritative).

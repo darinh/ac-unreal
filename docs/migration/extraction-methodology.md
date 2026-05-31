@@ -121,9 +121,19 @@ acdat export-setup <dat> <setupId> ...
 acdat export-landblock <dat> <LLLL> <out.aclb>            # outdoor heightfield
 ```
 
+**Analysis / verification tools** (downstream of export):
+- `analyze_surfaces.py <cell_hex>` (in `pipeline/dat-extract/`) - the reusable
+  "fishing rod": from the exported OBJ+MTL+textures it derives, per surface, the
+  **role** (wall/floor/ceiling, from face normals), the **resolved texture**, and
+  that texture's **average colour**. Tells you what texture belongs on which
+  faces of any cell. `--scan` summarises all cells; `--find-walltex <hex>` finds
+  cells using a texture on their walls. Use it to identify a room and to verify
+  extraction, *then* confirm against the answer-key screenshot.
+
 **Commands still to add** (per category): `export-texture` (Surface -> PNG with
 palette applied), `export-gfxobj`, `dump-clothing`, `export-particle`,
-`dump-motiontable`, `export-region`, `export-scene`, `export-ui-layout`.
+`dump-motiontable`, `export-region`, `export-scene`, `export-ui-layout`, and a
+`dump-poly-uvs <cell>` to expose `PosUVIndices` for UV verification.
 
 > `Program.cs` is ~1900 lines with no section map yet (tracked in the
 > remediation backlog). Search the command switch for the entry point, then the
@@ -214,7 +224,42 @@ Template for "verify against known-good geometry, then fix the exporter."
 
 ---
 
-## 7. Known gotchas (operational)
+## 7. Verifying extraction is correct AND UE-compatible (trust nothing)
+
+The exported intermediates and import scripts were written by a prior agent and
+have already shipped real bugs: a UV V-flip (textures upside-down), light-coord
+doubling (lights 140 m outside cells), NaN mesh bounds, per-polygon UVs ignored,
+and a leftover diagnostic material left bound to a wall. **Treat every layer as
+suspect until confirmed against ground truth.** The DAT structures are the
+source of truth for the data; the reference screenshots are the answer key for
+the final visual confirm (never the input).
+
+Per-layer verification (status as of 2026-05-30, exemplar cell `0x860201AD`):
+
+| Layer | How to verify | Status |
+|-------|---------------|--------|
+| Geometry + coord transform | vertex/poly counts vs `EnvCell.CellStruct`; cell lands at the right world pos | CONFIRMED (renders coherent, correct place) |
+| Surface->texture identity | `analyze_surfaces.py` derives role+texture per surface; confirm vs answer key | CONFIRMED (`860201AD`: walls `06003C9C` brown, floor `06003C9A` blue = starting-view screenshot) |
+| UV orientation | top-left origin, no V-flip | CONFIRMED (fixed + face-on test) |
+| UV per-face selection (`PosUVIndices`) | exporter still uses `UVs[0]`; dump indices, confirm all 0 else fix | **UNVERIFIED** (needs `dump-poly-uvs`) |
+| Texture decode (format/palette) | PNGs plausible; audit P8/INDEX16 + palette overrides | PARTIAL |
+| Two-sided / `CullMode` / `NegSurface` | not consumed by importer | UNVERIFIED |
+| Ceiling surface | `0x08000034` solid-black sentinel; real ceiling is wood-beam **statics** | needs the statics pass |
+| UE material binding | each slot -> correct MI | CONFIRMED for `860201AD` (caught + removed a leftover `M_HotPinkDiagnostic` on the wall slot) |
+| Mesh bounds / NaN | bounds non-zero, finite | CONFIRMED for cells (fixed earlier); setups still suspect |
+
+Independence note: re-running `acdat` is *not* independent of itself. For a
+true second opinion, cross-check counts/surfaces against ACViewer or a manual
+DAT read. At minimum: `analyze_surfaces.py` + answer-key confirm for textures,
+and a face-on render compared to the screenshot at tier T1/T3 for UV/decode.
+
+**Lesson (the "fish"):** identify and reproduce a room by deriving its
+surfaces/textures/UVs from the data with `analyze_surfaces.py`, *verify each
+layer*, then confirm against the answer key. The earlier "walls are the wrong
+texture" panic was a **false alarm** - a reference misread plus a stale UE
+binding, not an extraction error. Verification caught that.
+
+## 8. Known gotchas (operational)
 
 - **Project lock:** a stale `UnrealEditor-Cmd.exe` holds the `.uproject` lock; headless scripts then fail silently (exit 1/255, no output). Kill all `UnrealEditor*` processes before any run.
 - **Never delete+recreate master materials** that have MaterialInstances: new params get new GUIDs and every instance's overrides fall back to defaults (grey). Modify masters in place, or re-apply overrides by name afterward.
