@@ -1,0 +1,635 @@
+{
+  "schema_version": 1,
+  "landblock_id": "0x8602",
+  "source_sql": "Database\\3-Core\\6 LandBlockExtendedData\\SQL\\8602.sql",
+  "instance_count": 22,
+  "weenies_resolved": 16,
+  "weenies_missing": 0,
+  "category_counts": {
+    "npc": 1,
+    "portal": 1,
+    "door": 7,
+    "fixture": 6,
+    "scenery": 7,
+    "weapon": 0,
+    "other": 0
+  },
+  "instances": [
+    {
+      "guid": 2019565571,
+      "wcid": 4451,
+      "class_name": "doorolthoi",
+      "display_name": "Door",
+      "weenie_type": 19,
+      "weenie_type_name": "Door",
+      "category": "door",
+      "setup_id": "0x020005F2",
+      "cell_id": "0x86020114",
+      "landblock_comment": "Door",
+      "position": {
+        "x": -22503.7,
+        "y": 19006.800000000003,
+        "z": -1200.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.999998,
+        "w": -0.002074
+      },
+      "origin_ac_landblock": {
+        "x": 190.068,
+        "y": -225.037,
+        "z": -12.0
+      }
+    },
+    {
+      "guid": 2019565573,
+      "wcid": 4451,
+      "class_name": "doorolthoi",
+      "display_name": "Door",
+      "weenie_type": 19,
+      "weenie_type_name": "Door",
+      "category": "door",
+      "setup_id": "0x020005F2",
+      "cell_id": "0x86020127",
+      "landblock_comment": "Door",
+      "position": {
+        "x": -24002.9,
+        "y": 20498.8,
+        "z": -1200.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.694745,
+        "w": 0.719256
+      },
+      "origin_ac_landblock": {
+        "x": 204.988,
+        "y": -240.029,
+        "z": -12.0
+      }
+    },
+    {
+      "guid": 2019565574,
+      "wcid": 30989,
+      "class_name": "chesttutorial",
+      "display_name": "Treasure Chest",
+      "weenie_type": 20,
+      "weenie_type_name": "Chest",
+      "category": "fixture",
+      "setup_id": "0x0200007C",
+      "cell_id": "0x8602012B",
+      "landblock_comment": "Treasure Chest",
+      "position": {
+        "x": -24011.600000000002,
+        "y": 20635.7,
+        "z": -1200.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.695578,
+        "w": 0.718451
+      },
+      "origin_ac_landblock": {
+        "x": 206.357,
+        "y": -240.116,
+        "z": -12.0
+      }
+    },
+    {
+      "guid": 2019565616,
+      "wcid": 5141,
+      "class_name": "trainviewpointsign",
+      "display_name": "VIEW CONTROLS ",
+      "weenie_type": 8,
+      "weenie_type_name": "Book",
+      "category": "scenery",
+      "setup_id": "0x0200062E",
+      "cell_id": "0x860201B1",
+      "landblock_comment": "VIEW CONTROLS",
+      "position": {
+        "x": -2936.25,
+        "y": 2200.97,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.702414,
+        "w": 0.711769
+      },
+      "origin_ac_landblock": {
+        "x": 22.0097,
+        "y": -29.3625,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565618,
+      "wcid": 29329,
+      "class_name": "doornewbieacademypracticearea",
+      "display_name": "Training Area",
+      "weenie_type": 19,
+      "weenie_type_name": "Door",
+      "category": "door",
+      "setup_id": "0x020005DA",
+      "cell_id": "0x860201B2",
+      "landblock_comment": "Training Area",
+      "position": {
+        "x": -2999.63,
+        "y": 2480.41,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.707107,
+        "w": -0.707107
+      },
+      "origin_ac_landblock": {
+        "x": 24.8041,
+        "y": -29.9963,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565619,
+      "wcid": 12705,
+      "class_name": "dooracademya",
+      "display_name": "Door",
+      "weenie_type": 19,
+      "weenie_type_name": "Door",
+      "category": "door",
+      "setup_id": "0x020005DA",
+      "cell_id": "0x860201B4",
+      "landblock_comment": "Door",
+      "position": {
+        "x": -2999.1800000000003,
+        "y": 1504.8899999999999,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.707107,
+        "w": -0.707107
+      },
+      "origin_ac_landblock": {
+        "x": 15.0489,
+        "y": -29.9918,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565623,
+      "wcid": 30989,
+      "class_name": "chesttutorial",
+      "display_name": "Treasure Chest",
+      "weenie_type": 20,
+      "weenie_type_name": "Chest",
+      "category": "fixture",
+      "setup_id": "0x0200007C",
+      "cell_id": "0x860201C4",
+      "landblock_comment": "Treasure Chest",
+      "position": {
+        "x": -11144.0,
+        "y": 2152.33,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.911627,
+        "w": 0.411018
+      },
+      "origin_ac_landblock": {
+        "x": 21.5233,
+        "y": -111.44,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565624,
+      "wcid": 30989,
+      "class_name": "chesttutorial",
+      "display_name": "Treasure Chest",
+      "weenie_type": 20,
+      "weenie_type_name": "Chest",
+      "category": "fixture",
+      "setup_id": "0x0200007C",
+      "cell_id": "0x860201D6",
+      "landblock_comment": "Treasure Chest",
+      "position": {
+        "x": -14044.7,
+        "y": 2251.43,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.707107,
+        "w": 0.707107
+      },
+      "origin_ac_landblock": {
+        "x": 22.5143,
+        "y": -140.447,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565625,
+      "wcid": 4453,
+      "class_name": "doormetalcave",
+      "display_name": "Door",
+      "weenie_type": 19,
+      "weenie_type_name": "Door",
+      "category": "door",
+      "setup_id": "0x020005F1",
+      "cell_id": "0x860201DF",
+      "landblock_comment": "Door",
+      "position": {
+        "x": -7000.2,
+        "y": 3451.5099999999998,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.707107,
+        "w": 0.707107
+      },
+      "origin_ac_landblock": {
+        "x": 34.5151,
+        "y": -70.002,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565630,
+      "wcid": 278,
+      "class_name": "door",
+      "display_name": "Door",
+      "weenie_type": 19,
+      "weenie_type_name": "Door",
+      "category": "door",
+      "setup_id": "0x0200024F",
+      "cell_id": "0x860201F2",
+      "landblock_comment": "Door",
+      "position": {
+        "x": -2000.02,
+        "y": 4476.36,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.707107,
+        "w": -0.707107
+      },
+      "origin_ac_landblock": {
+        "x": 44.7636,
+        "y": -20.0002,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565645,
+      "wcid": 30989,
+      "class_name": "chesttutorial",
+      "display_name": "Treasure Chest",
+      "weenie_type": 20,
+      "weenie_type_name": "Chest",
+      "category": "fixture",
+      "setup_id": "0x0200007C",
+      "cell_id": "0x86020231",
+      "landblock_comment": "Treasure Chest",
+      "position": {
+        "x": 218.029,
+        "y": 5775.51,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": -0.389418,
+        "w": 0.921061
+      },
+      "origin_ac_landblock": {
+        "x": 57.7551,
+        "y": 2.18029,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565646,
+      "wcid": 5101,
+      "class_name": "traincombat1sign",
+      "display_name": "WIELDING ITEMS ",
+      "weenie_type": 8,
+      "weenie_type_name": "Book",
+      "category": "scenery",
+      "setup_id": "0x0200062E",
+      "cell_id": "0x86020238",
+      "landblock_comment": "WIELDING ITEMS",
+      "position": {
+        "x": -1416.0,
+        "y": 6017.2,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.707107,
+        "w": 0.707107
+      },
+      "origin_ac_landblock": {
+        "x": 60.172,
+        "y": -14.16,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565649,
+      "wcid": 5105,
+      "class_name": "trainmagic1sign",
+      "display_name": "BASICS OF MAGIC ",
+      "weenie_type": 8,
+      "weenie_type_name": "Book",
+      "category": "scenery",
+      "setup_id": "0x0200062E",
+      "cell_id": "0x8602023D",
+      "landblock_comment": "BASICS OF MAGIC",
+      "position": {
+        "x": -2587.9,
+        "y": 6016.8,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.707107,
+        "w": 0.707107
+      },
+      "origin_ac_landblock": {
+        "x": 60.168,
+        "y": -25.879,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565650,
+      "wcid": 30989,
+      "class_name": "chesttutorial",
+      "display_name": "Treasure Chest",
+      "weenie_type": 20,
+      "weenie_type_name": "Chest",
+      "category": "fixture",
+      "setup_id": "0x0200007C",
+      "cell_id": "0x86020244",
+      "landblock_comment": "Treasure Chest",
+      "position": {
+        "x": -4240.67,
+        "y": 5762.29,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.92506,
+        "w": -0.37982
+      },
+      "origin_ac_landblock": {
+        "x": 57.6229,
+        "y": -42.4067,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565651,
+      "wcid": 30998,
+      "class_name": "doornewbieacademylibrary",
+      "display_name": "Academy Library",
+      "weenie_type": 19,
+      "weenie_type_name": "Door",
+      "category": "door",
+      "setup_id": "0x0200024F",
+      "cell_id": "0x8602024C",
+      "landblock_comment": "Academy Library",
+      "position": {
+        "x": -9000.3,
+        "y": 6473.999999999999,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.707107,
+        "w": -0.707107
+      },
+      "origin_ac_landblock": {
+        "x": 64.74,
+        "y": -90.003,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565653,
+      "wcid": 5102,
+      "class_name": "traincombat2sign",
+      "display_name": "COMBAT BAR ",
+      "weenie_type": 8,
+      "weenie_type_name": "Book",
+      "category": "scenery",
+      "setup_id": "0x0200062E",
+      "cell_id": "0x8602026C",
+      "landblock_comment": "COMBAT BAR",
+      "position": {
+        "x": -590.952,
+        "y": 6583.91,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": -0.0,
+        "w": 1.0
+      },
+      "origin_ac_landblock": {
+        "x": 65.8391,
+        "y": -5.90952,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565655,
+      "wcid": 5106,
+      "class_name": "trainmagic2sign",
+      "display_name": "SPELLCASTING ",
+      "weenie_type": 8,
+      "weenie_type_name": "Book",
+      "category": "scenery",
+      "setup_id": "0x0200062E",
+      "cell_id": "0x8602026E",
+      "landblock_comment": "SPELLCASTING",
+      "position": {
+        "x": -3388.0000000000005,
+        "y": 6579.900000000001,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 1.0,
+        "w": 0.0
+      },
+      "origin_ac_landblock": {
+        "x": 65.799,
+        "y": -33.88,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565656,
+      "wcid": 31061,
+      "class_name": "ace31061-centralcourtyard",
+      "display_name": "Central Courtyard",
+      "weenie_type": 7,
+      "weenie_type_name": "Portal",
+      "category": "portal",
+      "setup_id": "0x020001B3",
+      "cell_id": "0x86020273",
+      "landblock_comment": "Central Courtyard",
+      "position": {
+        "x": -4000.0,
+        "y": 7000.0,
+        "z": -6.3
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": -0.0,
+        "w": 1.0
+      },
+      "origin_ac_landblock": {
+        "x": 70.0,
+        "y": -40.0,
+        "z": -0.063
+      }
+    },
+    {
+      "guid": 2019565657,
+      "wcid": 30997,
+      "class_name": "academyresearcher",
+      "display_name": "Academy Researcher",
+      "weenie_type": 12,
+      "weenie_type_name": "Vendor",
+      "category": "npc",
+      "setup_id": "0x02000001",
+      "cell_id": "0x86020278",
+      "landblock_comment": "Academy Researcher",
+      "position": {
+        "x": -8790.699999999999,
+        "y": 7086.26,
+        "z": 0.5
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.541475,
+        "w": -0.840717
+      },
+      "origin_ac_landblock": {
+        "x": 70.8626,
+        "y": -87.907,
+        "z": 0.005
+      }
+    },
+    {
+      "guid": 2019565658,
+      "wcid": 5103,
+      "class_name": "traincombat3sign",
+      "display_name": "STATUS BARS ",
+      "weenie_type": 8,
+      "weenie_type_name": "Book",
+      "category": "scenery",
+      "setup_id": "0x0200062E",
+      "cell_id": "0x86020281",
+      "landblock_comment": "STATUS BARS",
+      "position": {
+        "x": -407.894,
+        "y": 7563.1,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.707107,
+        "w": 0.707107
+      },
+      "origin_ac_landblock": {
+        "x": 75.631,
+        "y": -4.07894,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565666,
+      "wcid": 30989,
+      "class_name": "chesttutorial",
+      "display_name": "Treasure Chest",
+      "weenie_type": 20,
+      "weenie_type_name": "Chest",
+      "category": "fixture",
+      "setup_id": "0x0200007C",
+      "cell_id": "0x860202A3",
+      "landblock_comment": "Treasure Chest",
+      "position": {
+        "x": -4237.71,
+        "y": 9240.67,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.92269,
+        "w": 0.385543
+      },
+      "origin_ac_landblock": {
+        "x": 92.4067,
+        "y": -42.3771,
+        "z": 0.0
+      }
+    },
+    {
+      "guid": 2019565676,
+      "wcid": 5107,
+      "class_name": "trainmagic3sign",
+      "display_name": "MAGIC TIPS ",
+      "weenie_type": 8,
+      "weenie_type_name": "Book",
+      "category": "scenery",
+      "setup_id": "0x0200062E",
+      "cell_id": "0x8602028A",
+      "landblock_comment": "MAGIC TIPS",
+      "position": {
+        "x": -3583.77,
+        "y": 7575.2,
+        "z": 0.0
+      },
+      "orientation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": 0.707107,
+        "w": 0.707107
+      },
+      "origin_ac_landblock": {
+        "x": 75.752,
+        "y": -35.8377,
+        "z": 0.0
+      }
+    }
+  ]
+}
