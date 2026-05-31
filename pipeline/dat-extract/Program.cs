@@ -862,35 +862,14 @@ internal static class Commands
 
         const float kCmPerMetre = 100.0f;
 
-        // Per-cell, per-stab world transform:
-        //   stab.world = cell.world ⊕ stab.local
-        // We apply the AC→UE coord transform to the WORLD-SPACE result so
-        // UE can drop a StaticMeshActor at this position directly.
-        // Orientation needs the same (w, -y, -x, -z) basis-swap quaternion
-        // as in DumpAcademyLayout. We also have to compose the cell's
-        // orientation with the stab's local orientation in AC space FIRST,
-        // then transform the combined quaternion — otherwise the stab
-        // inherits a wrong basis.
-        static (float x, float y, float z, float w) QuatMulAc((float x, float y, float z, float w) a, (float x, float y, float z, float w) b)
-        {
-            return (
-                a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
-                a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
-                a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
-                a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z);
-        }
-        static (float x, float y, float z) RotateAcVec((float x, float y, float z, float w) q, (float x, float y, float z) v)
-        {
-            // Standard quaternion-vector rotation: v' = q ⊗ v ⊗ q^-1
-            float qx = q.x, qy = q.y, qz = q.z, qw = q.w;
-            float tx = 2 * (qy * v.z - qz * v.y);
-            float ty = 2 * (qz * v.x - qx * v.z);
-            float tz = 2 * (qx * v.y - qy * v.x);
-            return (
-                v.x + qw * tx + (qy * tz - qz * ty),
-                v.y + qw * ty + (qz * tx - qx * tz),
-                v.z + qw * tz + (qx * ty - qy * tx));
-        }
+        // BUGFIX 2026-05-31: EnvCell.StaticObjects[].Frame is landblock-ABSOLUTE
+        // (same as the lights fix in DumpAcademyLights). The old code composed
+        // cell.world ⊕ stab.local (cellPos + RotateAcVec(cellOrient, localPos)),
+        // which doubled coordinates because stab.Frame already includes the cell
+        // offset (verified: identity-orientation cells placed stabs at 2× cellPos).
+        // Use stab.Frame directly; only the AC→UE axis swap is applied below.
+        // cellPos/cellOrient and the quaternion/rotation helpers are no longer
+        // needed here.
 
         var allInstances = new List<object>();
         var uniqueSetups = new HashSet<uint>();
@@ -902,29 +881,17 @@ internal static class Commands
             if (ec.StaticObjects == null || ec.StaticObjects.Count == 0) continue;
             cellsWithStatics++;
 
-            var cellPos = (x: ec.Position.Origin.X, y: ec.Position.Origin.Y, z: ec.Position.Origin.Z);
-            var cellOrient = (
-                x: ec.Position.Orientation.X,
-                y: ec.Position.Orientation.Y,
-                z: ec.Position.Orientation.Z,
-                w: ec.Position.Orientation.W);
-
             foreach (var stab in ec.StaticObjects)
             {
                 uniqueSetups.Add(stab.Id);
 
-                var localPos = (x: stab.Frame.Origin.X, y: stab.Frame.Origin.Y, z: stab.Frame.Origin.Z);
-                var localOrient = (
+                // stab.Frame is landblock-absolute (see BUGFIX note above): use it directly.
+                var worldPosAc = (x: stab.Frame.Origin.X, y: stab.Frame.Origin.Y, z: stab.Frame.Origin.Z);
+                var worldOrientAc = (
                     x: stab.Frame.Orientation.X,
                     y: stab.Frame.Orientation.Y,
                     z: stab.Frame.Orientation.Z,
                     w: stab.Frame.Orientation.W);
-
-                // Compose: stab_world.pos = cell.pos + cell.rot * stab.local.pos
-                //          stab_world.rot = cell.rot * stab.local.rot
-                var rotatedLocal = RotateAcVec(cellOrient, localPos);
-                var worldPosAc = (x: cellPos.x + rotatedLocal.x, y: cellPos.y + rotatedLocal.y, z: cellPos.z + rotatedLocal.z);
-                var worldOrientAc = QuatMulAc(cellOrient, localOrient);
 
                 allInstances.Add(new
                 {
