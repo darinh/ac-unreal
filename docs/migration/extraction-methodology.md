@@ -158,6 +158,7 @@ into UE at Import Scale = 1.0.
    - Triangulate as a **fan from vertex 0** (`v0, vi, vi+1`).
    - `PosSurface` / `NegSurface` are signed indices into `EnvCell.Surfaces` (front / back face). Honor `CullMode` for one- vs two-sided faces.
    - UVs come from `PosUVIndices[k]` selecting which entry of vertex `VertexIds[k]`'s UV list to use (NOT vertex-index = UV-index). Cells often use index 0, but this is not guaranteed. `[OPEN]` in the exporter today (it uses `UVs[0]`).
+   - **Confirmed blocking symptom (Step 0, 2026-05-30):** in the first-room candidate `0x860201AD` the walls render the wrong texture identity (brown `06003C9C` where the reference shows grey-blue masonry; `06003C9A` blue-grey blocks appear mapped to the floor). This must be resolved before any room can be visually matched to a reference. Suspects to check in order: (1) per-surface `surf_N -> EnvCell.Surfaces[]` resolution and the `Textures[last]` mip pick; (2) `PosUVIndices` per-face UV selection; (3) which polygon group is wall vs floor. Verify against the source PNGs in `out/academy_8602/textures/`.
 5. Emit OBJ (transform per §4) + `.mtl` mapping `surf_N` -> texture/color.
 
 ### Textures & materials `[PARTIAL]`

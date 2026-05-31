@@ -165,7 +165,7 @@ build the room until we know which cell(s) it is.
 
 | # | Step | Categories | Acceptance bar | Status |
 |---|------|-----------|----------------|--------|
-| 0 | **Identify the room** — find the exact EnvCell ID(s) composing the screenshot's first room (spawn cell `0x860201AD` is a candidate but its walls don't match the grey-block reference — confirm via `envcell-info`/render sweep). | I, II | Cell ID(s) named; renders match reference layout. | `[OPEN]` |
+| 0 | **Identify the room** — match the reference's texture signature (blue-grey floor `06003C9A`) + a warm fire light + furniture density. Candidate set found: **`0x860201AD`** (primary; documented spawn, 2 fires, 30 statics) and `0x860201B6`. The green object in the shot is an urn, **not** an NPC. Method + evidence: [`runbook/step0-identify-first-room.md`](runbook/step0-identify-first-room.md). | I, II, III | Cell id named ✓; render matches reference walls/floor — **pending Step 1** (walls currently render the wrong texture identity). | `[PARTIAL]` cell identified; visual match `[BLOCKED on 1]` |
 | 1 | **Room bounds + correct textures** — floor, walls, ceiling geometry with every surface's correct texture, correctly oriented (UVs), no light dependence yet. | II, III | **T0** geometry round-trips + **T1** every surface = correct texture id, correct orientation (no flip/mirror). | `[PARTIAL]` UV V-flip fixed; per-poly `PosUVIndices` + texture-identity audit pending |
 | 2 | **Lighting** — reproduce the room's lit look; document the chosen UE approach. | IV | Brightness/character matches reference; method written down. | `[OPEN]` |
 | 3 | **Furniture & decorations** — bookshelf, desk, cabinets, rugs, the wooden archway (the room's Stab/Setup objects), placed + textured. | V, III | Each prop present at correct transform with correct texture. | `[OPEN]` |
@@ -220,9 +220,16 @@ PROVEN.
 - Bright **unlit** textured materials render the academy clearly (interim look; not the final lit look). (III)
 - Headless render-verification harness, with caveats (XIII).
 
+**Step 0 result (2026-05-30):** first room identified to **`0x860201AD`**
+(primary) / `0x860201B6` by texture+fixture method ([runbook](runbook/step0-identify-first-room.md)).
+Visual confirmation is `[BLOCKED on Step 1]`: candidate walls render the wrong
+texture (brown `06003C9C` vs the reference's grey-blue masonry; `06003C9A`
+blue-grey blocks appear mis-assigned to the floor). So Step 0 ↔ Step 1 are
+coupled.
+
 **Open / next:**
-- Step 0: positively identify the reference room's cell id(s).
-- Step 1: per-polygon `PosUVIndices` in the exporter; texture-identity audit vs reference (T1).
+- **Step 1 (now the unblocker): texture identity.** Honor per-polygon `PosUVIndices` in the exporter and audit each surf's surface->texture resolution against the reference; re-render `0x860201AD` and confirm walls/floor match (T1). This also closes Step 0's visual confirmation.
+- Fix the **magenta error-material** seen in `0x860201B6` (a MaterialInstance binding fault).
 - Step 2: choose + record (ADR) the lighting approach.
 
 **Known gotchas** (full list in [`extraction-methodology.md`](extraction-methodology.md) §7):
@@ -233,6 +240,7 @@ Lumen/Nanite/HW-RT currently disabled in the ini (root README #19 is stale).
 
 ## 6. Changelog (chronological; newest first)
 
+- **2026-05-30 (Step 0 executed, doc-vetting)** Ran Step 0 against the docs. Identified the first room to `0x860201AD`/`0x860201B6` by a texture+fixture method (not the assumed "spawn cell"/"NPC cell"; the screenshot has no NPC, the green object is an urn). Surfaced that **Step 0 is coupled to Step 1** (walls render wrong texture identity, so the room can't be visually confirmed yet) and that texture-identity is a **confirmed blocking defect** (not a footnote); logged a magenta error-material in `0x860201B6`. Added [`runbook/step0-identify-first-room.md`](runbook/step0-identify-first-room.md); updated §3 step 0, §5, methodology §5.
 - **2026-05-30 (review round 2)** Verified first-hand that the canonical lights JSON had **regressed** to the doubled-coord data (median 140 m); promoted the correct data back (median 2.7 m, 125/132 within 6 m, sha `e2ab7553…`), removed the `_fixed`/`.bak_2x` siblings, flagged the `cone_angle_degrees` garbage. Governance: added [`recovery.md`](recovery.md) (backup/restore) and ADR-0006 (ACE linking stance) per LEGAL rule #3; reconciled LEGAL rule #1 to an explicit grandfather clause naming `Content/**` + `samples/`; ADR-0003 names `samples/`; demoted lighting "ADR-0005" to [`notes/lighting-options.md`](notes/lighting-options.md). Mechanical: root README #19 marked SUPERSEDED inline; fixed the `r.AllowStaticLighting` "Lumen handles it" comment; pinned UE 5.7.4 + dropped the self-stale branch row in versions.md; `AC_LIGHT_MULT` parse made crash-safe; em-dash gotcha rescoped to code/PowerShell. **Still open (user decision):** strict purge + history scrub of grandfathered AC assets; `DumpAcademyStatics` doubling fix; owners on `[OPEN]`s.
 - **2026-05-30 (review round 1)** Multi-agent review of these docs. Fixed this pass: legal posture ([`../../LEGAL.md`](../../LEGAL.md)); glossary; tiered acceptance bars; corrected DAT taxonomy (cell range `0x0001-0x0040`, Font=Portal, mip=`Textures[last]`, quaternion order `W,X,Y,Z`, ClothingTable=substitution, added KeyMap/String/EnumMapper/StringState/CombatTable/ItemMutation/MasterProperty/ChatPoseTable + RegionDesc/Scene/DegradeInfo + texture formats incl. P8/INDEX16 trailing-palette caveat); Cat XI network decomposed; Step 8 reframed (no stub); status downgrades (I, IX, XIII -> PARTIAL/OPEN); `import_statics.py` UV bug fixed; stale `out/` lights artifact deleted; Lumen contradiction reconciled (ini authoritative).
 - **2026-05-30** UV V-flip discovered + fixed; all 568 cell meshes rebuilt.
