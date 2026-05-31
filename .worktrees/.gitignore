@@ -1,0 +1,4 @@
+# Agent worktrees created by the create-new-branch skill live here.
+# Keep this folder tracked, but ignore everything inside it.
+*
+!.gitignore
