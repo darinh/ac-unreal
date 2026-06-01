@@ -106,6 +106,36 @@ if positions are correct:
   confirmed: group interiors on a **Data Layer**; let **ADR-0013** drive per-cell
   occlusion.
 
+> **Evidence gathered (2026-05-31, empirical — this resolves the #1 check):**
+> Sampled `EnvCell.Position` across four landblocks via
+> `acdat envcell-info <dir> <cellId>` (DAT iteration 982; ~40-56 cells each):
+>
+> | Landblock | LbX,LbY | AC local frame bbox (X / Y / Z) | Composed world cell | In parent footprint? |
+> |---|---|---|---|---|
+> | `0x8602` (academy) | 134,2 | X[110..210] Y[-250..-150] Z[-12..-6] | (134,**0**) | **No** (~2 blocks S) |
+> | `0xA9B4` (Holtburg) | 169,180 | X[32..154] Y[132..160] Z[66..66] | (169,180) | Yes |
+> | `0x01AE` | 1,174 | X[0..50] Y[-110..-70] Z[-36..-30] | (1,**173**) | **No** (1 block S) |
+> | `0x00D6` | 0,214 | X[20..100] Y[-300..-250] Z[-6..0] | (0,**212**) | **No** (~2 blocks S) |
+>
+> The frame is **landblock-local**, composed as `world = LandblockX*192 +
+> Frame.Origin.X` [REF-IMPL: ACViewer `Position.cs:281-282,310-311` — verified]; a
+> frame outside `[0,192]` is legal and **rolls the cell into an adjacent block**
+> [REF-IMPL: ACE `Position.cs:129-180` block-offset normalization — verified].
+>
+> **Result: the working hypothesis is refuted in the general case.** Interiors are
+> landblock-local but routinely sit **outside** the addressing landblock's XY
+> footprint (3 of 4 sampled were offset south in -Y by 1-2 blocks) and at **arbitrary
+> Z** (Holtburg interiors are at +66 m, *above* ground — not "stacked lower Z").
+>
+> **Decision impact:** WP auto-assignment by world location will place many interiors
+> in a **different** grid cell than their addressing landblock. So (a) the per-cell
+> frame MUST be composed with `LandblockX/Y*192` (never assumed in-footprint) and may
+> need ACE-style block-offset normalization; (b) a Data Layer keyed by *addressing*
+> landblock is fine for organization but does not predict which WP streaming cell
+> loads the geometry; (c) ADR-0010 (coords) and ADR-0013 (culling) must account for
+> interiors crossing block boundaries. Sample is a subset (first ~40 cells/block, 4
+> blocks); widen before locking, but the pattern is consistent and source-backed.
+
 ## 4. Distant world (HLOD) [DESIGN / ADD]
 - A coarser **HLOD layer** (e.g. 4x4 landblocks per HLOD cell ~= 768 m) generates
   merged proxy meshes for blocks beyond the loading range, out to the far clip.

@@ -37,12 +37,17 @@ question (which landblock corner is UE origin) — `[VERIFY]` in `contract/` §0
 ## What goes in each cell
 WP auto-assigns actors by world location: terrain for that landblock; scenery
 (`Scene 0x12`) as **HISM/foliage instances, never per-object actors**; buildings
-(`LandblockInfo` 0xFFFE); and indoor `EnvCell`s (each carries a per-cell `Frame
-Position` within the landblock `[REF-IMPL: `EnvCell.cs:27,54`]`). Whether interiors
-are co-located under the outdoor block, stacked in Z, or live in a separate
-coordinate domain is `[VERIFY]` (gates ADR-0009/0010/0019; `contract/` §0b UNKNOWN)
-— do not assume a Z offset. Group interiors on a
-**Data Layer** and let `VisibleCells` (ADR-0013) do per-cell occlusion inside.
+(`LandblockInfo` 0xFFFE); and indoor `EnvCell`s. Each `EnvCell` carries a
+**landblock-local** `Frame Position` `[REF-IMPL: `EnvCell.cs:27,54`]`; world position
+is `LandblockX*192 + Frame.X` `[REF-IMPL: ACViewer `Position.cs:281-282`]`.
+**Measured (ADR-0009 evidence, 2026-05-31):** that frame is frequently **outside**
+the addressing landblock's `[0..192]` footprint — 3 of 4 sampled blocks placed
+interiors in the block to the south (negative-Y local) — and Z varies
+(Holtburg interiors at +66 m, others below). So **never assume interiors sit in
+their parent footprint or at lower Z**: compose the frame with `LandblockX/Y*192`
+(ACE rolls out-of-`[0,192]` frames into the adjacent block, `Position.cs:129-180`).
+A Data Layer keyed by addressing landblock organizes interiors but does not predict
+which WP cell streams them. Let `VisibleCells` (ADR-0013) do per-cell occlusion inside.
 
 ## Terrain — the one real wrinkle
 AC terrain is **9x9 height verts = 8x8 quads/landblock @ 24 m**. UE Landscape wants
