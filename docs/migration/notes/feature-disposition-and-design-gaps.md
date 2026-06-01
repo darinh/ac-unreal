@@ -156,6 +156,27 @@ extraction, not assumption. **These are now `Proposed` ADR stubs:**
 5. Whether outdoor terrain LOD is distinct from `DegradeInfo`.
 6. Whether `RenderTexture/RenderMesh` (0x15–0x19) are populated in the target DAT iteration (else REMOVE).
 
+## J. MED / LOW dispositions (the long tail — completes the backlog)
+Lower-impact subsystems and the previously un-disposed DAT types. Behaviors not
+literally citable are tagged `[COMMUNITY-VERIFY]`/`[DESIGN]`; DAT-type rows cite
+the repo's own taxonomy `[DOC: methodology §2]` (which mirrors ACE `DatFileType`).
+
+| Feature | Retail baseline (provenance) | Disposition | Notes |
+|---|---|---|---|
+| Spawn / encounter instances | spawn *definitions* are **server-authoritative** (ACE `landblock_instance`) [REF-IMPL: ACE.Server], not a client DAT | **MIRROR** | Client receives spawns as `GameMessage ObjectCreate` (ADR-0020); ties to relevance + streaming. |
+| Combat stance↔animation (`CombatTable 0x30`) | per-stance attack/defense animation pairing [DOC: methodology §2] | **MIRROR** | Selects which attack anim per stance; gameplay frames come from `AnimationHook` (ADR-0012, contract §7), not retimed visuals. |
+| Spell → FX mapping (`SpellTable` + `PhysicsScript 0x33`) | spell rules server-authoritative (ACE); visual script `PhysicsScript 0x33` [DOC: methodology §2] | **MIRROR** mapping + **IMPROVE** (Niagara) | Which spell → which effect; gameplay timing stays server/hook-driven, visuals re-authored. |
+| Inventory / item icons | items likely reference an icon image (weenie `IconId` → portal-DAT texture) [COMMUNITY-VERIFY] | **MIRROR** | Confirm `IconId`→texture vs a rendered-GfxObj thumbnail before building the icon pipeline. |
+| Minimap / radar / world map | AC client showed a position radar + world map [COMMUNITY-VERIFY: map data source] | **IMPROVE** (UMG, driven by landblock position) | Player position from the coord/streaming layer (ADR-0009/0010); map-tile source needs verification. |
+| Nameplates / chat bubbles / floating text | client world-space labels over actors [COMMUNITY-VERIFY] | **IMPROVE** (world-space UMG) | Core MMO UX; which actors get plates ties to the network object lifecycle (ADR-0020). |
+| Weather (beyond day-night) | `RegionDesc.SkyDesc` carries sky/weather params [REF-IMPL: ACE; DOC: methodology §2]; weather specifics [COMMUNITY-VERIFY] | **MIRROR** (data-driven) + **IMPROVE** (modern FX) | Blocked on the same `export-region` extraction as ADR-0011. |
+| Input bindings (`KeyMap 0x14`) | keyboard → action bindings [DOC: methodology §2] | **IMPROVE** (Enhanced Input; AC bindings as defaults) | Pairs with the legacy-turn → mouselook note in §C. |
+| Localization (`String 0x31`, `FontLocal`, `EnumMapper 0x22`) | localized strings/fonts + name→enum lookup [DOC: methodology §2] | **MIRROR** (consume needed subset) | Client needs a string/font subset; `EnumMapper` is internal id lookup. |
+| Rules / id-map DAT types (`ItemMutation 0x38`, `MasterProperty 0x39`, `ActionMap 0x26`, `DidMapper 0x25`/`DualDidMapper 0x27`, `DbProperties`) | rules/property/id-remap tables [DOC: methodology §2] | **MIRROR** (server owns; client consumes only what it needs) | Mostly ACE-authoritative (cat XII), not client-render assets. |
+| LOW: decals, shadows/reflections, post-process scope | presentation features [DESIGN] | **IMPROVE** (engine-native) | No faithful-data dependency; tune later. |
+| LOW: player housing | a full AC subsystem [COMMUNITY-VERIFY] | **MIRROR** (later; large) | Deferred; warrants its own decomposition when reached. |
+| LOW: client settings / keybind persistence | client stored settings [COMMUNITY-VERIFY] | **ADD** (modern settings UI + persistence) | Pairs with `KeyMap`. |
+
 ## I. Review remediation log + remaining backlog
 This doc and ADRs 0009-0020 incorporate a **multi-LLM adversarial review**
 (GPT-5.2 evidence / Opus-4.5 gaps / GPT-5.5 design, + orchestrator verification
@@ -192,14 +213,13 @@ presentation-only and must not perturb tick membership/order) →
 **NPC/crowd/creature LOD** (MIRROR DegradeInfo + ADD crowd/impostor LOD,
 presentation-only) → [ADR-0024](../decisions/0024-npc-crowd-lod.md).
 
-**Still-open backlog (not yet ADR'd — MED/future, from the review):**
-- MED disposition rows still to add: spawn/encounter instances (ACE
-  `landblock_instance`), `CombatTable 0x30` stance-animation pairing,
-  minimap/radar/world-map, nameplates/chat-bubbles (world-space UMG), spell->FX
-  mapping (`SpellTable`+`PhysicsScript`), inventory icons, weather beyond
-  day-night, and the un-disposed DAT types (EnumMapper 0x22, ActionMap 0x26,
-  DidMapper 0x25/0x27, String 0x31, KeyMap 0x14, FontLocal, ItemMutation 0x38,
-  MasterProperty 0x39, DbProperties).
+**Backlog CLEARED.** The MED/LOW disposition rows the reviews named (spawn
+instances, `CombatTable`, spell→FX, inventory icons, minimap/nameplates, weather,
+`KeyMap`, localization, the rules/id-map DAT types, and the LOW items) are now
+dispositioned in **§J** above. Remaining open work is execution (the `[VERIFY]`/
+extraction items inside the ADRs, e.g. `export-region`, `contract` §0b) and
+flipping `Proposed` ADRs to `Accepted` as their evidence clears — not new
+disposition gaps.
 - **Confirmed-correct by the review (do not re-litigate):** the DAT type codes,
   the AC->UE transform, rigid (non-skinned) animation in substance, and the
   provenance-tagging scheme itself.
