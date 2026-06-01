@@ -40,12 +40,14 @@ WP auto-assigns actors by world location: terrain for that landblock; scenery
 (`Scene 0x12`) as **HISM/foliage instances, never per-object actors**; buildings
 (`LandblockInfo` 0xFFFE); and indoor `EnvCell`s. Each `EnvCell` carries a
 **landblock-local** `Frame Position` `[REF-IMPL: `EnvCell.cs:28,56`]`; world position is
-`(LbX*192 + Frame.X, LbY*192 + Frame.Y, Frame.Z)` with **no terrain offset on Z**
-`[REF-IMPL: ACViewer `PositionExtensions.cs:9-29` (`ToXna`/`GetWorldPos`), `R_EnvCell.cs:47-49,78`]`.
+`(LbX*192 + Frame.X, LbY*192 + Frame.Y, Frame.Z)` with **no terrain offset on Z** `[REF-IMPL:
+ACViewer `PositionExtensions.GetWorldPos:22-29`; world renderer places each EnvCell at that
+origin — `R_Landblock.cs:51-56`, `Buffer.cs:340-344`, `InstanceBatch.cs:98-105`]`.
 **Measured (ADR-0009 full per-block census; [PRELIMINARY]):** whether that frame stays in the
 addressing landblock's `[0..192]` footprint is **type-dependent**. The one **building-interior**
-block sampled (Holtburg `0xA9B4`, 12 buildings) was fully co-located (138/138 cells in footprint);
-all three **dungeon** blocks (`Buildings==0`) placed the large majority of cells **outside** it
+block sampled (Holtburg `0xA9B4`, 12 buildings) was fully co-located (all sampled cells in
+footprint); all three **zero-building** blocks (`Buildings==0` — the zero-building half of ACViewer's
+`IsDungeon` predicate, not a verified dungeon) placed the large majority of cells **outside** it
 (532/568, 734/745, 934/946 — negative-Y, block(s) south), Z spanning a wide range. So **never
 assume interiors sit in their parent footprint or at a fixed Z** — compose the frame with
 `LbX/Y*192` and check. A Data Layer keyed by addressing landblock organizes interiors but does

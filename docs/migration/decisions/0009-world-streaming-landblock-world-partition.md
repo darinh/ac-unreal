@@ -95,8 +95,8 @@ if positions are correct:
 - **Buildings / structures** (`LandblockInfo` 0xFFFE) static meshes.
 - **Indoor `EnvCell`s**: **[VERIFY — this is the #1 gating assumption; partially
   addressed by the census below]** the original working hypothesis was that an EnvCell's
-  world frame sits within its parent landblock's XY footprint (dungeons stacked at lower
-  Z), so WP would assign it to the same cell automatically. The census below shows this
+  world frame sits within its parent landblock's XY footprint (the old guess being that dungeons
+  were simply stacked at lower Z — now shown false), so WP would assign it to the same cell automatically. The census below shows this
   is **type-dependent** (it held for the one building-interior block but failed for the
   three dungeon blocks) — so it must **not** be assumed. `contract/` §0b still marks the
   indoor coordinate domain UNKNOWN in the general case. **Remaining check before accepting
@@ -114,46 +114,58 @@ if positions are correct:
 >
 > **Proven — how an `EnvCell` is placed in the world (ACViewer render path):**
 > `world = (LbX*192 + Frame.Origin.X, LbY*192 + Frame.Origin.Y, Frame.Origin.Z)`, where
-> `LbX/LbY` are the cell-id's high bytes and **Z gets no terrain offset** (the Z translation
-> is 0). [REF-IMPL: ACViewer `Extensions/PositionExtensions.cs:9-29` — `ToXna()`/`GetWorldPos()`
-> compose `Frame * CreateTranslation(LbX*BlockLength, LbY*BlockLength, 0)`; `Render/R_EnvCell.cs:47-49,78`
-> — EnvCell geometry is drawn at `EnvCell.Pos.ToXna()` via the `xWorld` matrix;
-> `Physics/Common/LandDefs.cs:102` — `BlockLength=192` — verified]. The frame is therefore
-> **landblock-local**, and a frame outside `[0,192]` simply renders in a different world block.
+> `LbX/LbY` are the cell-id's high bytes and **Z gets no terrain offset** (the Z translation is
+> 0, modulo a +0.05 z-fight nudge). [REF-IMPL: ACViewer `Extensions/PositionExtensions.cs:22-29`
+> — `GetWorldPos()` returns `(LbX*BlockLength + Frame.Origin.X, LbY*BlockLength + Frame.Origin.Y,
+> Frame.Origin.Z)`; the **world renderer** places each EnvCell instance at that origin —
+> `Render/R_Landblock.cs:51-56` (`AddEnvCells`), `Render/Buffer.cs:340-344`,
+> `Render/InstanceBatch.cs:98-105` (`origin = EnvCell.Pos.GetWorldPos()`);
+> `Physics/Common/LandDefs.cs:102` — `BlockLength=192` — verified. (`PositionExtensions.ToXna:9-20`
+> / `R_EnvCell.cs:47-49,78` give the same composition for the unbatched model-viewer path.)]
+> The frame is therefore **landblock-local**, and a frame outside `[0,192]` simply renders in a
+> different world block.
 > (The ACE.Entity `Position.SetLandblock` block-offset normalization does **not** apply to
 > EnvCells: it early-returns for indoor cells — `if (Indoors) return false`,
 > ACE.Entity `Position.cs:123` — verified.)
 >
 > **The hypothesis must be split by cell type.** An `EnvCell` is "mostly dungeons, but can also
-> be a building interior" [REF-IMPL: ACE.DatLoader `FileTypes/EnvCell.cs:11` — verified]; a
-> landblock is a **dungeon** when all terrain heights are 0 and it has EnvCells but **zero
-> buildings** [REF-IMPL: ACViewer `Physics/Common/Landblock.cs:592-604` — verified]. Census,
-> split by category (`Buildings` count from `LandblockInfo`):
+> be a building interior" [REF-IMPL: ACE.DatLoader `FileTypes/EnvCell.cs:11` — verified]. ACViewer
+> flags a landblock `IsDungeon` when all terrain heights are 0 **and** it has EnvCells but **zero
+> buildings** [REF-IMPL: ACViewer `Physics/Common/Landblock.cs:592-604` — verified]. I measured
+> only the **zero-building** half of that predicate (`LandblockInfo.Buildings==0`); the
+> all-heights-0 half is **unverified per block**, so the rows below are labeled **"zero-building"**
+> — a *necessary, not sufficient* condition for ACViewer's `IsDungeon`, and **not** an asserted
+> dungeon/content classification. (`0x8602`, the project's "academy", is zero-building.)
+> **"building interior"** = has buildings. Census, split by category (`Buildings` count from
+> `LandblockInfo`):
 >
 > | Landblock | LbX,LbY | Buildings | Category | Frame.Origin bbox (X / Y / Z) | Cells in `[0,192]²` |
 > |---|---|---|---|---|---|
 > | `0xA9B4` (Holtburg) | 169,180 | 12 | **building interior** | X[31.5..161.9] Y[7.5..159.5] Z[66..94] | **138 / 138 IN** |
-> | `0x8602` (academy) | 134,2 | 0 | dungeon | X[0..210] Y[-250..0] Z[-12..18] | 36 IN / **532 OUT** |
-> | `0x01AE` | 1,174 | 0 | dungeon | X[0..180] Y[-140..0] Z[-36..24] | 11 IN / **734 OUT** |
-> | `0x00D6` | 0,214 | 0 | dungeon | X[0..120] Y[-340..0] Z[-6..96] | 12 IN / **934 OUT** |
+> | `0x8602` (academy) | 134,2 | 0 | zero-building | X[0..210] Y[-250..0] Z[-12..18] | 36 IN / **532 OUT** |
+> | `0x01AE` | 1,174 | 0 | zero-building | X[0..180] Y[-140..0] Z[-36..24] | 11 IN / **734 OUT** |
+> | `0x00D6` | 0,214 | 0 | zero-building | X[0..120] Y[-340..0] Z[-6..96] | 12 IN / **934 OUT** |
 >
 > **Result (sample of 4 blocks; [PRELIMINARY]):** co-location is **type-dependent**, so it must
 > **not be assumed** either way. The one **building-interior** block sampled was fully co-located
-> — all 138 cells inside the addressing landblock's XY footprint. All three **dungeon** blocks
-> placed the **large majority** of cells *outside* that footprint (532/568, 734/745, 934/946 —
-> negative-Y, i.e. the block(s) to the south), though a small minority near the origin stay
-> inside. Z is the raw frame Z with no terrain offset; the Z ranges are wide (e.g. dungeon
-> `0x00D6` spans Z[-6..96]), and whether any given Z sits above or below ground is **unmeasured**
-> (would require the landblock height table) and is **not** claimed here.
+> — every sampled cell inside the addressing landblock's XY footprint. (The census enumerated all
+> 138 EnvCell *files* in `0xA9B4`; `LandblockInfo.NumCells`=123 is the subset ACViewer actually
+> walks for world render — `R_Landblock.cs:90-100` iterates `0x100..0x100+NumCells` — and since all
+> 138 files are in-footprint, the rendered 123 are too.) All three **zero-building** blocks placed
+> the **large majority** of cells *outside* that footprint (532/568, 734/745, 934/946 — negative-Y,
+> i.e. the block(s) to the south), though a small minority near the origin stay inside. Z is the raw
+> frame Z with no terrain offset; the Z ranges are wide (e.g. `0x00D6` spans Z[-6..96]), and whether
+> any given Z sits above or below ground is **unmeasured** (would require the landblock height table)
+> and is **not** claimed here.
 >
 > **Decision impact:** (a) compose every EnvCell with `LbX/Y*192` per the proven formula —
-> never assume in-footprint; (b) WP auto-assignment by world location will, for **dungeon**
-> blocks, place most geometry in a **different** grid cell than the addressing landblock, so a
-> Data Layer keyed by addressing landblock organizes interiors but does **not** predict which WP
-> cell streams them; (c) ADR-0010 (coords) and ADR-0013 (culling) must handle interiors that
-> cross block boundaries. Sample is four blocks (1 interior, 3 dungeon); **widen before locking**
-> — especially add more building-interior blocks before generalizing the co-location result for
-> that category.
+> never assume in-footprint; (b) for the sampled **zero-building** blocks, WP
+> auto-assignment by world location would place most geometry in a **different** grid cell than
+> the addressing landblock, so a Data Layer keyed by addressing landblock organizes interiors but
+> does **not** predict which WP cell streams them; (c) ADR-0010 (coords) and ADR-0013 (culling)
+> must handle interiors that cross block boundaries. Sample is four blocks (1 interior, 3
+> zero-building); **widen before locking** — especially add more building-interior blocks before
+> generalizing the co-location result for that category.
 
 ## 4. Distant world (HLOD) [DESIGN / ADD]
 - A coarser **HLOD layer** (e.g. 4x4 landblocks per HLOD cell ~= 768 m) generates
