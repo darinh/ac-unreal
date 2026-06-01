@@ -8,8 +8,10 @@ metadata:
 # AC MMO client networking (server-authoritative, ACEmulator-compatible)
 
 The UE client is forward-compatible with **ACEmulator** (open-source AC server),
-which speaks the **retail Turbine protocol**. That makes the wire format a **hard
-MIRROR**: we cannot "improve" it without losing server compatibility. AC is
+which implements a **retail-compatible Turbine protocol**. That makes the wire
+format a **hard MIRROR**: we cannot "improve" it without losing server
+compatibility. Exact byte-for-byte equivalence with the *retail* server is
+`[COMMUNITY/VERIFY]` — target ACE and confirm against a recorded session. AC is
 **heavily server-authoritative** — copying only server-side math, or predicting
 things the server owns, both break feel. See `docs/migration/README.md` §XI/§XII
 and `contract/physics-feel-spec-request.md` §10/§10b.
@@ -21,10 +23,13 @@ and `contract/physics-feel-spec-request.md` §10/§10b.
   session establishment.
 - **Character select / enter-world** — char list, selection, world entry,
   portal/teleport transitions.
-- **Message taxonomy** — `GameAction` (client->server) and `GameEvent`
-  (server->client), with ordered/sequenced (F7B0) flows.
-- **Object/state sync** — object create/update/delete, position broadcasts,
-  visibility (ties to streaming relevance — see `ac-world-streaming`).
+- **Message taxonomy** — `GameAction` (client->server), `GameEvent` (server->client
+  *targeted* events), and `GameMessage` (server->client world/object state), with
+  ordered/sequenced (F7B0) flows. `[REF-IMPL]` ACE.
+- **Object/state sync** — `GameMessage` object create/update/delete + position
+  broadcasts (ACE opcodes `ObjectCreate`/`ObjectDelete`/`UpdatePosition`,
+  `GameMessageOpcode.cs:50-53`), visibility (ties to streaming relevance — see
+  `ac-world-streaming`).
 
 ## The prediction/reconciliation contract (do NOT guess — `contract/` §10)
 Replicate the *shape* of AC's client/server split, not a generic one:

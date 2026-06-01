@@ -272,8 +272,10 @@ internal static class Commands
     /// List indoor EnvCell IDs in a landblock. EnvCells are the indoor
     /// cells that make up dungeon / building interiors. Their full
     /// cell ID is `(landblockHigh16 &lt;&lt; 16) | envCellLow16` where
-    /// envCellLow16 has its high byte >= 0x01 (outdoor cells use
-    /// 0x0001..0x00FE in the low 16; EnvCells use 0x0100..0xFFFE).
+    /// envCellLow16 selects the cell. Outdoor land cells occupy the
+    /// 0x0001..0x0040 range (8x8 = 64 surface cells; ACE EnvCell.cs:13,
+    /// ACViewer LandDefs LastLandCellID = 64); indoor EnvCells use
+    /// 0x0100..0xFFFD; 0xFFFE = LandblockInfo.
     /// </summary>
     public static int ListEnvCells(ReadOnlySpan<string> args)
     {

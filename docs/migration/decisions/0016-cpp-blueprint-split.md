@@ -17,8 +17,9 @@ Proposed split (the seam is **data**):
   replication** (the ACEmulator-compatible protocol + predict/reconcile
   component), **perf-critical/high-count** systems (landblock streaming, Mass-style
   entities, the importers), and **core data types** (`USTRUCT`/`UCLASS`/
-  `UDataAsset`). Parity-critical math must NOT live in Blueprint (non-deterministic
-  execution undermines trace-level parity testing).
+  `UDataAsset`). Parity-critical math must NOT live in Blueprint (BP's tick/latent-
+  node ordering, VM float/iteration-order behavior, and reduced auditability make
+  trace-level parity testing fragile).
 - **Blueprint** for: **UI/HUD** (UMG), **designer-tunable gameplay** (ability/
   effect/quest/spawn wiring), **prototyping** (promote hot paths to C++ once
   settled), and **level/content scripting**.

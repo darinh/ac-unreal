@@ -14,9 +14,10 @@ iteration and presentation go in Blueprint; the seam is data.**
 ## Use C++ for
 - **The simulation lane** — anything parity-tested against the original: movement
   (`UCharacterMovementComponent` subclass), collision, physics-feel, projectile/
-  cast timing, the fixed-tick math (`contract/`). Blueprint's execution is
-  non-deterministic enough to make trace-level parity testing unreliable, so
-  parity-critical math must NOT live in Blueprint.
+  cast timing, the fixed-tick math (`contract/`). Blueprint's tick/latent-node
+  ordering, VM float/iteration-order behavior, and weaker auditability make
+  trace-level parity testing fragile, so parity-critical math must NOT live in
+  Blueprint.
 - **Networking / replication** — the ACEmulator-compatible protocol layer and the
   predict/reconcile component (see `ac-mmorpg-networking`).
 - **Perf-critical / high-count systems** — landblock streaming, Mass-style entity
@@ -42,8 +43,8 @@ load from a `UDataAsset`). This keeps the faithful/parity values in data, the
 deterministic math in C++, and the tunable/visual glue in Blueprint.
 
 ## Anti-patterns
-- Parity-critical or per-frame-at-scale math in Blueprint (non-deterministic, slow,
-  hard to trace-test).
+- Parity-critical or per-frame-at-scale math in Blueprint (harder to make
+  tick-deterministic, slower, hard to trace-test).
 - Hard-coded gameplay constants in C++ that designers need to tune (put them in a
   `UDataAsset`/`DataTable` instead).
 - A monolithic "God" Blueprint — keep Blueprint thin over C++ components.

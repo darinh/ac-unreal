@@ -15,7 +15,10 @@ derivations, never an input.**
 - **Currently disabled** (interim, see ADR-0002/0015): Lumen, Nanite, hardware
   ray tracing, mesh distance fields, static lighting; auto-exposure off
   (deterministic renders). These are step-0 expedients, not world-scale decisions.
-- **World scale:** seamless ~49 km world, 192 m landblocks (8x8 of 24 m cells).
+- **World scale:** ~49 km world `[REF-IMPL: derived from ACE/ACViewer LandDefs]`,
+  192 m landblocks (8x8 of 24 m cells) `[REF-IMPL: ACE `Position.cs:516-519`]`.
+  "Seamless/zoneless" client streaming behavior is `[COMMUNITY/VERIFY]` (ACE's
+  `LandblockManager` is server-side, not proof of client behavior).
 - **Multiplayer:** server-authoritative; forward-compatible with **ACEmulator**
   (retail Turbine protocol must be mirrored).
 
@@ -35,8 +38,8 @@ ACEmulator/ACViewer, not just our own tools.
 - Plan + taxonomy + status: `docs/migration/README.md`
 - Extraction how-to: `docs/migration/extraction-methodology.md`
 - Terms: `docs/migration/glossary.md`
-- Decisions: `docs/migration/decisions/` (ADRs; 0009-0016 are the open
-  world-scale + Blueprint decisions)
+- Decisions: `docs/migration/decisions/` (ADRs; 0009-0020 are the open
+  world-scale + Blueprint + collision/water/portal/networking decisions)
 - Feature dispositions + gaps: `docs/migration/notes/feature-disposition-and-design-gaps.md`
 - Simulation spec: `contract/physics-feel-spec-request.md`
 - Extraction CLI: `pipeline/dat-extract/` (`acdat`, wraps `ACE.DatLoader`)

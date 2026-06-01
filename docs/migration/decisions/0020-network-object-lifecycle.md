@@ -5,8 +5,11 @@ Status: Proposed   Date: 2026-05-31
 The disposition matrix dispositions networking as "MIRROR" in one word but gives
 no **mechanism** for how dynamic objects (other players, creatures, items) appear,
 move, and disappear. AC is server-authoritative: the server broadcasts object
-create/update/delete and position updates (`GameEvent CreateObject` etc.)
-[REF-IMPL: ACE — relayed from the multi-LLM review; confirm the message set], and
+create/update/delete and position updates as ACE **`GameMessage`s** —
+`GameMessageCreateObject`/`GameMessageDeleteObject`/`GameMessageUpdatePosition`,
+opcodes `ObjectCreate`/`ObjectDelete`/`UpdatePosition`
+[REF-IMPL: ACE.Server `Network/GameMessages/Messages/*` + `GameMessageOpcode.cs:50-53`
+— verified] (a `GameMessage`, not a targeted `GameEvent`), and
 spawns are defined server-side (ACE `landblock_instance`). Critically, **the
 server is ACEmulator, not a UE dedicated server**, so UE's native replication
 graph does not apply — relevance/authority come from the AC protocol.
@@ -20,12 +23,12 @@ reconciled with World-Partition streaming (ADR-0009) so a server-relevant object
 in a not-yet-streamed cell is handled deliberately (force-load vs defer).
 
 ## Assumptions it depends on
-- A1 [VERIFY]: the GameEvent object-lifecycle message set + position-update cadence
+- A1 [VERIFY]: the `GameMessage` object-lifecycle set + position-update cadence
   (`contract/` §10/§10b); the wire schema for create/update/delete.
 - A2 [VERIFY]: AC's relevance/visibility rules and how they relate to landblock.
 
 ## Evidence required before Accepted
-- Fill `contract/` §10b (wire state); map the relevant ACE GameEvent catalog;
+- Fill `contract/` §10b (wire state); map the relevant ACE `GameMessage` catalog;
   confirm against a recorded session.
 
 ## Failure mode if an assumption is false

@@ -40,13 +40,16 @@ day-night/terrain) · ClothingTable `0x10` · ParticleEmitterInfo `0x32`.
 `audit-portals`. Analysis: `analyze_surfaces.py <cell_hex>` derives per-surface
 role (wall/floor/ceiling)+texture+avg-color from the exported OBJ/MTL.
 
-## Coordinate & orientation transform (PROVEN — methodology §4)
-AC is right-handed, Z-up, metres; UE is left-handed, Z-up, cm. The exporter bakes
-this so OBJs import at scale 1.0:
+## Coordinate & orientation transform (PROVEN for the exporter's OBJ/import convention — methodology §4)
+The exporter treats AC as right-handed, Z-up, metres and UE as left-handed, Z-up,
+cm, and bakes the transform so OBJs import at scale 1.0. **This is verified for the
+repo's render/import path.** The retail *simulation/wire* coordinate convention
+(handedness, up-axis, units, landblock extent) remains `contract/` §0 `[VERIFY]`
+(ADR-0010) — do not assume the exporter convention equals the sim convention.
 - Position: `UE.X = AC.Y*100`, `UE.Y = AC.X*100`, `UE.Z = AC.Z*100` (swap X<->Y).
 - Winding: **reverse** (the X<->Y swap flips chirality).
 - Quaternion: serialized **W,X,Y,Z** on disk; layout JSON emits `{W, -Y, -X, -Z}`.
-- UVs: AC origin is **top-left**, same as UE — **do NOT flip V** (use `vv`).
+- UVs: AC origin is **top-left**, same as UE — **do NOT flip V**.
 - Indoor polys: triangulate as a fan from vertex 0; `PosUVIndices[k]` selects the
   UV per corner (a vertex can carry several UVs — emit one `vt` per (vertex,UV)).
 - Portal openings (`Stippling == NoPos`) are skipped (ADR-0008) so you see through

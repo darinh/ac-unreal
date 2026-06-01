@@ -4,23 +4,28 @@ Status: Proposed   Date: 2026-05-31
 ## Context
 Nothing in the plan yet covers AC **collision** — it blocks all movement and
 interaction, and the entire simulation-lane collision spec (`contract/` §5) is
-UNKNOWN. AC's collision geometry is distinct from its render geometry: ACE derives
-indoor collision from `EnvCell.CellBSP` / `PhysicsObj`, outdoor from the landblock
-heightfield, and props from `Setup` bounds [REF-IMPL: ACE — relayed from the
-multi-LLM review; confirm the exact `CellBSP`/`PhysicsObj` symbols]. This is a
+UNKNOWN. AC's collision geometry is distinct from its render geometry: in ACE the indoor
+collision geometry lives on `CellStruct` (`CellStruct.PhysicsBSP` /
+`CellStruct.PhysicsPolygons`, distinct from the render `Polygons`; `CellBSP` is
+also present), referenced from a cell via `EnvCell.CellStructure`; outdoor from the
+landblock heightfield; and props from `Setup` bounds. `PhysicsObj` is ACE.Server
+*runtime* state, not a DAT structure. [REF-IMPL: ACE.DatLoader
+`Entity/CellStruct.cs:13-15`, `FileTypes/EnvCell.cs:27` — verified]. This is a
 **simulation-lane** concern: collision feeds parity-tested movement, so it must
 MIRROR, not approximate with UE defaults.
 
 ## Candidate (proposed, not decided)
 Derive UE collision from the AC source per domain: **indoor** from
-`CellStruct`/`CellBSP`, **terrain** from the heightfield mesh, **props** from
+`CellStruct.PhysicsBSP`/`PhysicsPolygons` (the collision geometry, *not* the render
+`Polygons`), **terrain** from the heightfield mesh, **props** from
 `Setup` bounds. The movement component (the `UCharacterMovementComponent`
 subclass) uses the AC collision *model* from `contract/` §5 (capsule size, step-up,
 slope limit, wall/ceiling response, heightfield interpolation), not UE's defaults.
 
 ## Assumptions it depends on
-- A1 [VERIFY]: `CellBSP`/`PhysicsObj` structure + semantics (is collision a BSP, a
-  convex set, or render-geometry-derived?).
+- A1 [VERIFY]: `CellStruct.PhysicsBSP`/`PhysicsPolygons` structure + semantics (is
+  collision a BSP, a convex set, or render-geometry-derived?), and whether the
+  client's runtime physics (the ACE.Server `PhysicsObj` analogue) consumes it as-is.
 - A2 [VERIFY]: the §5 values (capsule per species, step-up height, max slope,
   slide/wall/ceiling response, heightfield interpolation — bilinear assumed).
 

@@ -55,7 +55,8 @@ The full per-feature matrix is in
   coordinate transform, per-asset recipes, gotchas. (See skill `ac-dat-extraction`.)
 - `docs/migration/glossary.md` — AC/DAT terms (ACEmulator vocabulary).
 - `docs/migration/decisions/` — ADRs (the *why*; challenge the rationale, don't
-  silently reverse). 0009-0015 are the open world-scale decisions.
+  silently reverse). 0009-0020 are the open world-scale + Blueprint + collision/
+  water/portal/networking decisions.
 - `docs/migration/notes/feature-disposition-and-design-gaps.md` — what we
   mirror/improve/remove/add and the open design gaps.
 - `contract/physics-feel-spec-request.md` — the simulation parity spec (mostly

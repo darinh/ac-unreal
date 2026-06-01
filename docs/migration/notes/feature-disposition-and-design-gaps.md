@@ -88,7 +88,7 @@ T0–T4).
 | Coordinate precision over ~49 km | landblock-local coords (global = LB origin + local) [COMMUNITY/VERIFY] confirm vs ACE `Position`/`Frame` | **MIRROR capability**, **REPLACE mechanism** with UE **LWC** (double precision, already `=1`) | GAP: decide LWC-global vs keep landblock-local (pairs with WP cell origins). Contract §0/§0b has this UNKNOWN. |
 | Terrain + object LOD | `DegradeInfo` object LOD; terrain LOD (TBD) [DATA]/[COMMUNITY/VERIFY] | **MIRROR** object LOD; **ADD** HLOD | See A rows. |
 | Day-night / weather | `RegionDesc.SkyDesc` "lighting of day"; weather [DATA] methodology; [DOC] README §XV | **MIRROR** (data-driven) + **IMPROVE** (volumetrics) | GAP: extraction + a time-of-day drive system are unbuilt. |
-| Runtime occlusion | portal/cell `VisibleCells` (interior PVS); fog far-clip outdoors [DATA] ADR-0008; README §II | **MIRROR** | GAP: no runtime culling design; needed for both perf and to stop sky-leak indoors. |
+| Runtime occlusion | portal/cell `VisibleCells` (per-cell visible set; PVS-vs-adjacency semantics `[VERIFY]`, ADR-0013); fog far-clip outdoors [DATA] ADR-0008; README §II | **MIRROR** | GAP: no runtime culling design; needed for both perf and to stop sky-leak indoors. |
 | Asset/object relevance (creatures/items entering view) | server broadcasts object create/update/delete in range [DOC] README §XI.e | **MIRROR** | Ties to network relevance + streaming radius. |
 | Performance budgets (draw calls / VRAM / memory) | 1999 hardware budget [COMMUNITY] | **ADD** (modern budgets) | §XV bullet; undesigned. |
 | Packaging / CI / telemetry / settings persistence | client installer + registry settings [COMMUNITY] | **ADD/IMPROVE** | §XV bullets; undesigned. |
@@ -162,6 +162,20 @@ This doc and ADRs 0009-0020 incorporate a **multi-LLM adversarial review**
 against ACE.DatLoader/ACViewer). Applied: provenance honesty fixes (C1-C3, M1-M2,
 M4-M6, M8), the C5 restructure of Proposed ADRs (candidates no longer read as
 decisions), M7/M9-M14, and four new HIGH-impact ADRs.
+
+**Second-pass re-review (2026-05-31, GPT-5.5 + GPT-5.2 evidence + rubber-duck, with
+orchestrator verification against ACE.DatLoader/ACE.Server):** the ADR remediation
+held up, but the **operational layer had regressed several corrected claims** — the
+skills and `.agents/ue-project-context.md` (read first by agents) restated dungeon
+co-location, world-scale/streaming, and the Gouraud formula as fact, and two new
+ADRs named wrong ACE symbols. Applied this pass: ADR-0017 collision source corrected
+to `CellStruct.PhysicsBSP`/`PhysicsPolygons` (not `EnvCell.CellBSP`/`PhysicsObj`);
+ADR-0020 + networking skill corrected `GameEvent`->`GameMessage`
+(`ObjectCreate`/`ObjectDelete`/`UpdatePosition`); skills + shared context re-tagged
+for co-location, ~49 km/192 m, retail streaming, HLOD/fog, and the Gouraud combine
+equation; `Program.cs` cell-id range reconciled to 0x0040; `VisibleCells` "interior
+PVS" softened to unconfirmed; Blueprint-non-determinism reworded to concrete
+reasons. The second-pass review doc is `review.md` (worktree root, uncommitted).
 
 **Newly covered (were missing dispositions):**
 [ADR-0017](../decisions/0017-collision-physics-representation.md) collision ·

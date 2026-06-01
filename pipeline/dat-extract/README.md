@@ -60,8 +60,8 @@ $acdat = ".\bin\Release\net8.0\acdat.exe"
 # (LandblockX is the top byte, LandblockY the next byte.)
 & $acdat landblock-info $dat 8602   # Aluvian Training Academy
 
-# List indoor EnvCell IDs in a landblock (cell IDs with high byte of
-# low-16 != 0 are indoor; 0x0001..0x00FE are outdoor cells).
+# List indoor EnvCell IDs in a landblock (low-16 0x0001..0x0040 are
+# outdoor land cells; 0x0100..0xFFFD are indoor EnvCells; 0xFFFE = LandblockInfo).
 & $acdat list-envcells $dat 8602
 
 # Print one cell's metadata (position, portals, static objects).

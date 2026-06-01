@@ -19,8 +19,13 @@ master that has instances** — new param GUIDs drop every instance's overrides 
 grey; modify in place or re-apply by name.
 
 ## Lighting (presentation; the live state)
-AC computes **per-vertex Gouraud** at runtime (`dot(N,-L)+ambient` x texture); no
-baked vertex color, so pure-black surfaces are invisible without light/ambient.
+AC uses **per-vertex (Gouraud-style) lighting** at runtime with **no baked vertex
+color** (`SWVertex` carries only Origin/Normal/UVs) `[REF-IMPL:
+`SWVertex.cs:12-15`]`; ambient is a **global** time-of-day term (`SkyTimeOfDay.
+AmbBright`/`AmbColor`) `[REF-IMPL: `SkyTimeOfDay.cs:15-21`]`. The exact combine
+equation (e.g. `dot(N,-L)+ambient` x texture) is **`[VERIFY]`** — confirm it from
+the client render path before baking it into materials/tests. Consequence either
+way: pure-black surfaces are invisible without light/ambient.
 Current decisions:
 - **Indoor interim = unlit emissive textures** (ADR-0007): bright, even,
   deterministic; this is a step-0 expedient, NOT the world model.

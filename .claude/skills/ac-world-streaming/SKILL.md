@@ -7,9 +7,13 @@ metadata:
 
 # AC open world -> UE World Partition
 
-AC is a **seamless, zoneless ~49 km world** partitioned into **192 m x 192 m
-landblocks** (8x8 grid of 24 m land cells). The retail client streamed landblocks
-around the player. The naive "all actors in one level" approach **hangs `-game`**
+AC is a **~49 km world** `[REF-IMPL: derived from ACE/ACViewer LandDefs +
+`ACE.Entity/Position.cs:516-519`]` partitioned into **192 m x 192 m
+landblocks** (8x8 grid of 24 m land cells) `[REF-IMPL: `Position.cs:516-519`]`.
+Whether the retail *client* streamed landblocks around the player (and presented a
+"seamless/zoneless" world) is `[COMMUNITY/VERIFY]` — ACE's `LandblockManager` is
+**server-side** `[REF-IMPL]`, not proof of client behavior. Regardless, the naive
+"all actors in one level" approach **hangs `-game`**
 ("Waiting for static meshes to be ready N/618") and does not scale. Mirror AC's
 per-landblock streaming with **World Partition**. Decisions: ADR-0009 (streaming),
 ADR-0010 (precision), ADR-0013 (occlusion).
@@ -33,8 +37,11 @@ question (which landblock corner is UE origin) — `[VERIFY]` in `contract/` §0
 ## What goes in each cell
 WP auto-assigns actors by world location: terrain for that landblock; scenery
 (`Scene 0x12`) as **HISM/foliage instances, never per-object actors**; buildings
-(`LandblockInfo` 0xFFFE); and indoor `EnvCell`s (they carry world frames inside
-the landblock footprint, dungeons stacked at lower Z). Group interiors on a
+(`LandblockInfo` 0xFFFE); and indoor `EnvCell`s (each carries a per-cell `Frame
+Position` within the landblock `[REF-IMPL: `EnvCell.cs:27,54`]`). Whether interiors
+are co-located under the outdoor block, stacked in Z, or live in a separate
+coordinate domain is `[VERIFY]` (gates ADR-0009/0010/0019; `contract/` §0b UNKNOWN)
+— do not assume a Z offset. Group interiors on a
 **Data Layer** and let `VisibleCells` (ADR-0013) do per-cell occlusion inside.
 
 ## Terrain — the one real wrinkle
@@ -47,10 +54,12 @@ quads-per-section in {7,15,31,63,127,255}; 8 does not divide cleanly.
   resolution (better runtime LOD + virtual heightfield + layer blending for AC's
   6-UV terrain-type blend).
 
-## Distant world = HLOD (an ADD; AC had none — it used fog)
+## Distant world = HLOD (an ADD; whether AC used HLOD is `[VERIFY]`)
 Add a coarser HLOD layer (e.g. 4x4 landblocks/cell) generating merged proxies
 beyond the loading range, out to the far clip. Tune far-clip + fog to the
-extracted `RegionDesc` values (ADR-0011); HLOD fills what fog used to hide.
+extracted `RegionDesc` values (ADR-0011; fog params are `[REF-IMPL:
+`SkyTimeOfDay.cs:18-21`]`). AC clearly had **no UE-style HLOD**; whether it leaned
+on fog to mask draw distance is `[COMMUNITY/VERIFY]`, not established here.
 
 ## Precision (LWC)
 A 49 km world exceeds single-float comfort (~20 km). UE **LWC double precision**
