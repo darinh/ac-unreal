@@ -2,17 +2,27 @@
 Status: Proposed   Date: 2026-05-31
 
 ## Context
-AC is a seamless, zoneless ~49 km world; all world data is keyed **per
-landblock** (192 m x 192 m, 8x8 grid of 24 m cells) [DATA: `Program.cs`
-`ListLandblocks`/`LandblockInfo`; glossary]. The retail client streamed
-landblocks around the player (no zone loads) [COMMUNITY/VERIFY: confirm the
-client's active-landblock radius against ACE `LandblockManager` + community
-docs]. The current UE project stores **all academy actors inline in one level**
-(no streaming), which is the direct cause of the `-game` "Waiting for static
-meshes to be ready N/618" hang and does not scale past one zone. See gap doc
+The world is a grid of landblocks addressed by an 8-bit X / 8-bit Y byte pair
+[DATA: `Program.cs` `ListLandblocks`/`LandblockInfo` + glossary — the ID bit
+layout / file-id patterns]. Each landblock is **192 m**, subdivided 8x8 into 24 m
+land cells [REF-IMPL: ACViewer `Physics/Common/LandDefs.cs`
+`BlockLength=192`/`CellLength=24`/`BlockSide=8`; the extractor does not yet emit
+metric dimensions], giving a maximum extent of ~49 km per side (arithmetic). That
+the world is **seamless/zoneless** with a long view distance is retail *client
+behavior* [COMMUNITY/VERIFY]. The world *data* is keyed strictly per-landblock
+[DATA] — the structural enabler for streaming — but the retail *client's*
+active-landblock load policy is [COMMUNITY/VERIFY]; do **not** infer it from ACE
+`LandblockManager`, which is server-side. The current UE project stores **all
+academy actors inline in one level** (no streaming); this **likely contributes**
+to the `-game` "Waiting for static meshes to be ready N/618" hang, but the root
+cause is **not isolated** (procedural-mesh build, Nanite/Lumen paths,
+mesh-readiness/compilation, and actor count are all candidates) [DESIGN — validate
+with a controlled before/after load trace]. It does not scale past one zone
+regardless. See gap doc
 [`../notes/feature-disposition-and-design-gaps.md`](../notes/feature-disposition-and-design-gaps.md) §D.
 
-Disposition: **MIRROR** AC's per-landblock streaming intent via a UE mechanism.
+Disposition: **MIRROR** AC's per-landblock data partitioning via a UE mechanism;
+the streaming *policy* mirrors the client only once the load radius is verified.
 
 ## Decision
 TBD (Proposed). Candidate [DESIGN]: enable **World Partition** with a streaming
@@ -21,20 +31,29 @@ runtime streaming source on the player; indoor `EnvCell`s grouped as data layers
 / sublevels keyed by landblock. Loading range set from the verified AC radius
 (item H1). Deep-dive of the concrete mapping is appended below once drafted.
 
-## Consequences
-- Fixes the all-in-one-level hang; required before any outdoor/multi-zone work.
-- Forces decisions in ADR-0010 (precision/origin) and ADR-0013 (occlusion) to
-  align with the grid; HLOD (an ADD) becomes the mechanism for distant blocks.
+## Consequences (if this candidate is accepted)
+- Removes the monolithic-level load pressure (a likely contributor to the hang;
+  root cause not yet isolated — see Context); required for outdoor/multi-zone work.
+- Forces ADR-0010 (precision/origin) and ADR-0013 (occlusion) to align with the
+  grid; HLOD (an ADD) becomes the mechanism for distant blocks.
 - Revisit trigger: if the verified AC load radius or cell size differs from the
   assumed grid, re-tune the WP grid before committing content.
 
-## Alternatives
-- Keep one monolithic level: rejected (the current hang; un-scalable).
-- Hand-rolled level streaming volumes per landblock: rejected vs World Partition
-  unless WP proves unable to honor the landblock grid.
+## Alternatives (still live — this is a Proposed candidate, not a decision)
+- One monolithic level: not selected (does not scale; likely load pressure).
+- Hand-rolled per-landblock streaming volumes: a fallback if World Partition
+  cannot honor the landblock grid.
+
+## Assumptions this candidate depends on (must hold before Accepted)
+- A1 [VERIFY]: indoor cells are co-located within their parent landblock's XY
+  footprint (so they stream with it) — see deep-dive; contradicts nothing only if
+  confirmed (contract §0b marks the indoor domain UNKNOWN).
+- A2 [VERIFY]: the monolithic level is a material cause of the hang (load trace).
 
 ## Verify before locking
-- H1: AC client active-landblock load radius (ACE `LandblockManager`).
+- H1: AC client active-landblock load **radius/policy** (NOT from server-side ACE
+  `LandblockManager` alone; confirm the client's behavior).
+- See also the deep-dive's "Verify before locking" and the per-assumption checks above.
 
 ---
 
@@ -44,8 +63,10 @@ Engineering detail for the Decision above. Tagged [DATA] (from the DAT/extractor
 methodology), [DESIGN] (our proposal, contestable), [VERIFY] (must confirm first).
 
 ## 1. The grid + the axis swap (get this right or the world transposes)
-- [DATA] A landblock is **192 m**; its id high-16 = `(LbX << 8) | LbY`, `LbX`/`LbY`
-  each a byte -> up to **256 x 256** landblocks. Internally 8x8 land cells of 24 m.
+- The landblock id high-16 = `(LbX << 8) | LbY`, `LbX`/`LbY` each a byte -> up to
+  **256 x 256** landblocks [DATA: extractor ID layout]. A landblock is **192 m**,
+  8x8 land cells of **24 m** [REF-IMPL: ACViewer `LandDefs.cs`
+  `BlockLength=192`/`CellLength=24`/`BlockSide=8`]; ~49 km/side is arithmetic.
 - [DATA] The AC->UE transform **swaps X and Y** and scales m->cm:
   `UE.X = AC.Y*100`, `UE.Y = AC.X*100` (methodology §4).
 - [DESIGN] Therefore landblock `(LbX, LbY)`, occupying AC metres
@@ -72,11 +93,18 @@ if positions are correct:
 - **Terrain** for that landblock (see §5).
 - **Scenery** (`Scene 0x12`) as **HISM/foliage** instances, not actors.
 - **Buildings / structures** (`LandblockInfo` 0xFFFE) static meshes.
-- **Indoor `EnvCell`s**: they carry world `Position` frames inside the landblock
-  footprint (AC dungeons sit under the block, same XY, lower Z) -> they fall into
-  the same WP cell automatically. Group them on a **Data Layer** ("Interiors")
-  so they can be toggled, and let **ADR-0013** (`VisibleCells` PVS) do the fine
-  per-cell occlusion once inside.
+- **Indoor `EnvCell`s**: **[VERIFY — this is the #1 gating assumption]** the
+  working hypothesis is that an EnvCell's world frame sits within its parent
+  landblock's XY footprint (dungeons stacked at lower Z), so WP would assign it to
+  the same cell automatically. This is **NOT confirmed** — `contract/` §0b marks
+  the indoor coordinate domain UNKNOWN, and it is only observed for *some* academy
+  cells. **Required check before accepting this ADR:** dump transformed UE XY
+  bounds for EnvCells across several known dungeons/buildings and confirm they lie
+  within the parent landblock footprint (and record whether interiors are global /
+  landblock-local / a separate domain). If false, the WP grouping, ADR-0010
+  (coords), ADR-0013 (culling), and portal-transition handling all change. Once
+  confirmed: group interiors on a **Data Layer**; let **ADR-0013** drive per-cell
+  occlusion.
 
 ## 4. Distant world (HLOD) [DESIGN / ADD]
 - A coarser **HLOD layer** (e.g. 4x4 landblocks per HLOD cell ≈ 768 m) generates
