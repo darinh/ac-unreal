@@ -38,6 +38,7 @@ never edit history away.
 | [0013](0013-runtime-occlusion-portal-culling.md) | Runtime occlusion / portal culling (CellPortals/VisibleCells) | Proposed |
 | [0014](0014-reenable-nanite-lumen-world-scale.md) | Re-enable Nanite/Lumen at world scale (revisit of 0002) | Proposed |
 | [0015](0015-indoor-first-expedients-are-temporary.md) | Indoor-first expedients are temporary (revisit triggers) | Proposed |
+| [0016](0016-cpp-blueprint-split.md) | C++ / Blueprint split strategy | Proposed |
 
 The open-world / world-scale design analysis that motivates ADRs 0009-0015 is in
 [`../notes/feature-disposition-and-design-gaps.md`](../notes/feature-disposition-and-design-gaps.md).
