@@ -156,6 +156,35 @@ extraction, not assumption. **These are now `Proposed` ADR stubs:**
 5. Whether outdoor terrain LOD is distinct from `DegradeInfo`.
 6. Whether `RenderTexture/RenderMesh` (0x15–0x19) are populated in the target DAT iteration (else REMOVE).
 
+## I. Review remediation log + remaining backlog
+This doc and ADRs 0009-0020 incorporate a **multi-LLM adversarial review**
+(GPT-5.2 evidence / Opus-4.5 gaps / GPT-5.5 design, + orchestrator verification
+against ACE.DatLoader/ACViewer). Applied: provenance honesty fixes (C1-C3, M1-M2,
+M4-M6, M8), the C5 restructure of Proposed ADRs (candidates no longer read as
+decisions), M7/M9-M14, and four new HIGH-impact ADRs.
+
+**Newly covered (were missing dispositions):**
+[ADR-0017](../decisions/0017-collision-physics-representation.md) collision ·
+[ADR-0018](../decisions/0018-water-liquid-swim.md) water/swim ·
+[ADR-0019](../decisions/0019-portal-transitions.md) portal transitions ·
+[ADR-0020](../decisions/0020-network-object-lifecycle.md) network object lifecycle.
+
+**Still-open backlog (not yet ADR'd — MED/future, from the review):**
+- A future **Audio** ADR (emitter placement, music transitions, ambient-zone
+  volumes, portal occlusion) and **Determinism-at-world-scale** ADR (sim runs on a
+  fixed entity set per tick; WP streaming is presentation-only and must not perturb
+  tick membership/order). Also: asset cooking/packaging, NPC/crowd LOD.
+- MED disposition rows still to add: spawn/encounter instances (ACE
+  `landblock_instance`), `CombatTable 0x30` stance-animation pairing,
+  minimap/radar/world-map, nameplates/chat-bubbles (world-space UMG), spell->FX
+  mapping (`SpellTable`+`PhysicsScript`), inventory icons, weather beyond
+  day-night, and the un-disposed DAT types (EnumMapper 0x22, ActionMap 0x26,
+  DidMapper 0x25/0x27, String 0x31, KeyMap 0x14, FontLocal, ItemMutation 0x38,
+  MasterProperty 0x39, DbProperties).
+- **Confirmed-correct by the review (do not re-litigate):** the DAT type codes,
+  the AC->UE transform, rigid (non-skinned) animation in substance, and the
+  provenance-tagging scheme itself.
+
 ## Provenance index
 - DAT taxonomy, recipes, gotchas, coordinate transform: [`../extraction-methodology.md`](../extraction-methodology.md) §2/§4/§5/§8.
 - Category plan + tiered acceptance + two-lane note: [`../README.md`](../README.md) §2/§3, L14/L30.

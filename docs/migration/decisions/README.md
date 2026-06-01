@@ -39,6 +39,10 @@ never edit history away.
 | [0014](0014-reenable-nanite-lumen-world-scale.md) | Re-enable Nanite/Lumen at world scale (revisit of 0002) | Proposed |
 | [0015](0015-indoor-first-expedients-are-temporary.md) | Indoor-first expedients are temporary (revisit triggers) | Proposed |
 | [0016](0016-cpp-blueprint-split.md) | C++ / Blueprint split strategy | Proposed |
+| [0017](0017-collision-physics-representation.md) | Collision / physics representation | Proposed |
+| [0018](0018-water-liquid-swim.md) | Water / liquid surfaces + swim physics | Proposed |
+| [0019](0019-portal-transitions.md) | Portal transitions / recall / teleport | Proposed |
+| [0020](0020-network-object-lifecycle.md) | Network object lifecycle / replication of other players & creatures | Proposed |
 
 The open-world / world-scale design analysis that motivates ADRs 0009-0015 is in
 [`../notes/feature-disposition-and-design-gaps.md`](../notes/feature-disposition-and-design-gaps.md).
