@@ -3,8 +3,11 @@
 Goal: name the exact EnvCell id(s) of the reference screenshot's first room
 (`~/repos/ac-screenshots/aluvian training academy first room.png`).
 
-Status: **candidate identified, visual confirmation BLOCKED on Step 1**
-(texture identity). See "Outcome" + "What this vetted in the docs".
+Status: **CONFIRMED + coexistence PROVEN** (2026-06-01, user sign-off). The
+room shell (walls + floor + ceiling) renders correctly *together* from a fixed
+6-view sweep that passes `test_renders.py --manifest`. The earlier "BLOCKED on
+Step 1 (texture identity)" status is **resolved** — see "Coexistence proof"
+below. The old blocking notes are kept for history but are superseded.
 
 ## Reference signature (read off the screenshot)
 - Floor: blue-grey stone tile.
@@ -28,6 +31,45 @@ spawn cell". Steps:
 3. Top candidates: `0x860201AD` (pos UE -3000,1000,0; 2 fire lights; 30
    statics; documented "spawn cell"; textures `06003C9A`+`06003C9C`),
    `0x860201B6` (pos -4000,2000,0; 4 fire lights; 29 statics; same textures).
+
+## Coexistence proof (2026-06-01, Step 0/1 — PROVEN, user sign-off)
+The room SHELL renders correctly **together** (walls + floor + ceiling in one
+coherent set), not just from a lucky single angle. Proven by the fixed-camera
+sweep + manifest formula, so it is re-runnable and regression-guarded.
+
+- **Tooling:** `pipeline/ue-import/render_firstroom_sweep.ps1` renders 6 fixed
+  cameras from the room center (UE world -3000,1000,250): `wall_n/e/s/w`
+  (yaw 0/90/180/270, pitch 0), `ceiling` (pitch +75), `floor` (pitch -75) into
+  one timestamped folder. `test_renders.py --manifest <dir>` then REQUIRES all
+  6 present AND each to pass the absolute checks (mean_lum 15–245,
+  content_frac ≥0.45, magenta ≤0.015, color_std ≥14) + a sky-leak gate
+  (sky_frac ≤0.30). A single cherry-picked angle cannot pass this.
+- **Evidence dir:** `pipeline/renders/firstroom_sweep_20260601_080757/`
+  (6 PNGs, 0.8–1.2 MB each — none are the 17709-byte pure-black signature).
+- **Result:** `MANIFEST PASS (room shell coexists)`, exit 0. Per-view metrics:
+
+  | view | mean | content | sky | result |
+  |------|------|---------|-----|--------|
+  | wall_n | 46.3 | 0.927 | 0.000 | PASS |
+  | wall_e | 70.8 | 0.964 | 0.001 | PASS |
+  | wall_s | 43.7 | 0.906 | 0.001 | PASS |
+  | wall_w | 54.2 | 0.947 | 0.000 | PASS |
+  | ceiling | 22.0 | 0.623 | 0.000 | PASS |
+  | floor | 43.8 | 0.936 | 0.033 | PASS |
+
+- **Visual match vs answer key** (`~/repos/ac-screenshots/aluvian training
+  academy - 01 - *.png`): tan plaster walls + grey stone-brick base band,
+  green mossy-stone fireplace with glowing embers, blue-grey stone-tile floor,
+  wood-beam ceiling seen through the `NoPos` portal to the adjacent cell
+  (`0x...02E2`, ADR-0008). Max sky_frac 0.033 ≪ 0.30 — the "blue sky through
+  gaps" problem is gone.
+- **Out of scope (Step 3):** untextured furniture statics (white blobs, cones,
+  floating swords) appear but issue #1 covers the SHELL only.
+- **Repro:**
+  ```
+  pwsh pipeline/ue-import/render_firstroom_sweep.ps1 -ResX 1280 -ResY 720
+  python pipeline/ue-import/test_renders.py --manifest pipeline/renders/firstroom_sweep_20260601_080757
+  ```
 
 ## Outcome
 - **Primary candidate: `0x860201AD`** - documented spawn cell, has the
