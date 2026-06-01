@@ -184,12 +184,13 @@ reasons. The second-pass review doc is `review.md` (worktree root, uncommitted).
 [ADR-0020](../decisions/0020-network-object-lifecycle.md) network object lifecycle.
 
 **Now ADR'd:** **Audio** → [ADR-0022](../decisions/0022-audio.md); **Determinism
-at world scale** (sim runs on a fixed entity set per tick; WP streaming is
-presentation-only and must not perturb tick membership/order) →
-[ADR-0021](../decisions/0021-determinism-at-world-scale.md).
+at world scale** → [ADR-0021](../decisions/0021-determinism-at-world-scale.md);
+**Asset cooking/packaging/distribution** (legal-constrained user-side cook) →
+[ADR-0023](../decisions/0023-asset-cooking-packaging-distribution.md);
+**NPC/crowd/creature LOD** (MIRROR DegradeInfo + ADD crowd/impostor LOD,
+presentation-only) → [ADR-0024](../decisions/0024-npc-crowd-lod.md).
 
 **Still-open backlog (not yet ADR'd — MED/future, from the review):**
-- Asset cooking/packaging; NPC/crowd LOD.
 - MED disposition rows still to add: spawn/encounter instances (ACE
   `landblock_instance`), `CombatTable 0x30` stance-animation pairing,
   minimap/radar/world-map, nameplates/chat-bubbles (world-space UMG), spell->FX

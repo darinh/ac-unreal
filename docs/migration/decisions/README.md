@@ -45,6 +45,8 @@ never edit history away.
 | [0020](0020-network-object-lifecycle.md) | Network object lifecycle / replication of other players & creatures | Proposed |
 | [0021](0021-determinism-at-world-scale.md) | Determinism at world scale (simulation vs streaming) | Proposed |
 | [0022](0022-audio.md) | Audio (samples, event/ambient mapping, spatialization) | Proposed |
+| [0023](0023-asset-cooking-packaging-distribution.md) | Asset cooking, packaging & distribution (legal-constrained cook) | Proposed |
+| [0024](0024-npc-crowd-lod.md) | NPC / crowd / creature LOD & density | Proposed |
 
 The open-world / world-scale design analysis that motivates ADRs 0009-0015 is in
 [`../notes/feature-disposition-and-design-gaps.md`](../notes/feature-disposition-and-design-gaps.md).
