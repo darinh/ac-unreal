@@ -51,3 +51,36 @@ academy's furnished look.
 - A per-object orientation audit vs the answer key is not yet done.
 - `DumpAcademyStatics` orientation now uses `stab.Frame.Orientation` directly;
   confirm rotated props read correctly (rotated-cell case).
+
+## 2026-06-01 - Prop UV mapping fixed (per-corner PosUVIndices), user sign-off
+Symptom: prop/furniture textures rendered stretched / sometimes reversed; the
+framed map-of-Dereth collapsed to a flat "plaster" smear.
+
+Root cause: the prop exporter `ExportSetup` (Program.cs) emitted one `vt` per
+vertex from `UVs[0]` and wrote faces `v/v/v`, ignoring per-corner
+`poly.PosUVIndices`. Same bug already fixed in `ExportEnvCell` (cells).
+
+Fix:
+1. `ExportSetup` now emits one `vt` per (vertex,UV) and indexes faces `p/t/n`,
+   selecting `PosUVIndices[corner]` (fallback UV 0); winding swap preserved.
+   acdat rebuilt clean.
+2. The canonical prop OBJs already carried the fix, so the visible defect was
+   stale UE meshes. Rebuilt the 135 stale `SM_Setup_*` meshes in place from the
+   current OBJs (those with split UVs, `vt>v`), preserving material bindings, via
+   the same delete+recreate mechanism proven on the 430-cell portal fix. The 65
+   props with no UV splits (`vt==v`) were left untouched (regression-safe).
+
+Verify:
+- `render_firstroom_sweep.ps1` + `test_renders.py --manifest` => MANIFEST PASS
+  (shell intact; `AcademyMap.umap` untouched).
+- First-room wall renders match the answer key: map-of-Dereth legible +
+  gold-framed, red tapestry's full ornate pattern, bookshelves/fireplace/urns/
+  helmets/candlesticks correctly textured; no stretching/reversal.
+
+Scope: 135 `Content/Academy/Setups/*.uasset` + `Program.cs`. Adversarially
+reviewed (rubber-duck); delete+recreate metadata-loss risk closed by parity with
+the original `build_setup_mesh` import path (which set no collision/Nanite/LOD
+either) plus material preservation.
+
+Open: `ExportNpc` has the same unfixed bug (Step 4); the 65 `vt==v` props'
+uniform-non-zero-UV-index edge case is an unmeasured follow-up (not a regression).

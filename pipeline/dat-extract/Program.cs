@@ -1430,6 +1430,10 @@ internal static class Commands
         sw.WriteLine($"o setup_{setupId:X8}");
 
         int globalVertOffset = 0;
+        // OBJ vt indices are a single file-global 1-based list, independent of
+        // the v/vn lists. Accumulate across parts (parallel to globalVertOffset)
+        // so per-corner UV references resolve to the right global vt slot.
+        int nextVt = 1;
         var allMtls = new Dictionary<string, (uint surfaceId, uint? textureId)>();
         int totalTris = 0;
 
@@ -1489,13 +1493,32 @@ internal static class Commands
                 var rn = RotAcQ(qx, qy, qz, qw, sv.Normal.X, sv.Normal.Y, sv.Normal.Z);
                 sw.WriteLine($"vn {rn.y:R} {rn.x:R} {rn.z:R}");
             }
+            // UVs: emit one vt per (vertex, UV-index). An SWVertex can carry
+            // several UVs; each polygon corner selects which one via
+            // PosUVIndices. The old code emitted only UVs[0] per vertex and
+            // wrote faces as v/v/v, mismapping any corner that references a
+            // non-zero UV index (textures stretched / map collapsing to a flat
+            // smear). Mirrors the fix already in ExportEnvCell and ACViewer
+            // FileExport.cs. Keyed by the part-local vertex id; the vt slot is
+            // the file-global nextVt (parallel to globalVertOffset).
+            var uvKeyToObjVt = new Dictionary<(ushort vid, int uvi), int>();
             for (int i = 0; i < vertOrder.Count; i++)
             {
-                var sv = gfx.VertexArray.Vertices[vertOrder[i]];
+                ushort vid = vertOrder[i];
+                var sv = gfx.VertexArray.Vertices[vid];
                 if (sv.UVs != null && sv.UVs.Count > 0)
-                    sw.WriteLine($"vt {sv.UVs[0].U:R} {sv.UVs[0].V:R}");
+                {
+                    for (int j = 0; j < sv.UVs.Count; j++)
+                    {
+                        sw.WriteLine($"vt {sv.UVs[j].U:R} {sv.UVs[j].V:R}");
+                        uvKeyToObjVt[(vid, j)] = nextVt++;
+                    }
+                }
                 else
+                {
                     sw.WriteLine($"vt 0 0");
+                    uvKeyToObjVt[(vid, 0)] = nextVt++;
+                }
             }
 
             var groups = gfx.Polygons.Values
@@ -1533,12 +1556,32 @@ internal static class Commands
                     if (poly.NumPts < 3) continue;
                     if (poly.VertexIds == null || poly.VertexIds.Count < poly.NumPts) continue;
 
-                    int v0 = idToObjIndex[(ushort)poly.VertexIds[0]];
+                    // Per-corner UV select via PosUVIndices (parallel to
+                    // VertexIds); fall back to the vertex's first UV when no
+                    // explicit index exists. Position/normal stay indexed by
+                    // the global vertex obj-index; only the texture coord uses
+                    // uvKeyToObjVt.
+                    int VtForCorner(int c)
+                    {
+                        ushort cvid = (ushort)poly.VertexIds[c];
+                        int uvi = (poly.PosUVIndices != null && c < poly.PosUVIndices.Count)
+                            ? poly.PosUVIndices[c]
+                            : 0;
+                        if (!uvKeyToObjVt.TryGetValue((cvid, uvi), out int vt))
+                            vt = uvKeyToObjVt[(cvid, 0)];
+                        return vt;
+                    }
+
+                    int p0 = idToObjIndex[(ushort)poly.VertexIds[0]];
+                    int t0 = VtForCorner(0);
                     for (int i = 1; i + 1 < poly.NumPts; i++)
                     {
-                        int va = idToObjIndex[(ushort)poly.VertexIds[i]];
-                        int vb = idToObjIndex[(ushort)poly.VertexIds[i + 1]];
-                        sw.WriteLine($"f {v0}/{v0}/{v0} {vb}/{vb}/{vb} {va}/{va}/{va}");
+                        int pa = idToObjIndex[(ushort)poly.VertexIds[i]];
+                        int pb = idToObjIndex[(ushort)poly.VertexIds[i + 1]];
+                        int ta = VtForCorner(i);
+                        int tb = VtForCorner(i + 1);
+                        // Winding swap (v0, vb, va) preserved from the original.
+                        sw.WriteLine($"f {p0}/{t0}/{p0} {pb}/{tb}/{pb} {pa}/{ta}/{pa}");
                         totalTris++;
                     }
                 }
