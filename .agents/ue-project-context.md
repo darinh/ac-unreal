@@ -38,8 +38,9 @@ ACEmulator/ACViewer, not just our own tools.
 - Plan + taxonomy + status: `docs/migration/README.md`
 - Extraction how-to: `docs/migration/extraction-methodology.md`
 - Terms: `docs/migration/glossary.md`
-- Decisions: `docs/migration/decisions/` (ADRs; 0009-0020 are the open
-  world-scale + Blueprint + collision/water/portal/networking decisions)
+- Decisions: `docs/migration/decisions/` (ADRs; 0009-0022 are the open
+  world-scale + Blueprint + collision/water/portal/networking + determinism/audio
+  decisions)
 - Feature dispositions + gaps: `docs/migration/notes/feature-disposition-and-design-gaps.md`
 - Simulation spec: `contract/physics-feel-spec-request.md`
 - Extraction CLI: `pipeline/dat-extract/` (`acdat`, wraps `ACE.DatLoader`)

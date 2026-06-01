@@ -43,6 +43,8 @@ never edit history away.
 | [0018](0018-water-liquid-swim.md) | Water / liquid surfaces + swim physics | Proposed |
 | [0019](0019-portal-transitions.md) | Portal transitions / recall / teleport | Proposed |
 | [0020](0020-network-object-lifecycle.md) | Network object lifecycle / replication of other players & creatures | Proposed |
+| [0021](0021-determinism-at-world-scale.md) | Determinism at world scale (simulation vs streaming) | Proposed |
+| [0022](0022-audio.md) | Audio (samples, event/ambient mapping, spatialization) | Proposed |
 
 The open-world / world-scale design analysis that motivates ADRs 0009-0015 is in
 [`../notes/feature-disposition-and-design-gaps.md`](../notes/feature-disposition-and-design-gaps.md).
