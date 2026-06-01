@@ -43,7 +43,11 @@ them); each needs its own design + acceptance test:
 - A1 [VERIFY]: `EnvCell.VisibleCells` is a usable visibility set (PVS) vs mere
   adjacency (ACE hedges — see Context).
 - A2 [VERIFY]: indoor cells are reachable as a streamable group (gated on the same
-  indoor-domain question as ADR-0009 A1 / ADR-0010 A2 / contract §0b).
+  indoor-domain question as ADR-0009 A1 / ADR-0010 A2 / contract §0b). *Partial: per-block
+  co-location is RESOLVED (type-dependent) — see
+  [notes/envcell-colocation-findings.md](../notes/envcell-colocation-findings.md); zero-building
+  interiors can fall OUTSIDE the addressing landblock's footprint, so a streamable group must be
+  keyed explicitly, not inferred from world location.*
 
 ## Evidence required before Accepted
 - Compare `VisibleCells` against `CellPortals` adjacency on a representative

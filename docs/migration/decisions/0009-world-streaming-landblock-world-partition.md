@@ -45,11 +45,12 @@ runtime streaming source on the player; indoor `EnvCell`s grouped as data layers
   cannot honor the landblock grid.
 
 ## Assumptions this candidate depends on (must hold before Accepted)
-- A1 [PARTIALLY VERIFIED — see §3 census]: indoor cells' co-location within their parent
-  landblock's XY footprint is **type-dependent**. Holds for all 8 sampled building-interior
-  (`Buildings>0`) blocks (882/882 cells in-footprint); **fails** for the 3 sampled
-  zero-building blocks (2200/2259 cells outside). The fully general indoor coordinate domain
-  across all blocks remains UNKNOWN (contract §0b); do not assume uniform co-location.
+- A1 [RESOLVED 2026-05-31, user sign-off — see [notes/envcell-colocation-findings.md](../notes/envcell-colocation-findings.md)
+  and §3 census]: indoor cells' co-location within their parent landblock's XY footprint is
+  **type-dependent**. Holds for all 8 sampled building-interior (`Buildings>0`) blocks (882/882
+  cells in-footprint); **fails** for the 3 sampled zero-building blocks (2200/2259 cells outside).
+  The fully general indoor coordinate domain across all blocks remains UNKNOWN (contract §0b); do
+  not assume uniform co-location.
 - A2 [VERIFY]: the monolithic level is a material cause of the hang (load trace).
 
 ## Verify before locking
@@ -110,6 +111,7 @@ if positions are correct:
   block boundaries.
 
 > **Evidence gathered (2026-05-31, empirical — full per-block census, [PRELIMINARY]):**
+> *(Durable standalone record with all citations: [notes/envcell-colocation-findings.md](../notes/envcell-colocation-findings.md) — RESOLVED, user sign-off 2026-05-31.)*
 > Method: enumerated **every** indoor `EnvCell` (real Cell-DAT file keys `0x0100..0xFFFD`,
 > full census — not a first-N slice, not a probe) in **11 landblocks** and composed each local
 > frame to world coordinates with the placement formula proven below, via

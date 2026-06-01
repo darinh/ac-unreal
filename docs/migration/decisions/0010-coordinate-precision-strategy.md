@@ -25,7 +25,11 @@ conversions, with round-trip tests.
 ## Assumptions it depends on
 - A1 [VERIFY]: AC's stored coordinate convention (landblock-local vs global) — ACE `Position`.
 - A2 [VERIFY]: indoor coordinate domain + world origin — contract §0b. **Highest-
-  priority decompile item; it also gates ADR-0009 and ADR-0013.**
+  priority decompile item; it also gates ADR-0009 and ADR-0013.** *Partial: the
+  EnvCell↔landblock-footprint co-location sub-question is RESOLVED (type-dependent —
+  building interiors co-locate, zero-building blocks mostly do not) — see
+  [notes/envcell-colocation-findings.md](../notes/envcell-colocation-findings.md). The full
+  domain (handedness/up-axis/unit/world origin) still needs the decompile.*
 
 ## Evidence required before Accepted
 - Contract §0/§0b filled (handedness, up-axis, unit, landblock encoding, indoor
