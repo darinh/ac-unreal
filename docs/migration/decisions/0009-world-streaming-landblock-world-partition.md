@@ -66,10 +66,13 @@ Engineering detail for the Decision above. Tagged [DATA] (from the DAT/extractor
 methodology), [DESIGN] (our proposal, contestable), [VERIFY] (must confirm first).
 
 ## 1. The grid + the axis swap (get this right or the world transposes)
-- The landblock id high-16 = `(LbX << 8) | LbY`, `LbX`/`LbY` each a byte -> up to
-  **256 x 256** landblocks [DATA: extractor ID layout]. A landblock is **192 m**,
-  8x8 land cells of **24 m** [REF-IMPL: ACViewer `LandDefs.cs`
-  `BlockLength=192`/`CellLength=24`/`BlockSide=8`]; ~49 km/side is arithmetic.
+- The landblock id high-16 = `(LbX << 8) | LbY`, `LbX`/`LbY` each a byte [DATA:
+  extractor ID layout]. ACE treats valid outdoor indices as **0..254 -> 255 per
+  side** [REF-IMPL: ACE `LandblockId` rejects >254; `LandblockManager` uses a
+  [255,255] table], not a full 256. A landblock is **192 m**, 8x8 land cells of
+  **24 m** [REF-IMPL: ACViewer `LandDefs.cs`
+  `BlockLength=192`/`CellLength=24`/`BlockSide=8`]; ~49 km/side is derived
+  arithmetic [COMMUNITY/VERIFY for the retail playable limit].
 - [DATA] The AC->UE transform **swaps X and Y** and scales m->cm:
   `UE.X = AC.Y*100`, `UE.Y = AC.X*100` (methodology §4).
 - [DESIGN] Therefore landblock `(LbX, LbY)`, occupying AC metres
