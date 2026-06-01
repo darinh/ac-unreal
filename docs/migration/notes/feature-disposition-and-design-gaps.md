@@ -184,7 +184,9 @@ reasons. The second-pass review doc is `review.md` (worktree root, uncommitted).
 [ADR-0020](../decisions/0020-network-object-lifecycle.md) network object lifecycle.
 
 **Now ADR'd:** **Audio** → [ADR-0022](../decisions/0022-audio.md); **Determinism
-at world scale** → [ADR-0021](../decisions/0021-determinism-at-world-scale.md);
+at world scale** (sim runs on a fixed entity set per tick; WP streaming is
+presentation-only and must not perturb tick membership/order) →
+[ADR-0021](../decisions/0021-determinism-at-world-scale.md);
 **Asset cooking/packaging/distribution** (legal-constrained user-side cook) →
 [ADR-0023](../decisions/0023-asset-cooking-packaging-distribution.md);
 **NPC/crowd/creature LOD** (MIRROR DegradeInfo + ADD crowd/impostor LOD,
