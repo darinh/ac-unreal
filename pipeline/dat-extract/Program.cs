@@ -11,6 +11,8 @@
 //   acdat info <datDir>
 //   acdat list-landblocks <datDir>
 //   acdat landblock-info <datDir> <hexId>
+//   acdat find-building-blocks <datDir>
+//   acdat dump-envcell-positions <datDir> <hexId>
 //   acdat export-landblock <datDir> <hexId> <outFile.aclb>
 //
 // "Phase 5 / content extraction" scaffold. Next steps (future sessions):
@@ -67,6 +69,8 @@ internal static class Program
                 "info"               => Commands.Info(args.AsSpan(1)),
                 "list-landblocks"    => Commands.ListLandblocks(args.AsSpan(1)),
                 "landblock-info"     => Commands.LandblockInfo(args.AsSpan(1)),
+                "find-building-blocks" => Commands.FindBuildingBlocks(args.AsSpan(1)),
+                "dump-envcell-positions" => Commands.DumpEnvCellPositions(args.AsSpan(1)),
                 "list-envcells"      => Commands.ListEnvCells(args.AsSpan(1)),
                 "envcell-info"       => Commands.EnvCellInfo(args.AsSpan(1)),
                 "export-envcell"     => Commands.ExportEnvCell(args.AsSpan(1)),
@@ -134,6 +138,19 @@ internal static class Program
                     Print summary of one landblock (height samples, texture
                     layers, building/object/EnvCell counts via LandblockInfo).
                     <hexId> e.g. A9B4 = the LandblockX/Y high 16 bits.
+
+              acdat find-building-blocks <datDir>
+                    Scan every LandblockInfo in the Cell DAT and list the
+                    landblocks whose Buildings count > 0 (building-interior
+                    blocks), with their Buildings and NumCells. Used to pick
+                    building-interior samples for the ADR-0009 EnvCell census.
+
+              acdat dump-envcell-positions <datDir> <hexId>
+                    Full single-process EnvCell.Position census for one
+                    landblock: every indoor cell's landblock-local Frame.Origin,
+                    composed world position (LbX*192+x, LbY*192+y, z), and
+                    whether it falls inside the [0,192] footprint. Auditable
+                    artifact source for ADR-0009.
 
               acdat list-envcells      <datDir> <hexId>
                     List indoor EnvCell IDs in a landblock (cell IDs where
@@ -269,6 +286,45 @@ internal static class Commands
     }
 
     /// <summary>
+    /// Single-process scan of EVERY LandblockInfo (0xXXXXFFFE) in CellDat,
+    /// reporting landblocks whose Buildings.Count > 0 (i.e. building-interior
+    /// landblocks, as opposed to zero-building dungeon blocks). Used to widen
+    /// the ADR-0009 EnvCell co-location census beyond a single town block.
+    /// Output is hex landblock id + Buildings + NumCells, sorted by id.
+    /// </summary>
+    public static int FindBuildingBlocks(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 1) { Console.Error.WriteLine("find-building-blocks: missing <datDir>"); return 1; }
+        var datDir = args[0];
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: true);
+        var cellDb = DatManager.CellDat;
+        if (cellDb is null) { Console.Error.WriteLine("CellDat failed to load."); return 2; }
+
+        // LandblockInfo files have low 16 bits == 0xFFFE; high 16 = (LbX<<8)|LbY.
+        var infoIds = cellDb.AllFiles.Keys
+            .Where(id => (id & 0xFFFFu) == 0xFFFEu)
+            .OrderBy(id => id)
+            .ToList();
+
+        Console.WriteLine($"LandblockInfo entries (low 16 = 0xFFFE): {infoIds.Count}");
+        Console.WriteLine("Landblocks with Buildings > 0 (hex high16, Buildings, NumCells):");
+        int withBuildings = 0;
+        foreach (var id in infoIds)
+        {
+            var info = cellDb.ReadFromDat<ACE.DatLoader.FileTypes.LandblockInfo>(id);
+            var bcount = info.Buildings?.Count ?? 0;
+            if (bcount > 0)
+            {
+                withBuildings++;
+                var high16 = (id >> 16) & 0xFFFFu;
+                Console.WriteLine($"  0x{high16:X4}  Buildings={bcount,-4}  NumCells={info.NumCells}");
+            }
+        }
+        Console.WriteLine($"Total landblocks with Buildings>0: {withBuildings} of {infoIds.Count}");
+        return 0;
+    }
+
+    /// <summary>
     /// List indoor EnvCell IDs in a landblock. EnvCells are the indoor
     /// cells that make up dungeon / building interiors. Their full
     /// cell ID is `(landblockHigh16 &lt;&lt; 16) | envCellLow16` where
@@ -332,6 +388,78 @@ internal static class Commands
         Console.WriteLine($"  RestrictionObj: 0x{ec.RestrictionObj:X8}");
         Console.WriteLine($"  Surfaces:       {ec.Surfaces?.Count ?? 0}");
         Console.WriteLine($"  VisibleCells:   {ec.VisibleCells?.Count ?? 0}");
+        return 0;
+    }
+
+    /// <summary>
+    /// Full single-process EnvCell.Position census for one landblock, for the
+    /// ADR-0009 co-location evidence. Enumerates EVERY indoor EnvCell that
+    /// actually exists in CellDat (real file keys 0x0100..0xFFFD — not a probe,
+    /// not a first-N slice), prints each cell's landblock-local Frame.Origin,
+    /// the composed world position per ACViewer PositionExtensions.GetWorldPos
+    /// (world = lbX*192 + Fx, lbY*192 + Fy, Fz), and whether Frame.Origin's
+    /// X,Y fall inside the [0,192] landblock footprint. Also prints the
+    /// Buildings count so building-interior vs zero-building blocks are labeled.
+    /// Opens DATs once, so it is ~3 orders of magnitude faster than per-cell
+    /// invocation. Output is the auditable artifact for ADR-0009.
+    /// </summary>
+    public static int DumpEnvCellPositions(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 2) { Console.Error.WriteLine("dump-envcell-positions: missing <datDir> <hexId>"); return 1; }
+        var datDir = args[0];
+        if (!TryParseLandblockHex(args[1], out var lbHigh16)) { Console.Error.WriteLine($"Bad hex landblock id: {args[1]}"); return 1; }
+
+        const int BlockLength = 192;   // ACViewer Physics/Common/LandDefs.cs:102 BlockLength
+        var lbX = (int)((lbHigh16 >> 8) & 0xFF);
+        var lbY = (int)(lbHigh16 & 0xFF);
+
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: true);
+        var cellDb = DatManager.CellDat ?? throw new InvalidOperationException("CellDat unavailable.");
+
+        int buildings = 0, numCells = 0;
+        var infoFileId = (lbHigh16 << 16) | 0xFFFEu;
+        if (cellDb.AllFiles.ContainsKey(infoFileId))
+        {
+            var info = cellDb.ReadFromDat<ACE.DatLoader.FileTypes.LandblockInfo>(infoFileId);
+            buildings = info.Buildings?.Count ?? 0;
+            numCells = (int)info.NumCells;
+        }
+
+        var minId = (lbHigh16 << 16) | 0x0100u;
+        var maxId = (lbHigh16 << 16) | 0xFFFDu;
+        var ids = cellDb.AllFiles.Keys.Where(id => id >= minId && id <= maxId).OrderBy(id => id).ToList();
+
+        Console.WriteLine("================================================================");
+        Console.WriteLine($"LANDBLOCK 0x{lbHigh16:X4}  (LbX={lbX}, LbY={lbY})  Buildings={buildings}  NumCells={numCells}  EnvCellFiles={ids.Count}");
+        Console.WriteLine("----------------------------------------------------------------");
+        Console.WriteLine("  CellId        Frame.Origin(x,y,z)              World(x,y,z)        InFootprint?");
+
+        double minX = double.PositiveInfinity, maxX = double.NegativeInfinity;
+        double minY = double.PositiveInfinity, maxY = double.NegativeInfinity;
+        double minZ = double.PositiveInfinity, maxZ = double.NegativeInfinity;
+        int inFoot = 0, outFoot = 0, n = 0;
+        foreach (var id in ids)
+        {
+            var ec = cellDb.ReadFromDat<EnvCell>(id);
+            if (ec.Position is null) continue;
+            double fx = ec.Position.Origin.X, fy = ec.Position.Origin.Y, fz = ec.Position.Origin.Z;
+            double wx = lbX * BlockLength + fx, wy = lbY * BlockLength + fy, wz = fz;
+            bool isIn = fx >= 0 && fx <= BlockLength && fy >= 0 && fy <= BlockLength;
+            if (isIn) inFoot++; else outFoot++;
+            if (fx < minX) minX = fx; if (fx > maxX) maxX = fx;
+            if (fy < minY) minY = fy; if (fy > maxY) maxY = fy;
+            if (fz < minZ) minZ = fz; if (fz > maxZ) maxZ = fz;
+            n++;
+            Console.WriteLine($"  0x{id:X8}   ({fx,8:F2},{fy,9:F2},{fz,8:F2})   ({wx,10:F2},{wy,11:F2},{wz,8:F2})   {(isIn ? "IN" : "OUT")}");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine($"  SUMMARY 0x{lbHigh16:X4}: cells_with_position={n}");
+        if (n > 0)
+            Console.WriteLine($"  Frame.Origin bbox: X[{minX:F2}..{maxX:F2}] Y[{minY:F2}..{maxY:F2}] Z[{minZ:F2}..{maxZ:F2}]");
+        Console.WriteLine($"  Cells with Frame.Origin inside [0,{BlockLength}] on BOTH X and Y: {inFoot}");
+        Console.WriteLine($"  Cells with Frame.Origin OUTSIDE that footprint: {outFoot}");
+        Console.WriteLine();
         return 0;
     }
 

@@ -44,14 +44,15 @@ WP auto-assigns actors by world location: terrain for that landblock; scenery
 ACViewer `PositionExtensions.GetWorldPos:22-29`; world renderer places each EnvCell at that
 origin — `R_Landblock.cs:51-56`, `Buffer.cs:340-344`, `InstanceBatch.cs:98-105`]`.
 **Measured (ADR-0009 full per-block census; [PRELIMINARY]):** whether that frame stays in the
-addressing landblock's `[0..192]` footprint is **type-dependent**. The one **building-interior**
-block sampled (Holtburg `0xA9B4`, 12 buildings) was fully co-located (all sampled cells in
-footprint); all three **zero-building** blocks (`Buildings==0` — the zero-building half of ACViewer's
-`IsDungeon` predicate, not a verified dungeon) placed the large majority of cells **outside** it
-(532/568, 734/745, 934/946 — negative-Y, block(s) south), Z spanning a wide range. So **never
-assume interiors sit in their parent footprint or at a fixed Z** — compose the frame with
-`LbX/Y*192` and check. A Data Layer keyed by addressing landblock organizes interiors but does
-not predict which WP cell streams a dungeon. Let `VisibleCells` (ADR-0013) do per-cell occlusion inside.
+addressing landblock's `[0..192]` footprint is **type-dependent**. **All 8 building-interior
+blocks sampled** (1..49 buildings, e.g. Holtburg `0xA9B4`; found via `acdat find-building-blocks`)
+were fully co-located — **882/882 cells in footprint**; all three **zero-building** blocks
+(`Buildings==0` — the zero-building half of ACViewer's `IsDungeon` predicate, not a verified
+dungeon) placed the large majority of cells **outside** it (532/568, 734/745, 934/946 = 2200/2259
+OUT — negative-Y, block(s) south), Z spanning a wide range. So **never assume interiors sit in
+their parent footprint or at a fixed Z** — compose the frame with `LbX/Y*192` and check the
+category. A Data Layer keyed by addressing landblock organizes interiors but does not predict
+which WP cell streams a zero-building block. Let `VisibleCells` (ADR-0013) do per-cell occlusion inside.
 
 ## Terrain — the one real wrinkle
 AC terrain is **9x9 height verts = 8x8 quads/landblock @ 24 m**. UE Landscape wants

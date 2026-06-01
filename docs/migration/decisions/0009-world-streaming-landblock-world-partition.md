@@ -45,9 +45,11 @@ runtime streaming source on the player; indoor `EnvCell`s grouped as data layers
   cannot honor the landblock grid.
 
 ## Assumptions this candidate depends on (must hold before Accepted)
-- A1 [VERIFY]: indoor cells are co-located within their parent landblock's XY
-  footprint (so they stream with it) — see deep-dive; contradicts nothing only if
-  confirmed (contract §0b marks the indoor domain UNKNOWN).
+- A1 [PARTIALLY VERIFIED — see §3 census]: indoor cells' co-location within their parent
+  landblock's XY footprint is **type-dependent**. Holds for all 8 sampled building-interior
+  (`Buildings>0`) blocks (882/882 cells in-footprint); **fails** for the 3 sampled
+  zero-building blocks (2200/2259 cells outside). The fully general indoor coordinate domain
+  across all blocks remains UNKNOWN (contract §0b); do not assume uniform co-location.
 - A2 [VERIFY]: the monolithic level is a material cause of the hang (load trace).
 
 ## Verify before locking
@@ -93,24 +95,32 @@ if positions are correct:
 - **Terrain** for that landblock (see §5).
 - **Scenery** (`Scene 0x12`) as **HISM/foliage** instances, not actors.
 - **Buildings / structures** (`LandblockInfo` 0xFFFE) static meshes.
-- **Indoor `EnvCell`s**: **[VERIFY — this is the #1 gating assumption; partially
+- **Indoor `EnvCell`s**: **[VERIFY — this is the #1 gating assumption; substantially
   addressed by the census below]** the original working hypothesis was that an EnvCell's
   world frame sits within its parent landblock's XY footprint (the old guess being that dungeons
-  were simply stacked at lower Z — now shown false), so WP would assign it to the same cell automatically. The census below shows this
-  is **type-dependent** (it held for the one building-interior block but failed for the
-  three dungeon blocks) — so it must **not** be assumed. `contract/` §0b still marks the
-  indoor coordinate domain UNKNOWN in the general case. **Remaining check before accepting
-  this ADR:** widen the census (more building-interior blocks especially) and confirm the
-  per-category pattern. If interiors do not group cleanly, the WP grouping, ADR-0010
-  (coords), ADR-0013 (culling), and portal-transition handling all change. Where interiors
-  do co-locate: group them on a **Data Layer**; let **ADR-0013** drive per-cell occlusion.
+  were simply stacked at lower Z — now shown false). The census below shows this
+  is **type-dependent**: it held for **all 8** sampled building-interior blocks (every cell
+  in-footprint) but failed for the 3 zero-building blocks — so it must **not** be
+  assumed uniformly. `contract/` §0b still marks the indoor coordinate domain UNKNOWN in the
+  fully general case (the sample, while now broad for building interiors, is not exhaustive).
+  Where interiors co-locate (all sampled building interiors): group them on a **Data Layer**;
+  let **ADR-0013** drive per-cell occlusion. Where they do not (zero-building blocks): WP
+  auto-assignment by world location lands them in a different grid cell than the addressing
+  landblock, so ADR-0010 (coords) and ADR-0013 (culling) must handle interiors that cross
+  block boundaries.
 
 > **Evidence gathered (2026-05-31, empirical — full per-block census, [PRELIMINARY]):**
-> Method: enumerated **every** indoor `EnvCell` in four landblocks (full census, not a
-> first-N slice) via `acdat envcell-info` and composed each local frame to world coordinates
-> with the placement formula proven below. Raw per-cell output (every cell ID + frame + composed
-> world position) is committed at `pipeline/dat-extract/samples/envcell_position_census.txt`
-> (regenerate with the sibling `.ps1`); DAT iteration 982.
+> Method: enumerated **every** indoor `EnvCell` (real Cell-DAT file keys `0x0100..0xFFFD`,
+> full census — not a first-N slice, not a probe) in **11 landblocks** and composed each local
+> frame to world coordinates with the placement formula proven below, via
+> `acdat dump-envcell-positions` (single-process; the footprint test is computed in C#).
+> The 8 building-interior candidates were found by scanning **all 5346** `LandblockInfo`
+> records with `acdat find-building-blocks` (1639 of 5346 landblocks have `Buildings>0`) and
+> sampling across the building-count range (1..49 buildings) and spanning 2..251 EnvCell files
+> per block (not the full population, which reaches `NumCells` ~2468). Raw per-cell
+> output (every cell ID + frame + composed world position + IN/OUT) is committed at
+> `pipeline/dat-extract/samples/envcell_position_census.txt` (regenerate with the sibling
+> `.ps1`); DAT iteration 982.
 >
 > **Proven — how an `EnvCell` is placed in the world (ACViewer render path):**
 > `world = (LbX*192 + Frame.Origin.X, LbY*192 + Frame.Origin.Y, Frame.Origin.Z)`, where
@@ -133,39 +143,50 @@ if positions are correct:
 > flags a landblock `IsDungeon` when all terrain heights are 0 **and** it has EnvCells but **zero
 > buildings** [REF-IMPL: ACViewer `Physics/Common/Landblock.cs:592-604` — verified]. I measured
 > only the **zero-building** half of that predicate (`LandblockInfo.Buildings==0`); the
-> all-heights-0 half is **unverified per block**, so the rows below are labeled **"zero-building"**
-> — a *necessary, not sufficient* condition for ACViewer's `IsDungeon`, and **not** an asserted
-> dungeon/content classification. (`0x8602`, the project's "academy", is zero-building.)
-> **"building interior"** = has buildings. Census, split by category (`Buildings` count from
-> `LandblockInfo`):
+> all-heights-0 half is **unverified per block**, so the zero-building rows below are labeled as
+> such — a *necessary, not sufficient* condition for ACViewer's `IsDungeon`, and **not** an
+> asserted dungeon/content classification. (`0x8602`, the project's "academy", is zero-building.)
+> **"building interior"** = `LandblockInfo.Buildings>0`. Census, split by category:
 >
 > | Landblock | LbX,LbY | Buildings | Category | Frame.Origin bbox (X / Y / Z) | Cells in `[0,192]²` |
 > |---|---|---|---|---|---|
-> | `0xA9B4` (Holtburg) | 169,180 | 12 | **building interior** | X[31.5..161.9] Y[7.5..159.5] Z[66..94] | **138 / 138 IN** |
-> | `0x8602` (academy) | 134,2 | 0 | zero-building | X[0..210] Y[-250..0] Z[-12..18] | 36 IN / **532 OUT** |
-> | `0x01AE` | 1,174 | 0 | zero-building | X[0..180] Y[-140..0] Z[-36..24] | 11 IN / **734 OUT** |
-> | `0x00D6` | 0,214 | 0 | zero-building | X[0..120] Y[-340..0] Z[-6..96] | 12 IN / **934 OUT** |
+> | `0x1203` | 18,3 | 49 | **building interior** | X[12.00..156.00] Y[12.00..156.00] Z[0.00..0.00] | **182 / 182 IN** |
+> | `0xDA55` | 218,85 | 42 | **building interior** | X[9.12..188.40] Y[3.96..186.58] Z[20.00..20.04] | **251 / 251 IN** |
+> | `0x8851` | 136,81 | 38 | **building interior** | X[12.00..180.00] Y[12.00..180.00] Z[0.00..30.00] | **76 / 76 IN** |
+> | `0xC6A9` | 198,169 | 30 | **building interior** | X[12.00..132.00] Y[12.00..108.00] Z[42.00..42.00] | **205 / 205 IN** |
+> | `0xA9B4` (Holtburg) | 169,180 | 12 | **building interior** | X[31.50..161.93] Y[7.50..159.50] Z[66.00..94.00] | **138 / 138 IN** |
+> | `0x0503` | 5,3 | 3 | **building interior** | X[84.00..132.00] Y[36.00..36.00] Z[150.00..225.00] | **21 / 21 IN** |
+> | `0x0408` | 4,8 | 1 | **building interior** | X[108.02..108.02] Y[132.29..132.29] Z[87.19..87.19] | **7 / 7 IN** |
+> | `0x0604` | 6,4 | 1 | **building interior** | X[60.00..60.00] Y[108.00..108.00] Z[22.00..22.00] | **2 / 2 IN** |
+> | `0x8602` (academy) | 134,2 | 0 | zero-building | X[0.00..210.00] Y[-250.00..0.00] Z[-12.00..18.00] | 36 IN / **532 OUT** |
+> | `0x01AE` | 1,174 | 0 | zero-building | X[0.00..180.00] Y[-140.00..0.00] Z[-36.00..24.00] | 11 IN / **734 OUT** |
+> | `0x00D6` | 0,214 | 0 | zero-building | X[0.00..120.00] Y[-340.00..0.00] Z[-6.00..96.00] | 12 IN / **934 OUT** |
 >
-> **Result (sample of 4 blocks; [PRELIMINARY]):** co-location is **type-dependent**, so it must
-> **not be assumed** either way. The one **building-interior** block sampled was fully co-located
-> — every sampled cell inside the addressing landblock's XY footprint. (The census enumerated all
-> 138 EnvCell *files* in `0xA9B4`; `LandblockInfo.NumCells`=123 is the subset ACViewer actually
-> walks for world render — `R_Landblock.cs:90-100` iterates `0x100..0x100+NumCells` — and since all
-> 138 files are in-footprint, the rendered 123 are too.) All three **zero-building** blocks placed
-> the **large majority** of cells *outside* that footprint (532/568, 734/745, 934/946 — negative-Y,
-> i.e. the block(s) to the south), though a small minority near the origin stay inside. Z is the raw
-> frame Z with no terrain offset; the Z ranges are wide (e.g. `0x00D6` spans Z[-6..96]), and whether
-> any given Z sits above or below ground is **unmeasured** (would require the landblock height table)
-> and is **not** claimed here.
+> **Result (11 blocks: 8 building-interior + 3 zero-building; [PRELIMINARY]):** co-location is
+> **type-dependent**. **All 8 building-interior blocks were fully co-located — 882 / 882 cells
+> (100%) inside the addressing landblock's XY footprint**, across the sampled range
+> (1..49 buildings; 2..251 EnvCell files per block — note `Buildings>0` blocks in the
+> population reach far higher cell counts, e.g. `NumCells` up to ~2468, which this sample does
+> **not** cover). All 3 **zero-building** blocks placed the **large majority**
+> of cells *outside* that footprint (532/568, 734/745, 934/946 — combined **2200/2259, 97.4%
+> OUT**, into negative-Y, i.e. the block(s) to the south), with only a small minority near the
+> origin inside. (Two building blocks have more EnvCell *files* than `LandblockInfo.NumCells` —
+> `0xA9B4` 138 vs 123, `0xDA55` 251 vs 236; `NumCells` is the subset ACViewer's world renderer
+> walks — `R_Landblock.cs:90-100` iterates `0x100..0x100+NumCells` — and since *all* files in
+> those blocks are in-footprint, the rendered subset is too.) Z is the raw frame Z with no
+> terrain offset; the Z ranges are wide (e.g. `0x00D6` spans Z[-6..96]), and whether any given Z
+> sits above or below ground is **unmeasured** (would require the landblock height table) and is
+> **not** claimed here.
 >
 > **Decision impact:** (a) compose every EnvCell with `LbX/Y*192` per the proven formula —
-> never assume in-footprint; (b) for the sampled **zero-building** blocks, WP
-> auto-assignment by world location would place most geometry in a **different** grid cell than
-> the addressing landblock, so a Data Layer keyed by addressing landblock organizes interiors but
-> does **not** predict which WP cell streams them; (c) ADR-0010 (coords) and ADR-0013 (culling)
-> must handle interiors that cross block boundaries. Sample is four blocks (1 interior, 3
-> zero-building); **widen before locking** — especially add more building-interior blocks before
-> generalizing the co-location result for that category.
+> never assume in-footprint without checking the category; (b) for the sampled **zero-building**
+> blocks, WP auto-assignment by world location would place most geometry in a **different** grid
+> cell than the addressing landblock, so a Data Layer keyed by addressing landblock organizes
+> interiors but does **not** predict which WP cell streams them; (c) ADR-0010 (coords) and
+> ADR-0013 (culling) must handle interiors that cross block boundaries. The building-interior
+> co-location result is now **broadly sampled** (n=8, every cell co-located); the *fully general*
+> claim across all ~1639 building blocks and the zero-building Z-vs-ground question remain
+> **[PRELIMINARY]** pending wider sampling and the heights-0 measurement.
 
 ## 4. Distant world (HLOD) [DESIGN / ADD]
 - A coarser **HLOD layer** (e.g. 4x4 landblocks per HLOD cell ~= 768 m) generates
