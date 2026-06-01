@@ -54,8 +54,10 @@ Split the package into **engine/original content** vs **user-generated AC conten
 - Loose (uncooked) AC content for dev; decide the shipped form later.
 
 ## Disposition
-**ADD** (no retail analogue under this repo's posture): a user-side extraction +
-local population step AC's distribution did not require.
+**ADD [DESIGN]** under this repo's LEGAL.md / ADR-0003 posture: a user-side
+extraction + local population step. (Whether AC's own distribution "required" this
+is out of scope / [COMMUNITY-VERIFY]; the ADD is justified by our legal posture,
+not by a retail comparison.)
 
 ## Acceptance test
 - Clean-machine install with only the user's DATs -> pipeline runs -> first room

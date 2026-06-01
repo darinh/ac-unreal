@@ -5,9 +5,10 @@ Status: Proposed   Date: 2026-06-01
 `DegradeInfo (0x11)` is a per-**GfxObj** distance-LOD chain: alternate GfxObjs
 selected by `MinDist`/`IdealDist`/`MaxDist`, attached at the **`PhysicsPart`**
 (per-GfxObj) level, **not** per `Setup` (`SetupModel` has `Parts`/`PlacementFrames`/
-`Lights` but no DegradeInfo field) [REF-IMPL: ACE.DatLoader `Entity/GfxObjInfo.cs:7-11`
-(Id/DegradeMode/MinDist/IdealDist/MaxDist), `FileTypes/GfxObjDegradeInfo.cs:9-10`;
-methodology §2/§5].
+`Lights` and has no DegradeInfo field [REF-IMPL: ACE.DatLoader
+`FileTypes/SetupModel.cs:23,28,37`]) [REF-IMPL: ACE.DatLoader `Entity/GfxObjInfo.cs:7-11`
+(Id/DegradeMode/MinDist/IdealDist/MaxDist), `FileTypes/GfxObjDegradeInfo.cs:13-15`
+(the `Degrades` list); methodology §2/§5].
 
 **The retail runtime LOD *behavior* is unverified.** The distance-based GfxObj
 selection is **commented out in BOTH reference implementations** — `ACE.Server

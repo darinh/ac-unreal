@@ -72,7 +72,7 @@ Portal, C = Cell, L = Language). Values below are read directly from
 | RenderMesh | `0x19000000-0x19FFFFFF` | P | " |
 | SoundTable | `0x20000000-0x2000FFFF` | P | Event/ambient -> Wave mappings. |
 | UiLayout | `0x21000000-0x21FFFFFF` | L | UI panel layouts (HUD). |
-| EnumMapper | `0x22000000-0x22FFFFFF` | P | String-name -> enum-id lookup. |
+| EnumMapper | `0x22000000-0x22FFFFFF` | P | **enum-id -> string-name** lookup (ACE `EnumMapper.IdToStringMap`; the inverse of the old "name->enum" wording). |
 | StringTable | `0x23000000-0x24FFFFFF` | L | Localized text tables. |
 | DidMapper / DualDidMapper | `0x25…` / `0x27…` | P | Id remapping. |
 | ActionMap | `0x26000000-0x2600FFFF` | P | Action descriptors. |
