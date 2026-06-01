@@ -107,22 +107,33 @@ if positions are correct:
   occlusion.
 
 ## 4. Distant world (HLOD) [DESIGN / ADD]
-- A coarser **HLOD layer** (e.g. 4x4 landblocks per HLOD cell ≈ 768 m) generates
+- A coarser **HLOD layer** (e.g. 4x4 landblocks per HLOD cell ~= 768 m) generates
   merged proxy meshes for blocks beyond the loading range, out to the far clip.
-- AC hid the horizon with **fog** ([DATA] `RegionDesc`); tune the far clip + fog
-  to the extracted RegionDesc values (ADR-0011), with HLOD filling the gap the
-  fog used to hide. This is genuinely new (AC had no proxy-merge), so budget it.
+- `RegionDesc` **contains fog params** [DATA]; that the retail client used fog to
+  hide the draw-distance horizon is [VERIFY] (M4) — confirm the client's
+  draw-distance/horizon treatment before treating fog as the fidelity baseline.
+  Tune far clip + fog to the extracted values (ADR-0011); HLOD fills what fog hid.
+  Proxy-merge is genuinely new (AC had none), so **budget the HLOD build cost**;
+  a 255x255 grid could block CI -> spike a 4x4 region first.
 
 ## 5. Terrain representation — the one real wrinkle [DESIGN]
 AC terrain is **9x9 height verts = 8x8 quads per landblock @ 24 m** ([DATA]
 `ExportLandblock`). UE **Landscape** wants quads-per-section in `{7,15,31,63,127,255}`
 and 1 or 4 sections/component — **8 does not divide cleanly**, so a 1:1 AC->Landscape
 mapping needs resampling.
-- **Option B (recommended first): per-landblock static-mesh terrain.** A trivial
-  8x8 grid mesh from the 81 heights maps 1:1 to the data, drops straight into the
-  WP cell, and (when ADR-0014 re-enables it) Nanite can LOD it. Simplest path to
-  a streaming world; loses Landscape's sculpt/paint tooling (we don't author
-  terrain, we import it, so that loss is cheap).
+- **Option B (prototype first, NOT "trivial" — C4): per-landblock static-mesh
+  terrain.** A per-landblock grid mesh from the 81 heights is the simplest path to
+  a streaming world, but it is a **prototype** with unresolved requirements, not a
+  drop-in. Acceptance criteria before it counts as working:
+  - height **indices -> metres** via `RegionDesc.LandDefs.LandHeightTable`
+    (`ExportLandblock` currently writes raw indices cast to float — a TODO);
+  - **edge-compatible** verts + normals across the 2x2 landblock boundary (no
+    cracks / lighting seams);
+  - terrain-type **alpha blending** preserved (AC's 6-UV `LandVertex`) or the
+    visual loss explicitly accepted; roads/overlays handled;
+  - **collision** present + a movement test on the slope;
+  - HLOD cost measured.
+  (When ADR-0014 re-enables it, Nanite can LOD the mesh.)
 - **Option A (evaluate later): UE Landscape** with WP streaming proxies, AC
   heights resampled to a Landscape-friendly resolution. Better runtime LOD +
   virtual-heightfield + landscape-material layer blending (matches AC's 6-UV

@@ -40,14 +40,14 @@ T0–T4).
 |---|---|---|---|
 | Render pipeline | DX7 fixed-function, sRGB, per-vertex **Gouraud** lighting [DOC] README L14, glossary | **IMPROVE** | UE5 linear-HDR + filmic; pixel-equality explicitly not the bar (tiered T0–T4). Already decided. |
 | Indoor geometry (`EnvCell`→`Environment`→`CellStruct`) | explicit polygon cells [DATA] methodology §5 | **MIRROR** | Proven: 568-cell academy extracts/renders (T0). |
-| Outdoor terrain (`CellLandblock` 9×9 + `LandHeightTable`, 6-UV `LandVertex`) | heightfield + alpha-blended terrain types [DATA] `ExportLandblock`; methodology §5 | **MIRROR** (data) + **IMPROVE** (UE **Landscape**: built-in LOD/streaming/VT) | GAP: importer `[OPEN]`; height-table→metres is a TODO; OBJ can't carry 6 UVs → glTF (ADR-0004). |
+| Outdoor terrain (`CellLandblock` 9×9 [DATA] + `LandHeightTable`; 6-UV `LandVertex` [REF-IMPL: ACViewer]) | heightfield + alpha-blended terrain types | **MIRROR** (data); render path **unresolved — see ADR-0009** (per-landblock static mesh *first*, UE Landscape later), NOT a settled Landscape choice | GAP: importer `[OPEN]`; height-table→metres TODO; 8×8 quads don't map cleanly to Landscape sections; OBJ can't carry 6 UVs → glTF (ADR-0004, Proposed). |
 | Surfaces / textures | `Surface 0x08`→`SurfaceTexture 0x05`→`Texture 0x06`; flags `Luminosity`/`Translucency`/`Diffuse`/`Type` [DATA] methodology §5 | **MIRROR** identity + **IMPROVE** runtime (master-mat + per-Surface MI, VT, mip-gen) | GAP: surface flags **not consumed yet** `[OPEN]`; mip generation required or distant surfaces shimmer. |
 | Palettes / recolor (`Palette 0x04`, `PaletteSet 0x0F`, `OrigPaletteId`) | 256-color tables + palette-range recolor [DATA] methodology §5 | **MIRROR** semantics; **REMOVE** P8/INDEX16 *storage* (decode once to RGBA) | The recolor ranges ARE the dyeing/loot-variance system (cat XII) — keep the semantics, drop the runtime paletted-texture format. |
 | Lighting model | per-vertex Gouraud computed live [DATA/REF-IMPL]; per-Setup `LightInfo` [REF-IMPL: ACE `SetupModel.Lights`]; ambient is **global** time-of-day (`RegionDesc->SkyDesc->SkyTimeOfDay` `AmbBright`/`AmbColor`), **NOT** per-cell [REF-IMPL: ACE; corrects an earlier "per-cell ambient" error]; no baked vertex color [DATA] | **IMPROVE** (per-pixel dynamic) | GAP: only the **indoor unlit-emissive expedient** is decided (ADR-0007). Outdoor/day-night lighting model is **undecided** → ADR-0011. |
 | Sky / fog / sun-moon / day-night (`RegionDesc 0x13`) | global sky/sun/moon/fog/ambient + "lighting of day" [DATA] methodology §2/§5; glossary | **MIRROR** (data-driven) + **IMPROVE** (SkyAtmosphere/volumetrics) | GAP: extraction `[OPEN]`; **extract real fog/sky values before authoring — do not invent**. |
 | Outdoor scatter (`Scene 0x12`) | procedural trees/rocks/bushes per terrain type [DATA] methodology §2 | **MIRROR** via **HISM/Foliage/PCG** | One actor per object does NOT scale (the 1487-actor academy is the cautionary tale). |
 | Object LOD (`DegradeInfo 0x11`) | distance GfxObj swaps [DATA] methodology §2/§5 | **MIRROR** → UE Static Mesh LODs | Straightforward; extraction `[OPEN]`. |
-| Distant-world proxies (HLOD/impostors) | *none* — AC leaned on view distance + fog | **ADD** | New: World Partition HLOD for distant landblocks. Budget as new work. |
+| Distant-world proxies (HLOD/impostors) | *none* — AC had no proxy-merge; `RegionDesc` has fog params [DATA], but the retail draw-distance/horizon strategy is [COMMUNITY/VERIFY] | **ADD** | New: World Partition HLOD for distant landblocks. Budget as new work (spike a 4×4 region; HLOD build cost can block CI). |
 | Portal / interior visibility (`NoPos` portals, `CellPortals`, `VisibleCells`) | portal-connected cells + per-cell visibility set [DATA/REF-IMPL] ADR-0008; README §II L84 | **MIRROR** | GAP: extraction of openings done (ADR-0008) but **runtime occlusion is undesigned** — current all-cells-in-one-level both hangs `-game` and leaks outdoor sky through openings. |
 
 ---
@@ -60,7 +60,7 @@ T0–T4).
 | NPC / creature bodies (`Setup` + `ObjectHierarchy 0x0E00000D`) | part-based **rigid** GfxObj assembly, **no skinning/bones** [DATA/REF-IMPL] methodology §5 | **MIRROR** body assembly; **DECISION** on animation rep | GAP/fork: keep AC's rigid per-part transforms vs **IMPROVE** to a UE skeletal mesh. Needs ADR (affects animation, perf, tooling). |
 | Clothing / equipment (`ClothingTable 0x10`) | **substitution** (replace part GfxObj + swap textures) + palette recolor + `CoverageMask` [DATA/REF-IMPL] methodology §5 | **MIRROR** | The recolor path is shared with dyeing (cat XII). |
 | Player appearance (`CharacterGenerator 0x0E000002`) | starting looks/equipment [DATA] methodology §2 | **MIRROR** | |
-| Animation (`MotionTable 0x09`, `Animation 0x03`, `AnimationHook`) | per-part rigid keyframes; hooks (`AttackHook` etc.) gate gameplay [DATA/REF-IMPL] methodology §5 | **MIRROR timing** (sim) + **IMPROVE rendering** (sim/present split) | Hook *timings* are simulation (contract §7) → MIRROR exactly; the visual playback may be retimed/upgraded. |
+| Animation (`MotionTable 0x09`, `Animation 0x03`, `AnimationHook`) | per-part rigid keyframes; hooks (`AttackHook` etc.) gate gameplay [REF-IMPL: ACE `Animation.cs`] | **MIRROR timing** (sim) + **IMPROVE rendering** (sim/present split) | Hook *timings* are simulation (contract §7) → MIRROR exactly; visual *interpolation* may be upgraded, but **event-bearing frames stay aligned to hook times** (retime only via a documented, tested offset — ADR-0012). Watch for cast frames in `PhysicsScript`. |
 | Particles / FX (`ParticleEmitterInfo 0x32`, `PhysicsScript 0x33/0x34`) | scripted emitters [DATA] methodology §2 | **IMPROVE** → Niagara | Visual re-author OK; any gameplay timing must come from hooks, not the visual (contract §7 note). |
 | Audio (`Wave 0x0A`, `SoundTable 0x20`) | samples + event/ambient mapping [DATA] methodology §2 | **MIRROR** (+ optional **ADD**: occlusion/attenuation, ambient zones) | |
 
@@ -100,11 +100,13 @@ T0–T4).
 - **Load-time mip generation** — UE does this via VT/streaming. **REMOVE** (but DO generate mips, methodology §5). 
 - **Paletted-texture runtime storage (P8/INDEX16)** — decode to RGBA once at import; **keep palette *recolor* semantics** for dyeing. **REMOVE storage / KEEP semantics.**
 - **1999-tuned draw distance/fog constants** as hard limits — re-tune for modern GPUs; **keep the RegionDesc values as the faithful baseline**, not the cap. **IMPROVE.**
-- **Newer DAT render types** (`RenderTexture 0x15`–`RenderMesh 0x19`) are flagged "mostly post-retail" [DATA] methodology §2 — likely **REMOVE/ignore** for a retail-era client (verify they're empty/unused in the target iteration before relying on that).
+- **Newer DAT render types** (`RenderTexture 0x15`–`RenderMesh 0x19`): "mostly post-retail" is **[COMMUNITY/VERIFY]**, not [DATA] (ACE defines the id-ranges with no such marker). Before any REMOVE, **count records in the target Portal DAT iteration**; only REMOVE if empty/unused.
 
 ## F. Things to ADD (no retail analogue)
 - **World Partition HLOD / impostors** for the long view distance.
-- **LWC double-precision** world coords (engine-forced for ~49 km).
+- **LWC double-precision** world coords (enabled for ~49 km). NB: LWC being
+  *enabled* is not a decided coordinate *strategy* — that is **open in ADR-0010**
+  (LWC-global vs landblock-local).
 - **Modern AA (TSR)** — already `r.AntiAliasingMethod=4`; **Virtual Textures / VSM** already on.
 - **Nanite** (DECISION pending — disabled due to procedural-mesh crash; methodology §8).
 - **Modern input** (gamepad), accessibility, a settings UI beyond AC's.

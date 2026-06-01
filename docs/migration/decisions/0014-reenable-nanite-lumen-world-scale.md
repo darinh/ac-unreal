@@ -2,34 +2,39 @@
 Status: Proposed   Date: 2026-05-31
 
 ## Context
-ADR-0002 disabled Lumen, Nanite, and hardware ray tracing because procedural
-meshes + large instance counts crashed those paths (`IntFitsIn` assertion;
-empty-bounds Nanite clusters) [DATA: `Config/DefaultEngine.ini`; methodology §8,
-which explicitly asks for a record on re-enabling once meshes are Nanite-safe].
-That was the right call to unblock the first indoor room, but a large, long-view
-open world normally wants Nanite (auto-LOD on massive geometry) and a dynamic GI
-solution (Lumen) - especially with a day-night cycle (ADR-0011).
+ADR-0002 disabled Lumen/Nanite/HW-RT due to procedural-mesh crashes (`IntFitsIn`
+assertion; empty-bounds Nanite clusters) [DATA: `Config/DefaultEngine.ini`;
+methodology §8, which asks for this record]. A large, long-view, day-night world
+can benefit from dynamic GI (Lumen) and auto-LOD on dense geometry (Nanite).
+**Correction (M14):** a day-night cycle does **not** require Lumen — a dynamic
+directional sun + SkyLight + SkyAtmosphere + fog achieves it (ADR-0011). Lumen is
+a GI *quality* upgrade, not a day-night prerequisite.
 
-Disposition: **ADD/IMPROVE** (re-enable modern rendering) - pending a fix and a
-cost/benefit call given AC's low-poly assets.
+## Candidate (proposed, not decided)
+Keep Lumen/Nanite OFF as the baseline; re-enable only on **measured benefit**,
+staged: (1) consider Lumen only if the T3/T4 lighting goal is NOT met by dynamic
+sun+sky+fog alone; (2) consider Nanite for dense scatter/terrain.
 
-## Decision
-TBD (Proposed). Re-enable when: (1) the procedural-build pipeline produces
-Nanite-safe meshes (>=3 valid verts, finite bounds, no degenerate clusters), and
-(2) a perf pass shows benefit at world scale. Likely staged: Lumen for dynamic
-GI/day-night first (pairs with ADR-0011); Nanite second (its win is largest for
-dense scatter/terrain - weigh against AC's low poly counts). When accepted, this
-**supersedes ADR-0002**.
+## Assumptions it depends on
+- A1: procedural meshes are Nanite-safe.
+- A2: a perf/quality capture shows net benefit at world scale.
 
-## Consequences
-- Until then, ADR-0002 stands and ADR-0015 governs the interim look.
-- Distance-field-dependent features (some Lumen modes) need
-  `r.GenerateMeshDistanceFields=True`, currently off.
+## Evidence required before Accepted
+- Nanite-readiness is **necessary but not sufficient**: beyond ">=3 verts / finite
+  bounds", validate masked/translucent materials, foliage/HISM, collision, and run
+  a with/without perf capture on a representative *streamed* region.
+- A T3/T4 lighting comparison showing whether dynamic-only meets the bar (this
+  gates whether Lumen is even needed).
 
-## Alternatives
-- Keep everything off permanently: rejected (no dynamic GI for day-night; manual
-  LOD/HLOD only). Acceptable as a low-end scalability tier, not the default.
+## Failure mode if enabled prematurely
+- The original crash/instability returns, or perf regresses with no fidelity gain.
 
-## Verify before locking
-- Procedural meshes pass Nanite validation; a representative-scene perf capture
-  with/without Nanite + Lumen.
+## Alternatives still live
+- A permanent low-end tier (everything off; manual LOD/HLOD + dynamic sun/sky):
+  acceptable as a scalability floor, not necessarily the default.
+
+## Acceptance test
+- With/without Nanite+Lumen on a streamed multi-landblock region: frame time,
+  VRAM, and a T3 visual delta. Re-enable only where the data shows a win.
+
+When accepted, this **supersedes ADR-0002**.

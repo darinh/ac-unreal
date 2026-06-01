@@ -39,5 +39,26 @@ them); each needs its own design + acceptance test:
 - Pure UE auto-occlusion with no portal data: not selected (loses AC's authored
   visibility), but may suffice as a fallback if `VisibleCells` is only adjacency.
 
+## Assumptions it depends on
+- A1 [VERIFY]: `EnvCell.VisibleCells` is a usable visibility set (PVS) vs mere
+  adjacency (ACE hedges — see Context).
+- A2 [VERIFY]: indoor cells are reachable as a streamable group (gated on the same
+  indoor-domain question as ADR-0009 A1 / ADR-0010 A2 / contract §0b).
+
+## Evidence required before Accepted
+- Compare `VisibleCells` against `CellPortals` adjacency on a representative
+  dungeon (is it PVS or adjacency?).
+- A prototype where (1) cells outside the visibility set are culled and (2) the
+  outdoor sky does not appear through any portal opening.
+
+## Sequencing
+- ADR-0009 establishes the WP grid + interior Data Layer **first**; this ADR then
+  layers visibility/culling and sky suppression on top.
+
+## Acceptance test
+- (1) From inside a multi-cell dungeon, only visible cells are resident/drawn.
+- (2) Looking up/through every portal opening shows the neighbour cell or solid
+  occluder — **never** the outdoor `SkyAtmosphere`.
+
 ## Verify before locking
 - H4: exact `EnvCell.VisibleCells` semantics (PVS vs simple adjacency) - ACE `EnvCell`.
