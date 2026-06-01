@@ -31,6 +31,16 @@ never edit history away.
 | [0006](0006-ace-linking-stance.md) | ACE.DatLoader linking stance (AGPL obligations) | Accepted |
 | [0007](0007-indoor-lighting-unlit-emissive.md) | Indoor lighting: unlit emissive textures (point-light accents deferred) | Accepted |
 | [0008](0008-skip-portal-polygons-on-export.md) | Skip portal polygons (`Stippling == NoPos`) on EnvCell export | Accepted |
+| [0009](0009-world-streaming-landblock-world-partition.md) | World-scale streaming: landblock grid -> UE World Partition | Proposed |
+| [0010](0010-coordinate-precision-strategy.md) | Coordinate & precision strategy (LWC vs landblock-local) | Proposed |
+| [0011](0011-outdoor-lighting-day-night.md) | Outdoor lighting & day-night model (RegionDesc-driven) | Proposed |
+| [0012](0012-animation-representation.md) | Animation representation: rigid part-based vs skeletal | Proposed |
+| [0013](0013-runtime-occlusion-portal-culling.md) | Runtime occlusion / portal culling (CellPortals/VisibleCells) | Proposed |
+| [0014](0014-reenable-nanite-lumen-world-scale.md) | Re-enable Nanite/Lumen at world scale (revisit of 0002) | Proposed |
+| [0015](0015-indoor-first-expedients-are-temporary.md) | Indoor-first expedients are temporary (revisit triggers) | Proposed |
+
+The open-world / world-scale design analysis that motivates ADRs 0009-0015 is in
+[`../notes/feature-disposition-and-design-gaps.md`](../notes/feature-disposition-and-design-gaps.md).
 
 Option analysis for the lighting decision is at
 [`../notes/lighting-options.md`](../notes/lighting-options.md); the call is
