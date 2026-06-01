@@ -24,8 +24,10 @@ color** (`SWVertex` carries only Origin/Normal/UVs) `[REF-IMPL:
 `SWVertex.cs:12-15`]`; ambient is a **global** time-of-day term (`SkyTimeOfDay.
 AmbBright`/`AmbColor`) `[REF-IMPL: `SkyTimeOfDay.cs:15-21`]`. The exact combine
 equation (e.g. `dot(N,-L)+ambient` x texture) is **`[VERIFY]`** — confirm it from
-the client render path before baking it into materials/tests. Consequence either
-way: pure-black surfaces are invisible without light/ambient.
+the client render path before baking it into materials/tests. Note: *if* the combine
+is multiplicative (lighting x texture, as in the reference viewer), a surface with no
+light and zero ambient would render black — but that follows only from the unconfirmed
+equation above, so treat it as **`[VERIFY]`**, not established fact.
 Current decisions:
 - **Indoor interim = unlit emissive textures** (ADR-0007): bright, even,
   deterministic; this is a step-0 expedient, NOT the world model.

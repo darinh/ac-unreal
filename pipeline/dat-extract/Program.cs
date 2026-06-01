@@ -273,7 +273,7 @@ internal static class Commands
     /// cells that make up dungeon / building interiors. Their full
     /// cell ID is `(landblockHigh16 &lt;&lt; 16) | envCellLow16` where
     /// envCellLow16 selects the cell. Outdoor land cells occupy the
-    /// 0x0001..0x0040 range (8x8 = 64 surface cells; ACE EnvCell.cs:13,
+    /// 0x0001..0x0040 range (8x8 = 64 surface cells; ACE EnvCell.cs:12,
     /// ACViewer LandDefs LastLandCellID = 64); indoor EnvCells use
     /// 0x0100..0xFFFD; 0xFFFE = LandblockInfo.
     /// </summary>

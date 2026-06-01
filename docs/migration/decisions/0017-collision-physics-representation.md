@@ -4,20 +4,25 @@ Status: Proposed   Date: 2026-05-31
 ## Context
 Nothing in the plan yet covers AC **collision** — it blocks all movement and
 interaction, and the entire simulation-lane collision spec (`contract/` §5) is
-UNKNOWN. AC's collision geometry is distinct from its render geometry: in ACE the indoor
-collision geometry lives on `CellStruct` (`CellStruct.PhysicsBSP` /
-`CellStruct.PhysicsPolygons`, distinct from the render `Polygons`; `CellBSP` is
-also present), referenced from a cell via `EnvCell.CellStructure`; outdoor from the
-landblock heightfield; and props from `Setup` bounds. `PhysicsObj` is ACE.Server
-*runtime* state, not a DAT structure. [REF-IMPL: ACE.DatLoader
-`Entity/CellStruct.cs:13-15`, `FileTypes/EnvCell.cs:27` — verified]. This is a
+UNKNOWN. AC's collision geometry is distinct from its render geometry. In ACE the indoor cell
+geometry lives on `CellStruct`, which carries **two polygon sets and three BSP trees**:
+render `Polygons` build the `DrawingBSP`, while collision `PhysicsPolygons` build
+**both** the `PhysicsBSP` (sphere/box collision sweeps) **and** the `CellBSP`
+(point/box/sphere *containment* + cell-transit tests). Collision therefore derives
+from `PhysicsPolygons` (via `PhysicsBSP` and `CellBSP`), distinct from the render
+`Polygons`/`DrawingBSP`. The struct is referenced from a cell via `EnvCell.CellStructure`;
+outdoor collision comes from the landblock heightfield, and props from `Setup` bounds.
+`PhysicsObj` is ACE.Server *runtime* state, not a DAT structure. [REF-IMPL: ACE.DatLoader
+`Entity/CellStruct.cs:11-16` (fields), `FileTypes/EnvCell.cs:27` (`CellStructure`); ACE.Server
+`Physics/Common/CellStruct.cs:39-46` (BSP builds), `:49-73` (`CellBSP` containment) — verified]. This is a
 **simulation-lane** concern: collision feeds parity-tested movement, so it must
 MIRROR, not approximate with UE defaults.
 
 ## Candidate (proposed, not decided)
 Derive UE collision from the AC source per domain: **indoor** from
-`CellStruct.PhysicsBSP`/`PhysicsPolygons` (the collision geometry, *not* the render
-`Polygons`), **terrain** from the heightfield mesh, **props** from
+`CellStruct.PhysicsPolygons` (the collision geometry — feeding `PhysicsBSP` for
+sweeps and `CellBSP` for containment, *not* the render `Polygons`/`DrawingBSP`),
+**terrain** from the heightfield mesh, **props** from
 `Setup` bounds. The movement component (the `UCharacterMovementComponent`
 subclass) uses the AC collision *model* from `contract/` §5 (capsule size, step-up,
 slope limit, wall/ceiling response, heightfield interpolation), not UE's defaults.

@@ -30,7 +30,8 @@ question (which landblock corner is UE origin) — `[VERIFY]` in `contract/` §0
 ## Grid sizing
 - WP runtime cell = **one landblock = 19200 UU**. Sparse ocean cells are free.
 - **Loading range = (verified AC active-landblock radius) x 19200 UU.** Do NOT
-  guess the radius — confirm it (ACE `LandblockManager`) and expose it as a tunable.
+  guess the radius — confirm it from the **client** (ACE's `LandblockManager` is
+  server-side, not client proof — see above) and expose it as a tunable.
 - Streaming source on the player pawn AND on any headless render rig (so captures
   stream the same cells a player would).
 
@@ -38,16 +39,17 @@ question (which landblock corner is UE origin) — `[VERIFY]` in `contract/` §0
 WP auto-assigns actors by world location: terrain for that landblock; scenery
 (`Scene 0x12`) as **HISM/foliage instances, never per-object actors**; buildings
 (`LandblockInfo` 0xFFFE); and indoor `EnvCell`s. Each `EnvCell` carries a
-**landblock-local** `Frame Position` `[REF-IMPL: `EnvCell.cs:27,54`]`; world position
-is `LandblockX*192 + Frame.X` `[REF-IMPL: ACViewer `Position.cs:281-282`]`.
-**Measured (ADR-0009 evidence, 2026-05-31):** that frame is frequently **outside**
-the addressing landblock's `[0..192]` footprint — 3 of 4 sampled blocks placed
-interiors in the block to the south (negative-Y local) — and Z varies
-(Holtburg interiors at +66 m, others below). So **never assume interiors sit in
-their parent footprint or at lower Z**: compose the frame with `LandblockX/Y*192`
-(ACE rolls out-of-`[0,192]` frames into the adjacent block, `Position.cs:129-180`).
-A Data Layer keyed by addressing landblock organizes interiors but does not predict
-which WP cell streams them. Let `VisibleCells` (ADR-0013) do per-cell occlusion inside.
+**landblock-local** `Frame Position` `[REF-IMPL: `EnvCell.cs:28,56`]`; world position is
+`(LbX*192 + Frame.X, LbY*192 + Frame.Y, Frame.Z)` with **no terrain offset on Z**
+`[REF-IMPL: ACViewer `PositionExtensions.cs:9-29` (`ToXna`/`GetWorldPos`), `R_EnvCell.cs:47-49,78`]`.
+**Measured (ADR-0009 full per-block census; [PRELIMINARY]):** whether that frame stays in the
+addressing landblock's `[0..192]` footprint is **type-dependent**. The one **building-interior**
+block sampled (Holtburg `0xA9B4`, 12 buildings) was fully co-located (138/138 cells in footprint);
+all three **dungeon** blocks (`Buildings==0`) placed the large majority of cells **outside** it
+(532/568, 734/745, 934/946 — negative-Y, block(s) south), Z spanning a wide range. So **never
+assume interiors sit in their parent footprint or at a fixed Z** — compose the frame with
+`LbX/Y*192` and check. A Data Layer keyed by addressing landblock organizes interiors but does
+not predict which WP cell streams a dungeon. Let `VisibleCells` (ADR-0013) do per-cell occlusion inside.
 
 ## Terrain — the one real wrinkle
 AC terrain is **9x9 height verts = 8x8 quads/landblock @ 24 m**. UE Landscape wants
