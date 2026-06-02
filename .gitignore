@@ -88,3 +88,18 @@ Content/Developers/
 # Python caches
 __pycache__/
 *.pyc
+
+# --- Scratch diagnostics + run outputs (review L3) --------------------
+# `_`-prefixed scripts are throwaway diagnostics; REUSABLE tools get proper
+# non-underscore names (e.g. audit_cell_bounds.py, repair_cell_bounds.py) and
+# are committed normally. Render/audit text dumps + run logs are never source.
+pipeline/ue-import/_*.py
+pipeline/renders/_*.txt
+pipeline/ue-import/last-*.log
+*.log
+# Editor scratch: temp inspection level + the _Inspect probe content.
+Content/Academy/Maps/FirstRoomTest.umap
+Content/_Inspect/
+# EnterWorktree creates worktrees here (the existing `.worktrees/` rule above
+# does not match this path); never commit worktree trees or junctions.
+.claude/worktrees/

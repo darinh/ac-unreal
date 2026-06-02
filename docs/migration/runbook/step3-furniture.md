@@ -108,14 +108,21 @@ Fix:
    is unchanged. Affected setups were found in TWO source sets (an adversarial
    review caught that re-exporting the statics alone was incomplete - the door
    is interactive, not a static):
-   - Statics: re-exporting the 200 `academy_8602_statics` setups changed 12 -
-     the cave door `020005DA` + 11 furniture.
+   - Statics (`academy_8602_statics.json` `unique_setups`, exported via
+     `acdat export-academy-statics`): **11 furniture** setups changed. **NOTE
+     (review H1 correction):** the cave door `020005DA` is **NOT** in the statics
+     set - it is interactive (below). An earlier draft wrongly attributed it to
+     the statics export.
    - Interactive: auditing every setup id in `instances_8602.json` /
      `academy_8602_npcs.json` with `dump-setup` found 8 ids; 7 lack Resting and
      so were re-placed by the fix (only `0200062E` has `0x65` and is unchanged).
-     Six besides the cave door were stale/collapsed in committed content:
-     `02000001 0200007C 020001B3 0200024F 020005F1 020005F2`. (`020005F1` is the
-     practice-area door, `020005F2` the academy portal - both were 800-cubes.)
+     The 7: the cave door `020005DA` + `02000001 0200007C 020001B3 0200024F
+     020005F1 020005F2` (`020005F1` = practice-area door, `020005F2` = academy
+     portal - both were 800-cubes). **Reproducibility (review H1):** these 7 are
+     NOT in any `export-academy-statics` manifest; regenerate each OBJ one id at a
+     time with `acdat export-setup <datDir> <hexId> out/academy_8602_statics/setup_<hexId>.obj`
+     (the path `import_npcs.py` reads), then rebuild. `out/` is git-ignored, so
+     the OBJs are regenerated locally, not committed.
    Rebuilt all 18 `SM_Setup_*` meshes in place from the fixed OBJs, preserving
    material bindings, via the delete+recreate mechanism proven on the prop-UV fix
    (`_doorfix_rebuild.py` / `_furniturefix_rebuild.py`, the latter now driven by

@@ -26,5 +26,10 @@ for a in eas.get_all_level_actors():
         a.set_actor_location_and_rotation(cam, rot, False, False)
         break
 
-les.save_current_level()
-unreal.log("[iso] saved")
+# Do NOT save_current_level() here. This script loads the SHIPPED AcademyMap, so
+# saving would persist the throwaway ISO_DOOR actor + the moved PlayerStart into
+# the tracked umap -- a committed-map corruption footgun (review M2). The spawn and
+# the PlayerStart move are in-memory only, for an interactive-editor look; nothing
+# is written to disk. For a headless -game capture, use a dedicated throwaway
+# level, never the shipped map.
+unreal.log("[iso] spawned in-memory only; AcademyMap on disk left untouched (not saved)")
