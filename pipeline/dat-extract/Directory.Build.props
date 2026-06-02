@@ -1,0 +1,36 @@
+<Project>
+
+  <!--
+    Configurable path to the sibling ACEmulator/ACE checkout that acdat
+    references (ACE.DatLoader). This replaces a fragile filesystem junction
+    (.worktrees\ACE) whose target could be wiped by a recursive delete that
+    traverses the link, taking the real ACE checkout with it.
+
+    Resolution order (first non-empty wins):
+      1. /p:AcePath=<dir>   explicit MSBuild property (highest priority)
+      2. ACE_PATH           environment variable
+      3. <repos>\ACE        default: a sibling of the ac-unreal repo root.
+                            Resolves for the MAIN checkout; when building from a
+                            git worktree (the relative default would point inside
+                            the worktree) set ACE_PATH to the real ACE checkout.
+
+    Only AcDatExtract.csproj (this directory) imports these props; ACE.DatLoader
+    lives outside this tree and builds with its own settings.
+  -->
+  <PropertyGroup>
+    <AcePath Condition="'$(AcePath)' == '' and '$(ACE_PATH)' != ''">$(ACE_PATH)</AcePath>
+    <AcePath Condition="'$(AcePath)' == ''">$(MSBuildThisFileDirectory)..\..\..\ACE</AcePath>
+    <!-- Normalize into a SEPARATE local property: when AcePath is supplied via
+         /p:AcePath it is a read-only global property, so reassigning AcePath
+         here would be silently ignored (no trailing slash -> broken concat).
+         NormalizeDirectory guarantees exactly one trailing separator. -->
+    <_AceDir>$([MSBuild]::NormalizeDirectory('$(AcePath)'))</_AceDir>
+    <AceDatLoaderProject>$(_AceDir)Source\ACE.DatLoader\ACE.DatLoader.csproj</AceDatLoaderProject>
+  </PropertyGroup>
+
+  <Target Name="ValidateAcePath" BeforeTargets="Restore;CollectPackageReferences;ResolveProjectReferences;Build">
+    <Error Condition="!Exists('$(AceDatLoaderProject)')"
+           Text="ACE.DatLoader not found at '$(AceDatLoaderProject)'. Point acdat at your ACEmulator/ACE checkout by setting the ACE_PATH environment variable (or passing /p:AcePath=&lt;dir&gt;). Do NOT recreate the old .worktrees\ACE junction." />
+  </Target>
+
+</Project>

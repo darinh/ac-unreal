@@ -18,7 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ACE\Source\ACE.DatLoader\ACE.DatLoader.csproj" />
+    <!-- Path resolved by Directory.Build.props (AcePath / ACE_PATH); see that
+         file. Replaces the hard-coded ..\..\..\ACE junction-dependent path. -->
+    <ProjectReference Include="$(AceDatLoaderProject)" />
   </ItemGroup>
 
 </Project>

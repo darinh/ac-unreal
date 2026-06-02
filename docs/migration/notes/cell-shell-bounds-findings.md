@@ -75,6 +75,14 @@ so the next agent doesn't lose time:
    `<repo>/.claude/worktrees/ACE -> <ACE repo>`. **Recommended real fix:** make the
    ACE reference robust (e.g. a `Directory.Build.props` with a configurable ACE
    path) so acdat builds from any worktree.
+   **IMPLEMENTED (branch `harden/ace-path`):** added
+   `pipeline/dat-extract/Directory.Build.props` exposing a configurable `AcePath`
+   (resolution order: `/p:AcePath=` → `ACE_PATH` env var → default `..\..\..\ACE`
+   for the main checkout), with a clear build error if ACE is not found. The csproj
+   now references `$(AceDatLoaderProject)` instead of the hard-coded path, and the
+   fragile `.worktrees\ACE` junction has been removed — building from a worktree
+   just needs `ACE_PATH` set (no symlink, so no recursive-delete-through-junction
+   data-loss risk).
 3. **Generated intermediates** (`pipeline/**/out/` OBJs) are gitignored → not in a
    fresh worktree, so asset rebuilds need them copied or regenerated (which needs
    acdat → see #2).
