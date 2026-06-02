@@ -50,10 +50,29 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from import_academy import parse_obj, parse_mtl  # noqa: E402
 
 
+def _bounds_finite(sm) -> bool:
+    """A StaticMesh with NaN / Inf / ~1e48 bounds is frustum-culled by UE and
+    renders invisible (the "no walls / collapsed prop" failure). `v == v` is
+    False for NaN; `abs(v) < 1e7` rejects Inf and the ~3.7e48 garbage. Used as a
+    build-time validation gate so corruption is caught at write time, not later
+    by an audit."""
+    bb = sm.get_bounding_box()
+    vals = [bb.min.x, bb.min.y, bb.min.z, bb.max.x, bb.max.y, bb.max.z]
+    return all(v == v and abs(v) < 1e7 for v in vals)
+
+
 def build_setup_mesh(obj_path: Path, asset_name: str) -> unreal.StaticMesh:
     asset_path = f"{SETUPS_PACKAGE}/{asset_name}"
+    # Stale-detection guard (review follow-up): only REUSE an existing asset if
+    # its bounds are valid. Blindly returning a cached asset silently keeps
+    # corrupt-bounds meshes alive across re-imports (the bug class behind the
+    # collapsed props and the culled cell shells). A corrupt/stale existing
+    # asset is deleted and rebuilt fresh below.
     if unreal.EditorAssetLibrary.does_asset_exist(asset_path):
-        return unreal.EditorAssetLibrary.load_asset(asset_path)
+        existing = unreal.EditorAssetLibrary.load_asset(asset_path)
+        if existing is not None and _bounds_finite(existing):
+            return existing
+        unreal.EditorAssetLibrary.delete_asset(asset_path)
 
     unreal.EditorAssetLibrary.make_directory(SETUPS_PACKAGE)
     at = unreal.AssetToolsHelpers.get_asset_tools()
@@ -102,6 +121,12 @@ def build_setup_mesh(obj_path: Path, asset_name: str) -> unreal.StaticMesh:
             desc.create_triangle(pg_id, vi_ids)
 
     sm.build_from_static_mesh_descriptions([desc])
+    if not _bounds_finite(sm):
+        unreal.log_error(
+            f"[build_setup_mesh] {asset_name}: CORRUPT bounds after build "
+            f"({sm.get_bounding_box()}) -> the mesh will be frustum-culled. "
+            f"Source OBJ is {obj_path}; re-run, and if it persists the geometry/"
+            f"build needs investigation (do not ship a culled asset).")
     sm.set_editor_property("static_materials",
         [unreal.StaticMaterial(material_interface=None, material_slot_name=n)
          for n in slot_names])

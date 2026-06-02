@@ -1498,6 +1498,12 @@ internal static class Commands
         for (int partIdx = 0; partIdx < parts.Count; partIdx++)
         {
             uint gfxId = parts[partIdx];
+            // ACViewer (Model/Setup.cs) omits GfxObj 0x010001EC, an empty
+            // anchor/locator placeholder part with no renderable geometry; skip
+            // it so the merged OBJ matches the reference assembly. (ExportNpc
+            // already skips this id.) Review follow-up.
+            if (gfxId == 0x010001ECu)
+                continue;
             if (!portalDb.AllFiles.ContainsKey(gfxId))
             {
                 Console.Error.WriteLine($"  WARN: GfxObj 0x{gfxId:X8} (part {partIdx}) not in PortalDat — skipping");
