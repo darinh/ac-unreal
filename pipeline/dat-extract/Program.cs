@@ -82,6 +82,7 @@ internal static class Program
                 "dump-academy-statics" => Commands.DumpAcademyStatics(args.AsSpan(1)),
                 "dump-academy-lights" => Commands.DumpAcademyLights(args.AsSpan(1)),
                 "export-setup"       => Commands.ExportSetup(args.AsSpan(1)),
+                "dump-setup"         => Commands.DumpSetup(args.AsSpan(1)),
                 "export-npc"         => Commands.ExportNpc(args.AsSpan(1)),
                 "export-academy-statics" => Commands.ExportAcademyStatics(args.AsSpan(1)),
                 "dump-starterareas"  => Commands.DumpStarterAreas(args.AsSpan(1)),
@@ -1352,6 +1353,50 @@ internal static class Commands
     }
 
     /// <summary>
+    /// Dump the raw SetupModel structure for a 0x02 setup id: parts (GfxObj
+    /// ids), per-part DefaultScale, all PlacementFrames keys, and the per-part
+    /// Origin+Orientation for the Resting (0x65) frame. Read-only diagnostic
+    /// used to derive the authoritative assembly reference vs. ACViewer.
+    /// </summary>
+    public static int DumpSetup(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 2) { Console.Error.WriteLine("dump-setup: missing <datDir> <hexSetupId>"); return 1; }
+        var datDir = args[0];
+        if (!TryParseLandblockHex(args[1], out var setupId)) { Console.Error.WriteLine($"Bad hex setup id: {args[1]}"); return 1; }
+
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: false);
+        var portalDb = DatManager.PortalDat ?? throw new InvalidOperationException("PortalDat unavailable.");
+        if (!portalDb.AllFiles.ContainsKey(setupId)) { Console.Error.WriteLine($"Setup 0x{setupId:X8} not in PortalDat."); return 3; }
+
+        uint typeNibble = (setupId >> 24) & 0xFFu;
+        if (typeNibble != 0x02) { Console.Error.WriteLine($"0x{setupId:X8} is not a SetupModel (0x02)."); return 5; }
+
+        var setup = portalDb.ReadFromDat<SetupModel>(setupId);
+        Console.WriteLine($"Setup 0x{setupId:X8}: {setup.Parts.Count} parts, Flags={setup.Flags}");
+        Console.WriteLine($"DefaultMotionTable=0x{setup.DefaultMotionTable:X8} DefaultAnimation=0x{setup.DefaultAnimation:X8}");
+        Console.WriteLine("Parts (GfxObj ids):");
+        for (int i = 0; i < setup.Parts.Count; i++)
+        {
+            var gfxId = setup.Parts[i];
+            string scale = (i < setup.DefaultScale.Count) ? $"scale=({setup.DefaultScale[i].X:0.###},{setup.DefaultScale[i].Y:0.###},{setup.DefaultScale[i].Z:0.###})" : "scale=n/a";
+            string note = (gfxId == 0x010001ECu) ? "  <-- ANCHOR/LOCATOR (ACViewer skips this part)" : "";
+            int vtx = portalDb.AllFiles.ContainsKey(gfxId) ? portalDb.ReadFromDat<GfxObj>(gfxId).VertexArray.Vertices.Count : -1;
+            Console.WriteLine($"  part{i:D2}: 0x{gfxId:X8}  {scale}  verts={vtx}{note}");
+        }
+        Console.WriteLine($"PlacementFrames keys: {string.Join(", ", setup.PlacementFrames.Keys.Select(k => $"0x{k:X2}({k})"))}");
+        foreach (var kv in setup.PlacementFrames)
+        {
+            Console.WriteLine($"Placement key 0x{kv.Key:X2}({kv.Key}) per-part frames ({kv.Value.AnimFrame.Frames.Count}):");
+            for (int i = 0; i < kv.Value.AnimFrame.Frames.Count; i++)
+            {
+                var f = kv.Value.AnimFrame.Frames[i];
+                Console.WriteLine($"  part{i:D2}: origin=({f.Origin.X:0.####},{f.Origin.Y:0.####},{f.Origin.Z:0.####})  quat(xyzw)=({f.Orientation.X:0.####},{f.Orientation.Y:0.####},{f.Orientation.Z:0.####},{f.Orientation.W:0.####})");
+            }
+        }
+        return 0;
+    }
+
+    /// <summary>
     /// Export a SetupModel (0x02xxxxxx) as a single merged OBJ.
     /// Each Part (a GfxObj 0x01) is pre-transformed by its PlacementFrame
     /// (key = Placement.Resting = 0x65) and DefaultScale before emission, so
@@ -1394,8 +1439,21 @@ internal static class Commands
                 return 4;
             }
             parts = setup.Parts;
+            // Pick the part-placement frame the way ACViewer (Model/Setup.cs)
+            // and ACE (Physics/PartArray.SetPlacementFrame) do: prefer Resting
+            // (0x65), then fall back to Default (0x00). Multi-part setups that
+            // ship ONLY a Default frame (e.g. the academy cave door 0x020005DA)
+            // would otherwise get a null frame, collapsing every part onto the
+            // setup origin (parts that share a GfxObj end up coincident instead
+            // of mirrored left/right). Falling back to key 0 places them.
             const int RestingPlacement = 0x65;
-            placement = setup.PlacementFrames.TryGetValue(RestingPlacement, out var pf) ? pf : null;
+            const int DefaultPlacement = 0x00;
+            if (setup.PlacementFrames.TryGetValue(RestingPlacement, out var pfRest))
+                placement = pfRest;
+            else if (setup.PlacementFrames.TryGetValue(DefaultPlacement, out var pfDefault))
+                placement = pfDefault;
+            else
+                placement = null;
             defaultScales = (setup.DefaultScale != null && setup.DefaultScale.Count == parts.Count) ? setup.DefaultScale : null;
         }
         else if (typeNibble == 0x01)

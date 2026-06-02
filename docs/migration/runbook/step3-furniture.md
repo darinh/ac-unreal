@@ -84,3 +84,59 @@ either) plus material preservation.
 
 Open: `ExportNpc` has the same unfixed bug (Step 4); the 65 `vt==v` props'
 uniform-non-zero-UV-index edge case is an unmeasured follow-up (not a regression).
+
+## 2026-06-01 - Setup placement-frame fallback fixed (Resting->Default), user sign-off
+Symptom: the academy cave door (`SM_Setup_020005DA`) rendered as a garbled
+overlapping cross of a stone post + wood panel, not a door; several furniture
+statics were also collapsed onto a single point.
+
+Root cause: `ExportSetup` (Program.cs) read only the Resting (`0x65`) placement
+frame. Multi-part setups that ship ONLY a Default (`0x00`) frame got a null
+frame, so no per-part transform was applied and every part collapsed onto the
+setup origin (parts sharing a GfxObj - e.g. the door's mirrored left/right
+jambs - became coincident). Confirmed against ACViewer (`Model/Setup.cs`) and
+ACE (`Physics/PartArray.SetPlacementFrame`), whose assembly order is
+Resting -> Default -> null.
+
+Fix:
+1. `ExportSetup` now prefers Resting (`0x65`), then falls back to Default
+   (`0x00`), then null - matching ACViewer/ACE. acdat rebuilt clean. Added a
+   read-only `dump-setup <datDir> <hexId>` diagnostic (parts, scales, all
+   PlacementFrames keys + per-part origin/orientation) used to derive the
+   reference.
+2. The fix only moves vertex POSITIONS; topology (parts/tris/slots/materials)
+   is unchanged. Affected setups were found in TWO source sets (an adversarial
+   review caught that re-exporting the statics alone was incomplete - the door
+   is interactive, not a static):
+   - Statics: re-exporting the 200 `academy_8602_statics` setups changed 12 -
+     the cave door `020005DA` + 11 furniture.
+   - Interactive: auditing every setup id in `instances_8602.json` /
+     `academy_8602_npcs.json` with `dump-setup` found 8 ids; 7 lack Resting and
+     so were re-placed by the fix (only `0200062E` has `0x65` and is unchanged).
+     Six besides the cave door were stale/collapsed in committed content:
+     `02000001 0200007C 020001B3 0200024F 020005F1 020005F2`. (`020005F1` is the
+     practice-area door, `020005F2` the academy portal - both were 800-cubes.)
+   Rebuilt all 18 `SM_Setup_*` meshes in place from the fixed OBJs, preserving
+   material bindings, via the delete+recreate mechanism proven on the prop-UV fix
+   (`_doorfix_rebuild.py` / `_furniturefix_rebuild.py`, the latter now driven by
+   an `AC_FIX_SETUPS` id list for reuse). 18/18 verified CLEAN (tris/verts
+   identical; bounds now match the fixed OBJ instead of the old collapsed
+   800-cube placeholder).
+
+Verify:
+- `render_firstroom_sweep.ps1` + `test_renders.py --manifest` => MANIFEST PASS
+  (shell intact; `AcademyMap.umap` untouched).
+- Isolated renders confirm coherent geometry: the cave door (`020005DA`), the
+  practice-area door (`020005F1`, stone jambs + studs + lintel + leaf) and the
+  portal (`020005F2`, stone frame around a green vortex); first-room render shows
+  the forge, water barrel, torch stand and hanging sign correctly placed.
+
+Scope: 18 `Content/Academy/Setups/*.uasset` + `Program.cs`. Static set:
+`0200009E 02000322 02000341 02000384 020003B4 020003B5 020003F9 02000BBD
+02000F45 02001149 02001255`. Interactive set: `020005DA 02000001 0200007C
+020001B3 0200024F 020005F1 020005F2`. Adversarially reviewed (Sonnet code-review
++ GPT-5.3/GPT-5.5 rubber-ducks); the GPT-5.5 pass caught the incomplete
+interactive coverage, which this audit then closed.
+
+Open: `ExportNpc` already has the Resting->Default fallback but still carries
+the `UVs[0]` per-corner UV bug (Step 4, tracked).
