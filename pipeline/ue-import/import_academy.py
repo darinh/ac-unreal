@@ -376,17 +376,18 @@ def build_static_mesh(obj_mesh: ObjMesh, mtl_map: dict, asset_name: str,
 
     sm.build_from_static_mesh_descriptions([desc])
 
-    # Build-time bounds validation (review follow-up): a NaN / Inf / ~1e48
-    # bounding box means UE frustum-culls the mesh -> the room renders no shell
-    # (the "no walls" bug). `v == v` is False for NaN; `abs(v) < 1e7` rejects Inf
-    # and the ~3.7e48 garbage. Catch corruption at write time, not later by an
-    # audit. (Run audit_cell_bounds.py as the system-wide gate after bulk builds.)
+    # Build-time bounds check (ADVISORY -- review H2): a NaN / Inf / ~1e48 bounding
+    # box means UE frustum-culls the mesh -> no shell renders ("no walls" bug).
+    # This only LOGS; the asset is still saved below, so audit_cell_bounds.py is
+    # the AUTHORITATIVE gate after bulk builds. `v == v` is False for NaN;
+    # `abs(v) < 1e7` rejects Inf and ~3.7e48 (cell-local meshes are hundreds of cm;
+    # do NOT reuse this 1e7 bound on world-space/landblock meshes).
     _bb = sm.get_bounding_box()
     _vals = [_bb.min.x, _bb.min.y, _bb.min.z, _bb.max.x, _bb.max.y, _bb.max.z]
     if not all(v == v and abs(v) < 1e7 for v in _vals):
         unreal.log_error(f"[build_static_mesh] {asset_name}: CORRUPT bounds after build "
-                         f"({_bb}) -> the mesh will be frustum-culled / invisible. "
-                         f"Re-run; if it persists, investigate the build (do not ship it).")
+                         f"({_bb}) -> frustum-culled. ADVISORY (asset still saved); "
+                         f"audit_cell_bounds.py is the gate.")
 
     # Stamp material slots by slot_name, preserving any binding the mesh
     # already had (prev_mats) so a geometry/UV rebuild doesn't wipe assigned

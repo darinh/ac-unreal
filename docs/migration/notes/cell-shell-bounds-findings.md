@@ -33,13 +33,22 @@ correctly skipped per ADR-0008). Zero bounds is correct there; nothing to render
 
 ## Prevention added here (so it cannot silently recur)
 1. **Build-time bounds validation** in both build paths: `import_academy.py`
-   `build_static_mesh` and `import_statics.py` `build_setup_mesh` now log an ERROR
-   if a mesh comes out of `build_from_static_mesh_descriptions` with NaN/Inf/~1e48
-   bounds (`v == v and abs(v) < 1e7`). Corruption is caught at write time.
+   `build_static_mesh` and `import_statics.py` `build_setup_mesh` log an ERROR if a
+   mesh comes out of `build_from_static_mesh_descriptions` with NaN/Inf/~1e48
+   bounds (`v == v and abs(v) < 1e7`). **This is ADVISORY only** — the asset is
+   still saved (one ERROR line is easy to miss in a bulk build), so the
+   authoritative gate is `audit_cell_bounds.py`. **Scope note:** this bounds check
+   catches the **culled-shell** class (NaN/Inf/huge) — it does **NOT** catch a
+   *collapsed* mesh, which has *finite* (~0..800) bounds. Collapsed/stale content
+   is caught by (2), not this.
 2. **Stale-detection guard** in `build_setup_mesh`: it previously did
-   `if does_asset_exist: return load_asset` — silently reusing a possibly-corrupt
-   cached asset across re-imports (review follow-up #1). It now validates the
-   existing asset's bounds and **rebuilds fresh** if they are corrupt.
+   `if does_asset_exist: return load_asset` — silently reusing a stale cached
+   asset across re-imports (review follow-up #1). A re-exported OBJ (e.g. after a
+   placement fix that *un-collapses* a prop) was ignored, because a collapsed mesh
+   has *finite* bounds. It now reuses an existing asset only if its bounds are
+   finite **AND** it was built from the **same source OBJ** (sha1 stored as an
+   asset metadata tag) — a changed OBJ forces a fresh rebuild. (This is the real
+   fix for the finite-but-stale class the bounds check in (1) cannot see.)
 3. **Reusable audits** (run after ANY bulk cell/setup operation — the gate):
    - `pipeline/ue-import/audit_cell_bounds.py` — per-cell bounds health (finite/nan/huge/zero).
    - `pipeline/ue-import/audit_cells.py` — per-cell wiring (actor→mesh→tris→materials).

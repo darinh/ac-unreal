@@ -24,6 +24,7 @@ import json
 import os
 import sys
 import time
+import hashlib
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -50,27 +51,46 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from import_academy import parse_obj, parse_mtl  # noqa: E402
 
 
+_SRC_HASH_TAG = "AcSourceObjSha1"  # asset metadata: sha1 of the source OBJ
+
+
 def _bounds_finite(sm) -> bool:
-    """A StaticMesh with NaN / Inf / ~1e48 bounds is frustum-culled by UE and
-    renders invisible (the "no walls / collapsed prop" failure). `v == v` is
-    False for NaN; `abs(v) < 1e7` rejects Inf and the ~3.7e48 garbage. Used as a
-    build-time validation gate so corruption is caught at write time, not later
-    by an audit."""
+    """True iff the mesh bounds are finite + sane. Catches the NaN / Inf / ~1e48
+    corruption that makes UE frustum-cull a mesh (the culled cell-shell bug).
+    **It does NOT detect a *collapsed* mesh** — collapsed parts produce FINITE
+    bounds (~0..800) and pass this check; stale/collapsed content is caught by the
+    source-OBJ hash, not here. `v == v` is False for NaN; `abs(v) < 1e7` rejects
+    Inf and ~3.7e48. (Cell/setup-local meshes are hundreds of cm; do NOT reuse
+    this 1e7 bound on world-space/landblock meshes.)"""
     bb = sm.get_bounding_box()
     vals = [bb.min.x, bb.min.y, bb.min.z, bb.max.x, bb.max.y, bb.max.z]
     return all(v == v and abs(v) < 1e7 for v in vals)
 
 
+def _obj_sha1(obj_path: Path) -> str:
+    return hashlib.sha1(Path(obj_path).read_bytes()).hexdigest()
+
+
 def build_setup_mesh(obj_path: Path, asset_name: str) -> unreal.StaticMesh:
+    """Build (or reuse-if-unchanged) the setup StaticMesh from its OBJ.
+    CAUTION (review M1): when the reuse-guard rejects a stale asset it
+    delete+recreates at the same path. Run with NO level loaded -- the bulk
+    import builds every mesh BEFORE loading AcademyMap (see main() below).
+    Deleting an asset a loaded level references is the stale actor->mesh-ref
+    hazard this project has repeatedly hit."""
     asset_path = f"{SETUPS_PACKAGE}/{asset_name}"
-    # Stale-detection guard (review follow-up): only REUSE an existing asset if
-    # its bounds are valid. Blindly returning a cached asset silently keeps
-    # corrupt-bounds meshes alive across re-imports (the bug class behind the
-    # collapsed props and the culled cell shells). A corrupt/stale existing
-    # asset is deleted and rebuilt fresh below.
+    src_sha = _obj_sha1(obj_path)
+    # TRUE stale-detection (review B1): reuse an existing asset only if BOTH (a)
+    # its bounds are finite AND (b) it was built from the SAME source OBJ (sha1
+    # stored as a metadata tag). The old `if exists: return load_asset` silently
+    # reused stale meshes across re-imports -- so a re-exported OBJ (e.g. after a
+    # placement fix that un-collapses a prop) was IGNORED, because a collapsed
+    # mesh has *finite* bounds and passed the bounds-only check. A changed OBJ
+    # (or a missing/old tag, or corrupt bounds) now forces a fresh rebuild.
     if unreal.EditorAssetLibrary.does_asset_exist(asset_path):
         existing = unreal.EditorAssetLibrary.load_asset(asset_path)
-        if existing is not None and _bounds_finite(existing):
+        stored = unreal.EditorAssetLibrary.get_metadata_tag(existing, _SRC_HASH_TAG) if existing else None
+        if existing is not None and _bounds_finite(existing) and stored == src_sha:
             return existing
         unreal.EditorAssetLibrary.delete_asset(asset_path)
 
@@ -122,14 +142,19 @@ def build_setup_mesh(obj_path: Path, asset_name: str) -> unreal.StaticMesh:
 
     sm.build_from_static_mesh_descriptions([desc])
     if not _bounds_finite(sm):
+        # ADVISORY ONLY (review H2): this logs but the asset is still saved below;
+        # one ERROR line is easy to miss in a bulk build. The AUTHORITATIVE gate is
+        # audit_cell_bounds.py, run after bulk builds.
         unreal.log_error(
             f"[build_setup_mesh] {asset_name}: CORRUPT bounds after build "
-            f"({sm.get_bounding_box()}) -> the mesh will be frustum-culled. "
-            f"Source OBJ is {obj_path}; re-run, and if it persists the geometry/"
-            f"build needs investigation (do not ship a culled asset).")
+            f"({sm.get_bounding_box()}) -> will be frustum-culled. Source OBJ "
+            f"{obj_path}. ADVISORY (asset still saved); audit_cell_bounds.py is the gate.")
     sm.set_editor_property("static_materials",
         [unreal.StaticMaterial(material_interface=None, material_slot_name=n)
          for n in slot_names])
+    # Record the source-OBJ hash so the stale-detection reuse-guard above can tell
+    # next time whether this asset is still built from the current OBJ.
+    unreal.EditorAssetLibrary.set_metadata_tag(sm, _SRC_HASH_TAG, src_sha)
     unreal.EditorAssetLibrary.save_asset(asset_path)
     return sm
 

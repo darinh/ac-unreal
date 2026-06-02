@@ -28,22 +28,31 @@ def classify(sm):
     if ext < 1.0: return "zero", vals
     return "finite", vals
 
-stat = collections.Counter(); examples = {}; corrupt_ids = []
+stat = collections.Counter(); examples = {}; corrupt_ids = []; empty_ids = []
 for cid in expected:
     sm = EAL.load_asset(f"/Game/Academy/Cells/SM_{cid}")
     if sm is None: stat["missing"] += 1; continue
     cat, vals = classify(sm); stat[cat] += 1
     if cat not in examples: examples[cat] = (cid, [round(v, 1) for v in vals])
-    if cat in ("nan_inf", "huge", "zero"): corrupt_ids.append(cid)
+    # nan_inf/huge are genuine frustum-cull bugs. "zero" is NOT a bug per se: an
+    # all-portal connector cell (0 renderable faces after the NoPos skip) is
+    # legitimately empty (e.g. 0x860202D1, 8 verts / 0 faces). Report it
+    # separately so the gate can go green; only rebuild it if its OBJ has faces.
+    if cat in ("nan_inf", "huge"): corrupt_ids.append(cid)
+    elif cat == "zero": empty_ids.append(cid)
 
 w(f"\n=== bounds classification (of {len(expected)}) ===")
 for k, v in stat.most_common(): w(f"  {k}: {v}")
 w("\n=== one example per category ===")
 for cat, (cid, vals) in examples.items(): w(f"  {cat}: {cid} {vals}")
+if empty_ids:
+    w(f"\n=== {len(empty_ids)} EMPTY (zero bounds) — expected for all-portal "
+      f"connector cells; verify each OBJ has 0 faces, do NOT 'repair': ===")
+    w("  " + " ".join(empty_ids))
 if corrupt_ids:
-    w(f"\n=== {len(corrupt_ids)} CORRUPT (frustum-culled) cells ===")
+    w(f"\n=== GATE FAIL: {len(corrupt_ids)} CORRUPT (frustum-culled) cells — run repair_cell_bounds.py ===")
     w("  " + " ".join(corrupt_ids))
 else:
-    w("\n=== ALL CELLS FINITE — no frustum-cull culprits ===")
+    w("\n=== GATE PASS: no nan/inf/huge-bounds cells (frustum-cull culprits) ===")
 w("DONE")
 fh.close()

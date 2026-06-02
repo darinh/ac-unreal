@@ -118,11 +118,22 @@ Fix:
      so were re-placed by the fix (only `0200062E` has `0x65` and is unchanged).
      The 7: the cave door `020005DA` + `02000001 0200007C 020001B3 0200024F
      020005F1 020005F2` (`020005F1` = practice-area door, `020005F2` = academy
-     portal - both were 800-cubes). **Reproducibility (review H1):** these 7 are
-     NOT in any `export-academy-statics` manifest; regenerate each OBJ one id at a
-     time with `acdat export-setup <datDir> <hexId> out/academy_8602_statics/setup_<hexId>.obj`
-     (the path `import_npcs.py` reads), then rebuild. `out/` is git-ignored, so
-     the OBJs are regenerated locally, not committed.
+     portal - both were 800-cubes). (`02000001` was dropped - dead, anchor-polluted.)
+     **Reproducibility (review H1/M2):** these are NOT in any
+     `export-academy-statics` manifest. Their ids are tracked in
+     `samples/academy_8602_interactive_setups.json`; regenerate every OBJ in ONE
+     loop (not by hand):
+
+     ```powershell
+     $dat = "C:\Turbine\Asheron's Call"
+     $ids = (Get-Content pipeline/dat-extract/samples/academy_8602_interactive_setups.json | ConvertFrom-Json).interactive_setups.id
+     foreach ($id in $ids) { & acdat export-setup $dat $id "pipeline/dat-extract/out/academy_8602_statics/setup_$id.obj" }
+     ```
+
+     then re-run the statics import. `build_setup_mesh` now rebuilds any setup
+     whose source OBJ changed (it stores the OBJ sha1 as an asset metadata tag),
+     so a re-export reliably re-lands. `out/` is git-ignored - OBJs regenerate
+     locally, not committed.
    Rebuilt all 18 `SM_Setup_*` meshes in place from the fixed OBJs, preserving
    material bindings, via the delete+recreate mechanism proven on the prop-UV fix
    (`_doorfix_rebuild.py` / `_furniturefix_rebuild.py`, the latter now driven by

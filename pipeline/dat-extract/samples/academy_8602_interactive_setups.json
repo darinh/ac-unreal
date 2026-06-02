@@ -1,0 +1,13 @@
+{
+  "_comment": "Interactive setup ids (doors/portal/etc.) referenced by import_npcs.py / instances_8602.json for landblock 8602. These are NOT in academy_8602_statics.json's `unique_setups`, so `acdat export-academy-statics` does NOT produce their OBJs (review H1/M2). Regenerate every OBJ with the documented loop in runbook/step3-furniture.md so the meshes are reproducible from one invocation, not by hand. Source: dump-setup audit of instances_8602.json + academy_8602_npcs.json. 0x02000001 (an NPC-base setup, anchor-polluted, referenced by no actor) was dropped, not listed here.",
+  "landblock": "8602",
+  "interactive_setups": [
+    {"id": "020005DA", "note": "cave door (practice area)"},
+    {"id": "020005F1", "note": "practice-area door"},
+    {"id": "020005F2", "note": "academy portal"},
+    {"id": "0200007C", "note": "interactive setup (re-placed by the Resting->Default fix)"},
+    {"id": "020001B3", "note": "interactive setup (re-placed by the fix)"},
+    {"id": "0200024F", "note": "interactive setup (re-placed by the fix)"},
+    {"id": "0200062E", "note": "interactive setup; has a Resting (0x65) frame, unchanged by the fix"}
+  ]
+}

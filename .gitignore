@@ -90,12 +90,13 @@ __pycache__/
 *.pyc
 
 # --- Scratch diagnostics + run outputs (review L3) --------------------
-# `_`-prefixed scripts are throwaway diagnostics; REUSABLE tools get proper
-# non-underscore names (e.g. audit_cell_bounds.py, repair_cell_bounds.py) and
-# are committed normally. Render/audit text dumps + run logs are never source.
-pipeline/ue-import/_*.py
+# `_diag_*` scripts are throwaway probes; REUSABLE tools get proper non-underscore
+# names (e.g. audit_cell_bounds.py, repair_cell_bounds.py) and are committed
+# normally. (Narrowed from `_*.py` so it doesn't contradict already-tracked
+# _iso_setup.py / _doorfix_rebuild.py — review L1.) Render/audit dumps + logs are
+# never source.
+pipeline/ue-import/_diag_*.py
 pipeline/renders/_*.txt
-pipeline/ue-import/last-*.log
 *.log
 # Editor scratch: temp inspection level + the _Inspect probe content.
 Content/Academy/Maps/FirstRoomTest.umap
