@@ -7,12 +7,18 @@ The world is a grid of landblocks addressed by an 8-bit X / 8-bit Y byte pair
 layout / file-id patterns]. Each landblock is **192 m**, subdivided 8x8 into 24 m
 land cells [REF-IMPL: ACViewer `Physics/Common/LandDefs.cs`
 `BlockLength=192`/`CellLength=24`/`BlockSide=8`; the extractor does not yet emit
-metric dimensions], giving a maximum extent of ~49 km per side (arithmetic). That
+metric dimensions], giving a maximum extent of ~49 km per side (arithmetic; the
+**255 landblocks/axis** count is now confirmed from the client — the cell-coord
+guard `0x7f7` = 255·8−1 [DATA: acclient `LScape::update_block` 0x5063A0]). That
 the world is **seamless/zoneless** with a long view distance is retail *client
 behavior* [COMMUNITY/VERIFY]. The world *data* is keyed strictly per-landblock
-[DATA] — the structural enabler for streaming — but the retail *client's*
-active-landblock load policy is [COMMUNITY/VERIFY]; do **not** infer it from ACE
-`LandblockManager`, which is server-side. The current UE project stores **all
+[DATA] — the structural enabler for streaming — and the retail *client's*
+active-landblock load policy is now **[DATA: acclient] RESOLVED (H1, 2026-06-02)**:
+the client's `LScape` landscape engine keeps a square **`(2R+1) × (2R+1)` landblock
+window** centered on the viewer, where **`R = mid_radius = Render::m_RenderPrefs.LandscapeDrawDistance`**
+— a user graphics setting (presets 3/5/8/11/15; `LScape` default 5), **not** the
+server-side ACE `LandblockManager`. Full evidence + provenance:
+[notes/client-landblock-load-radius-findings.md](../notes/client-landblock-load-radius-findings.md). The current UE project stores **all
 academy actors inline in one level** (no streaming); this **likely contributes**
 to the `-game` "Waiting for static meshes to be ready N/618" hang, but the root
 cause is **not isolated** (procedural-mesh build, Nanite/Lumen paths,
@@ -22,7 +28,9 @@ regardless. See gap doc
 [`../notes/feature-disposition-and-design-gaps.md`](../notes/feature-disposition-and-design-gaps.md) §D.
 
 Disposition: **MIRROR** AC's per-landblock data partitioning via a UE mechanism;
-the streaming *policy* mirrors the client only once the load radius is verified.
+the streaming *policy* mirrors the client's verified `(2R+1)²` window (H1, resolved
+below), with the WP loading range exposed as a setting mapped to the client's
+`LandscapeDrawDistance` tiers (baseline R=5).
 
 ## Decision
 TBD (Proposed). Candidate [DESIGN]: enable **World Partition** with a streaming
@@ -54,8 +62,12 @@ runtime streaming source on the player; indoor `EnvCell`s grouped as data layers
 - A2 [VERIFY]: the monolithic level is a material cause of the hang (load trace).
 
 ## Verify before locking
-- H1: AC client active-landblock load **radius/policy** (NOT from server-side ACE
-  `LandblockManager` alone; confirm the client's behavior).
+- H1 [RESOLVED 2026-06-02 — [notes/client-landblock-load-radius-findings.md](../notes/client-landblock-load-radius-findings.md)]:
+  AC **client** active-landblock load **radius/policy**, read from the client's
+  `LScape` engine (not server-side ACE `LandblockManager`): a square `(2R+1)²`
+  landblock window centered on the viewer, `R = LandscapeDrawDistance` (graphics
+  presets 3/5/8/11/15; default 5 → 11×11 / 960 m radius). The grid shifts and loads
+  only the new edge as the viewer crosses a block boundary.
 - See also the deep-dive's "Verify before locking" and the per-assumption checks above.
 
 ---
@@ -87,9 +99,11 @@ methodology), [DESIGN] (our proposal, contestable), [VERIFY] (must confirm first
 ## 2. WP grid sizing [DESIGN]
 - **Runtime grid cell = one landblock = 19200 UU.** Simple 1:1 mental model;
   WP handles the sparse ocean blocks (empty cells cost nothing).
-- **Loading range = (verified AC radius) x 19200 UU.** Do **not** guess the
-  radius; set it from H1. If AC kept an `R`-landblock neighborhood hot, range ≈
-  `R·192 m`. Expose it as a tunable, default to the verified value.
+- **Loading range = `R` x 19200 UU**, `R` = the client's `LandscapeDrawDistance`
+  (H1, RESOLVED): the client keeps a square `(2R+1)²` landblock window hot, `R ∈
+  {3,5,8,11,15}` (default 5). So **default loading range = 5 × 19200 = 96000 UU
+  (960 m)**; expose it as a tunable mapped to those tiers (max 15 → 288000 UU).
+  Mirror the client's *square* (Chebyshev) window, not a circular radius.
 - Keep the streaming source on the player pawn (and on any render rig used for
   headless captures, so screenshots stream the same cells the player would).
 
@@ -228,7 +242,10 @@ mapping needs resampling.
   material layers. Revisit once the world streams.
 
 ## 6. Order of operations [DESIGN]
-1. Resolve H1 (load radius) + world origin (contract §0) — small extractions.
+1. ~~Resolve H1 (load radius) + world origin (contract §0)~~ **DONE 2026-06-02**
+   (decompile, not extraction) — [notes/client-landblock-load-radius-findings.md](../notes/client-landblock-load-radius-findings.md):
+   R = `LandscapeDrawDistance` (default 5); world origin = SW corner of LB(0,0),
+   +X East / +Y North / +Z up.
 2. Build the `LandblockId <-> UE WP cell` helper (§1) with round-trip tests.
 3. Stand up WP on a **2x2 landblock** test region (terrain Option B + scenery
    instances) and confirm streaming in/out around a moving source.
@@ -238,8 +255,17 @@ mapping needs resampling.
    Nanite (ADR-0014).
 
 ## Open technical questions [VERIFY/DESIGN]
-- World origin corner + whether AC Z (height) needs an offset to keep UE Z sane.
+- ~~World origin corner~~ **RESOLVED**: world `(0,0,0)` = **SW corner of landblock
+  `(0,0)`**, `+X` East, `+Y` North, `+Z` up; per-block render frame Z origin = 0,
+  i.e. **no global Z offset** — terrain height comes from the per-vertex height
+  table, so UE Z = AC height directly [DATA: acclient `calc_frame` 0x505460;
+  `get_block_orient` 0x504F90]. (Still open: pick a UE Z datum if AC heights ever go
+  meaningfully negative — unmeasured, see findings note.)
 - Does any landblock's content exceed a single WP cell (large surface buildings)?
   If so, raise the cell size or rely on WP's actor-spanning handling.
 - Interaction of LWC (ADR-0010) with WP cell origins: confirm we are not double-
-  rebasing (WP origin-shift + landblock-local both applied).
+  rebasing (WP origin-shift + landblock-local both applied). **Note:** the retail
+  client already used a single viewer-block-relative floating origin (`calc_frame`
+  rebases the landscape on the viewer's block) — so AC itself applied exactly one
+  rebasing layer; mirror that, do not stack WP origin-shift on top of a landblock
+  offset [DATA: acclient `calc_frame` 0x505460]. See ADR-0010.

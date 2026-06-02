@@ -1,7 +1,9 @@
 # Physics & Feel Specification — Response (Phase 2)
 
 **Status:** PARTIAL — populated from ACE (server emulator) + AC client
-Ghidra decomp, current as of 2026-05-29. Sources cited per field.
+Ghidra decomp, current as of 2026-06-02 (issue #3 added the client-confirmed
+§0 world origin + axes / encoding; client load-radius lives in ADR-0009).
+Sources cited per field.
 **Companion to:** [`contract/physics-feel-spec-request.md`](../physics-feel-spec-request.md).
 **Authority of values:** ACE is the **authoritative server** the UE
 client will talk to. Where ACE has a value, that value is what the
@@ -22,17 +24,17 @@ for** (the §10 client/server split).
 
 | Field | Value | Source |
 |---|---|---|
-| AC handedness | **UNKNOWN** (not explicitly stated in ACE) — design assumption: right-handed | — |
-| Up-axis | **Z-up** (ACE uses `point.Z`, `vz`, terrain `Z` everywhere) | `ACE.Server\Physics\Common\Landblock.cs:125-137`; `Position.cs` |
+| AC handedness | axis **triad confirmed from the client**: +X **East**, +Y **North**, +Z **up** (NE-of-viewer = both max). The left/right-handed *label* is still UNKNOWN (needs the client's matrix/winding code — issue #4); UE-side design assumption: right-handed. | `[acclient: get_block_orient 0x504F90]` |
+| Up-axis | **Z-up** (ACE uses `point.Z`, `vz`, terrain `Z` everywhere; **client** per-block render frame Z origin = 0, height carried on +Z) | `ACE.Server\Physics\Common\Landblock.cs:125-137`; `Position.cs`; `[acclient: calc_frame 0x505460]` |
 | Linear unit | **metres** | `LandDefs.BlockLength = 192.0f` is m | `[ACE: LandDefs.cs:102-105]` |
 | Angular unit | **radians** (assumed; quaternions used in `Position`) | `[ACE: ACE.Entity\Position.cs:251-264]` |
 | Sim time unit | **seconds (float)**; variable-step | `[ACE: MotionInterp / PhysicsObj]` |
 | Landblock side | **192 m** (`LandDefs.BlockLength`) | `[ACE: LandDefs.cs:102-105]` |
-| Landblock grid count | **255 per axis** (`LandLength=2040`, `LandblockShift=3` → 2040/8=255) | `[ACE: LandDefs.cs:99-105]` |
-| Landblock ID encoding | **`block_high16 \| (cell+1)_low16`**, where `block = (x>>3<<8) \| (y>>3)` and `cell = (x&7)<<3 \| (y&7)`. Note: cell index is **+1**, so low-16 is always non-zero for an addressed cell. | `[ACE: LandDefs.cs:227-239]`; `[ACE: Position.cs:379-390]` |
+| Landblock grid count | **255 per axis** (`LandLength=2040`, `LandblockShift=3` → 2040/8=255). **Client-corroborated:** cell-coord guard `≤ 0x7f7` (=2039=255·8−1). | `[ACE: LandDefs.cs:99-105]`; `[acclient: update_block 0x5063A0]` |
+| Landblock ID encoding | **`block_high16 \| (cell+1)_low16`**, where `block = (x>>3<<8) \| (y>>3)` and `cell = (x&7)<<3 \| (y&7)`. Note: cell index is **+1**, so low-16 is always non-zero for an addressed cell. **Client-corroborated:** the landscape builds the whole-block id as `((LbX<<8)\|LbY)<<16 \| 0xffff` (high byte = LbX/East, low byte = LbY/North; `0xffff` = whole-block sentinel). | `[ACE: LandDefs.cs:227-239]`; `[ACE: Position.cs:379-390]`; `[acclient: update_block 0x5063A0]` |
 | Height-sample grid | **9 × 9 per landblock** (`VertexDim = 9`) | `[ACE: LandDefs.cs:102-107]` |
 | Cell side length | **24 m** (192 / 8) | derived from `BlockLength / 8` |
-| World origin | not explicitly stated in source; outdoor positions clamped/transformed by `LandDefs.AdjustToOutside` / `Position` constructors | `[ACE: LandDefs.cs:120-147]` |
+| World origin | **`(0,0,0)` = south-west (min-East, min-North) corner of landblock `(LbX=0, LbY=0)`**, +X East / +Y North / +Z up. A block `(LbX,LbY)` spans AC-m `X∈[LbX·192,(LbX+1)·192]`, `Y∈[LbY·192,…]`; intra-block local coords `[0,192)` from that SW corner. Positions are stored **landblock-LOCAL** (`objcell_id`+local frame), composed to world — never stored global. The client's *render* frame additionally floats around the viewer's block (`calc_frame`). **Client-confirmed (issue #3).** | `[acclient: get_block_orient 0x504F90, calc_frame 0x505460, update_block 0x5063A0]`; see [`notes/client-landblock-load-radius-findings.md`](../../docs/migration/notes/client-landblock-load-radius-findings.md) |
 
 > **⚠ Phase 1 follow-up:** ACE's LandblockId low-16 contains `cell+1`,
 > not zero. Our `.aclb` intermediate format requires **low-16 = 0**
