@@ -244,8 +244,8 @@ mapping needs resampling.
 ## 6. Order of operations [DESIGN]
 1. ~~Resolve H1 (load radius) + world origin (contract §0)~~ **DONE 2026-06-02**
    (decompile, not extraction) — [notes/client-landblock-load-radius-findings.md](../notes/client-landblock-load-radius-findings.md):
-   R = `LandscapeDrawDistance` (default 5); world origin = SW corner of LB(0,0),
-   +X East / +Y North / +Z up.
+   R = `LandscapeDrawDistance` (default 5); world axes +X East / +Y North / +Z up
+   [DATA], origin corner = SW of LB(0,0) [DERIVED].
 2. Build the `LandblockId <-> UE WP cell` helper (§1) with round-trip tests.
 3. Stand up WP on a **2x2 landblock** test region (terrain Option B + scenery
    instances) and confirm streaming in/out around a moving source.
@@ -255,17 +255,20 @@ mapping needs resampling.
    Nanite (ADR-0014).
 
 ## Open technical questions [VERIFY/DESIGN]
-- ~~World origin corner~~ **RESOLVED**: world `(0,0,0)` = **SW corner of landblock
-  `(0,0)`**, `+X` East, `+Y` North, `+Z` up; per-block render frame Z origin = 0,
-  i.e. **no global Z offset** — terrain height comes from the per-vertex height
-  table, so UE Z = AC height directly [DATA: acclient `calc_frame` 0x505460;
-  `get_block_orient` 0x504F90]. (Still open: pick a UE Z datum if AC heights ever go
-  meaningfully negative — unmeasured, see findings note.)
+- ~~World origin corner~~ **RESOLVED**: axes `+X` East, `+Y` North, `+Z` up
+  **[DATA: acclient `get_block_orient` 0x504F90]**; world `(0,0,0)` = **SW corner of
+  landblock `(0,0)`** **[DERIVED]** (from axes + intra-block `[0,192)` clamp + id
+  encoding). On Z, the DATA fact is narrower: `calc_frame` applies **no Z offset**
+  (there is no `viewer_b_zoff`; `origin.z = 0`) **[DATA: acclient 0x505460]** — so
+  **"UE Z = AC height directly" is the [DERIVED] mapping**, still gated by the open
+  negative-heights / UE-Z-datum question. See findings note.
 - Does any landblock's content exceed a single WP cell (large surface buildings)?
   If so, raise the cell size or rely on WP's actor-spanning handling.
 - Interaction of LWC (ADR-0010) with WP cell origins: confirm we are not double-
-  rebasing (WP origin-shift + landblock-local both applied). **Note:** the retail
-  client already used a single viewer-block-relative floating origin (`calc_frame`
-  rebases the landscape on the viewer's block) — so AC itself applied exactly one
-  rebasing layer; mirror that, do not stack WP origin-shift on top of a landblock
-  offset [DATA: acclient `calc_frame` 0x505460]. See ADR-0010.
+  rebasing (WP origin-shift + landblock-local both applied). **Note [DATA]:** the
+  retail client's **`LScape` terrain** path already used a single viewer-block-
+  relative floating origin — `calc_frame` rebases the landscape on the viewer's
+  block, with `viewer_b_xoff/yoff` set in `calc_draw_order` [acclient: 0x505460,
+  0x505C70]. **Mirror that for outdoor terrain; do not stack** WP origin-shift on a
+  landblock offset. Whether non-terrain/indoor paths (`CellManager`/`CObjMaint`/
+  portals) add their own frame is **[DESIGN]**, unverified → issue #4. See ADR-0010.

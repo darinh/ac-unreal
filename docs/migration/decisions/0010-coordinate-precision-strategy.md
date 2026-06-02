@@ -7,10 +7,11 @@ proven AC->UE transform is additive (`UE.X=AC.Y*100`, swap X<->Y, reverse windin
 quaternion W,X,Y,Z) [DATA: methodology §4]. UE5 LWC (double precision) is enabled
 (`largeworldcoordinates="1"`) [DATA] — but *enabling* LWC is **not** the same as
 deciding a coordinate *strategy*. AC's own stored convention is now known to be
-**landblock-LOCAL** (`objcell_id` + intra-cell frame; world coords are composed,
-never stored global) [DATA: acclient — A1, resolved below]; the **indoor**
-coordinate domain (cell-id encoding, portal origin-shift) remains **UNKNOWN**
-[DOC: contract §0b — issue #4].
+**landblock-LOCAL** — the runtime position carries an `objcell_id` [DATA: acclient],
+and that it is `objcell_id` + an intra-cell frame (composed to world, never stored
+global) is the ACE wire `Position` shape [REF-IMPL: ACE] (A1, resolved below); the
+**indoor** coordinate domain (cell-id encoding, portal origin-shift) remains
+**UNKNOWN** [DOC: contract §0b — issue #4].
 
 ## Candidate (proposed, not decided)
 Define ONE canonical conversion boundary in `FAcWorldConventions`:
@@ -24,21 +25,28 @@ may use landblock-local internally. The decompiled client convention fixes the
 **Exactly one layer applies origin rebasing.** Never compose a WP per-cell origin
 shift AND a landblock-local offset on the same value. One helper performs all
 conversions, with round-trip tests.
-> **Precedent [DATA: acclient `LScape::calc_frame` 0x505460].** The retail client
-> already did exactly this: it rebases the entire landscape **relative to the
-> viewer's landblock** (`block_frame.origin = (block_idx − viewer_b_off)·block_length`)
-> — a single floating-origin layer that kept float precision across the ~49 km
-> world. UE5 reproduces it with WP origin-shifting + LWC; do **not** also apply a
-> landblock-local offset on top. See [notes/client-landblock-load-radius-findings.md](../notes/client-landblock-load-radius-findings.md) §3.
+> **Precedent [DATA: acclient `LScape` terrain path].** The retail client's
+> landscape engine already did exactly this for **outdoor terrain**: `calc_frame`
+> rebases each block **relative to the viewer's landblock**
+> (`block_frame.origin = (block_idx − viewer_b_off)·block_length`), where
+> `viewer_b_xoff/yoff` is the viewer's block index, set in `calc_draw_order`
+> [acclient: `calc_frame` 0x505460, `calc_draw_order` 0x505C70] — a single
+> floating-origin layer that held float precision across the ~49 km world. UE5
+> reproduces it with WP origin-shifting + LWC; do **not** also apply a
+> landblock-local offset on top. (Scope: this is the terrain path only; whether
+> `CellManager`/`CObjMaint`/indoor portals add their own frame is **[DESIGN]**,
+> unverified → issue #4.) See [notes/client-landblock-load-radius-findings.md](../notes/client-landblock-load-radius-findings.md) §3.
 
 ## Assumptions it depends on
 - A1 [RESOLVED 2026-06-02 — [notes/client-landblock-load-radius-findings.md](../notes/client-landblock-load-radius-findings.md)]:
-  AC's stored coordinate convention is **landblock-LOCAL** — a position is
-  `(objcell_id, intra-cell frame)`, not a global vector; world coords are *composed*
-  from the cell id [DATA: acclient `CPhysicsObj::m_position.objcell_id`; consistent
-  with the ACE wire `Position` = `LandblockId + local X/Y/Z + quat`]. **Outdoor
-  world origin/axes also resolved**: `(0,0,0)` = SW corner of LB(0,0), +X East,
-  +Y North, +Z up; 255 landblocks/axis; `block_length = square_length·8 = 192 m`.
+  AC's stored coordinate convention is **landblock-LOCAL**. **[DATA: acclient
+  0x453180]** the runtime `CPhysicsObj::m_position` carries an `objcell_id` field;
+  **[REF-IMPL: ACE]** that a position is `(objcell_id, intra-cell frame)` — composed
+  to world, never a global vector — is the ACE wire `Position`
+  (`LandblockId + local X/Y/Z + quat`); no cited client fn reads the local frame.
+  **Outdoor axes also resolved [DATA]**: +X East, +Y North, +Z up; 255 LB/axis;
+  `block_length = square_length·8 = 192 m`. **World-origin corner [DERIVED]**:
+  `(0,0,0)` = SW corner of LB(0,0).
 - A2 [PARTIAL]: **outdoor** world origin/axes RESOLVED (see A1); the **indoor**
   coordinate domain (cell-id encoding, intra-cell axis frame, portal origin-shift)
   remains the **highest-priority decompile item — issue #4** (gates ADR-0013/0019).
@@ -48,9 +56,10 @@ conversions, with round-trip tests.
   Remaining for §0b: handedness sign-label and the indoor domain.*
 
 ## Evidence required before Accepted
-- Contract §0/§0b filled. **Done (issue #3):** up-axis (Z), unit (m), landblock
-  encoding ((LbX<<8)|LbY, 255/axis), extent (192 m), **world origin** (SW corner of
-  LB(0,0), +X E/+Y N). **Remaining (issue #4):** handedness sign-label and the full
+- Contract §0/§0b filled. **Done (issue #3):** axes +X E/+Y N/+Z up [DATA], landblock
+  encoding ((LbX<<8)|LbY, 255/axis) [DATA], extent magnitude 192 (= square_length·8)
+  [DATA] — the "metres" unit-label is [REF-IMPL: ACE] — and the **world-origin corner**
+  SW of LB(0,0) [DERIVED]. **Remaining (issue #4):** handedness sign-label and the full
   **§0b indoor** domain (cell-id encoding, intra-cell frame, portal origin-shift).
 - The conversion helper exists with round-trip tests at: landblock (0,0); academy
   `0x8602`; far corner (255,255); a co-located indoor cell.

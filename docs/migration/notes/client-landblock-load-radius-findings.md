@@ -10,8 +10,9 @@ noted where it agrees, but the citations below are the client binary.
 
 > **Citation form:** `[acclient: <addr>]` → function at
 > `decomp/_baseline/by_addr/<addr>__<name>.c`. Tags: **[DATA]** = read directly
-> from the client; **[DERIVED]** = arithmetic from DATA; **[NOT-CLAIMED]** = out of
-> scope / unverified.
+> from the client binary; **[DERIVED]** = arithmetic/inference chained from DATA;
+> **[REF-IMPL]** = from the ACE/ACViewer reference implementation, **not** the client
+> binary; **[NOT-CLAIMED]** = out of scope / unverified.
 
 ---
 
@@ -35,18 +36,22 @@ noted where it agrees, but the citations below are the client binary.
      | 11 | 23×23 | 2112 m | 4416 m |
      | 15 (highest) | 31×31 | 2880 m | 5952 m |
 
-2. **World origin + axes [DATA].** AC world space is **+X = East, +Y = North,
-   +Z = up** (Z-up, height above 0). The **world origin `(0,0,0)` is the
-   south-west (min-East, min-North) corner of landblock `(LbX=0, LbY=0)`**. A
-   landblock `(LbX, LbY)` occupies AC-metres `X ∈ [LbX·192, (LbX+1)·192]`,
-   `Y ∈ [LbY·192, (LbY+1)·192]`; intra-block local coordinates run `[0, 192)` from
-   that SW corner. The landblock id high-16 encodes `(LbX << 8) | LbY` — **high
-   byte = LbX (East), low byte = LbY (North)** — with **255 landblocks per axis**.
-   - Bonus (resolves **ADR-0010 A1**): AC stores positions **landblock-LOCAL**
-     (`objcell_id` + an intra-cell frame), not global; world coordinates are
-     *composed* from the cell id. The client's *render* frame goes one step
-     further and rebases the whole landscape **relative to the viewer's block**
-     (a floating origin) — see §3.
+2. **World axes [DATA]; origin corner [DERIVED].** AC world space is **+X = East,
+   +Y = North, +Z = up** (Z-up, height above 0) — read directly from the client
+   [DATA]. *Derived from those axes + the intra-block `[0,192)` clamp + the id
+   encoding:* the **world origin `(0,0,0)` is the south-west (min-East, min-North)
+   corner of landblock `(LbX=0, LbY=0)`** [DERIVED]. A landblock `(LbX, LbY)`
+   occupies AC-metres `X ∈ [LbX·192, (LbX+1)·192]`, `Y ∈ [LbY·192, (LbY+1)·192]`;
+   intra-block local coordinates run `[0, 192)` from that SW corner. The landblock
+   id high-16 encodes `(LbX << 8) | LbY` — **high byte = LbX (East), low byte = LbY
+   (North)** — with **255 landblocks per axis** [DATA].
+   - Bonus (resolves **ADR-0010 A1**): the runtime `CPhysicsObj::m_position` carries
+     an **`objcell_id`** [DATA: acclient]; that a position is `objcell_id` **+ an
+     intra-cell local frame**, composed to world and never stored as a global vector,
+     is the ACE wire `Position` shape [REF-IMPL: ACE] (no cited client fn reads the
+     local frame). Either way A1 = **landblock-local**. The client's *render* frame
+     additionally rebases the landscape **relative to the viewer's block** (a floating
+     origin) — see §3.
 
 ---
 
@@ -203,17 +208,22 @@ same composition ACViewer uses and that the EnvCell census in
 [envcell-colocation-findings.md](envcell-colocation-findings.md) already proved for
 indoor frames: `world = LbX·192 + Origin.X, LbY·192 + Origin.Y, Origin.Z`.)
 
-**Stored convention is landblock-LOCAL, not global [DATA] (resolves ADR-0010 A1).**
-A physics object's position is `(objcell_id, local frame)` —
-`CPhysicsObj::m_position.objcell_id` plus an intra-cell offset
-[acclient: 00453180 references `player->m_position.objcell_id`]; the wire `Position`
-is `uint32 LandblockId + float X/Y/Z + quaternion` (already documented from ACE in
-`physics-feel-spec-response.md` §0/§10). World coordinates are **composed** from the
-cell id, never stored globally.
+**Stored convention is landblock-LOCAL, not global (resolves ADR-0010 A1).** Split
+by provenance, because the two halves are not both DATA:
+- **[DATA: acclient 00453180]** the runtime `CPhysicsObj::m_position` carries an
+  **`objcell_id`** field (`set_mid_radius` reads `player->m_position.objcell_id != 0`).
+- **[REF-IMPL: ACE]** that a position is `objcell_id` **+ an intra-cell local frame**,
+  with world coordinates **composed** from the cell id and **never stored as a global
+  vector**, is the ACE wire `Position` shape (`uint32 LandblockId + float X/Y/Z +
+  quaternion`; `physics-feel-spec-response.md` §0/§10). **No cited client function
+  reads the local X/Y/Z frame off `m_position`**, so this half is reference-impl, not
+  a direct client read. (It is nonetheless the established contract; A1 resolves to
+  landblock-local either way.)
 
-**The render frame floats around the viewer [DATA] (direct evidence for ADR-0010's
-"exactly one layer rebases" invariant).** `calc_frame` sets each loaded block's
-**render** origin relative to the *viewer's* block, not to world (0,0):
+**The render frame floats around the viewer [DATA]** (evidence for ADR-0010's
+single-rebasing-layer invariant — *terrain path*; see Scope below). `calc_frame`
+sets each loaded block's **render** origin relative to the *viewer's* block, not to
+world (0,0):
 
 ```c
 // [acclient: 00505460] LScape::calc_frame(block, bx, by)
@@ -222,10 +232,29 @@ block_frame.origin.y = (by - this->viewer_b_yoff) * block_length;
 block_frame.origin.z = 0;                                           // no per-block Z offset
 ```
 
-i.e. the retail client kept float precision across a ~49 km world by **rebasing the
-landscape on the viewer's landblock every time the window shifts** — exactly the
-"one origin-rebasing layer" UE5 will reproduce with World Partition origin shifting
-+ LWC (ADR-0010 invariant; ADR-0009 §6 open question on double-rebasing).
+The `viewer_b_xoff/yoff` it subtracts are **the viewer's own block index in the
+window**, assigned in `calc_draw_order` immediately before it calls `calc_frame`
+per block: `viewer_b_xoff = (mid_radius*8 − loaded_block_cell + viewer_cell) >> 3`
+[DATA: acclient `LScape::calc_draw_order` 0x505C70]. So the client kept float
+precision across the ~49 km world by **rebasing the landscape on the viewer's
+landblock every time the window shifts**.
+
+**Z asymmetry [DATA]:** X and Y are rebased by `viewer_b_xoff/yoff`; **Z is not —
+there is no `viewer_b_zoff`**, and `calc_frame` writes `origin.z = 0`. The exact
+DATA fact is therefore: *the landscape render frame rebases X/Y on the viewer's
+block and applies no Z offset.* That UE should consequently map **UE Z = AC height
+directly** is a sound **[DERIVED/DESIGN]** choice — still gated by the open "negative
+heights / pick a UE Z datum" question — **not** a DATA claim.
+
+**Scope [F6 — important]:** this single viewer-relative rebasing is the **`LScape`
+terrain** path only. `CellManager` (indoor cells), `CObjMaint` (dynamic objects),
+and portal transitions are **not** examined here and could apply their own frame.
+So **[DATA]** "LScape terrain uses one viewer-relative rebasing layer" is exact;
+**"AC applies exactly one rebasing layer everywhere" is [DESIGN]**, to be confirmed
+for the non-terrain/indoor paths in issue #4. The migration takeaway stands
+**[DESIGN]**: mirror the single floating origin for **outdoor terrain** (WP
+origin-shifting + LWC); do not stack a landblock-local offset on top (ADR-0010
+invariant; ADR-0009 §6 double-rebasing question).
 
 ---
 
@@ -245,6 +274,7 @@ landscape on the viewer's landblock every time the window shifts** — exactly t
 | ±`mid_radius` acceptance, grid index | `LScape::get_landblock` | 00505E40 |
 | **Axes: +X East, +Y North** | `LScape::get_block_orient` | 00504F90 |
 | **Viewer-relative floating render origin** | `LScape::calc_frame` | 00505460 |
+| `viewer_b_xoff/yoff` = viewer block index (setter for calc_frame) | `LScape::calc_draw_order` | 00505C70 |
 | Edge-of-window draw extents (block_length) | `LScape::draw_check_blocks` | 00505F80 |
 | Intra-block local coords `[0, block_length)` | `within_block` / `obj_within_block` | 0050E800 / 00511030 |
 | `block_length = square_length * 8.0f` | region-init thunks (`$E108` …) | 006C2CD0 |
@@ -269,10 +299,15 @@ landscape on the viewer's landblock every time the window shifts** — exactly t
 
 ## Cross-references / impact
 
-- **ADR-0009** H1 (load radius) → resolved; deep-dive §2 loading-range and §6 step 1
-  updated; the open "world origin / Z offset" question answered (SW corner; Z origin 0).
-- **ADR-0010** A1 (stored convention = landblock-local) → resolved; the floating
-  render origin is direct evidence for the single-rebasing-layer invariant.
+- **ADR-0009** H1 (load radius) → resolved [DATA]; deep-dive §2 loading-range and §6
+  step 1 updated; open "world origin / Z" question answered — origin corner [DERIVED]
+  (SW corner), and [DATA] the render frame applies no Z offset (UE Z = AC height is
+  the [DERIVED] mapping).
+- **ADR-0010** A1 (stored convention = landblock-local) → resolved (objcell_id field
+  [DATA]; intra-cell/never-global composition [REF-IMPL: ACE]); the floating render
+  origin is direct evidence for one rebasing layer **in the LScape terrain path**
+  ([DATA]) — mirror it for outdoor; non-terrain/indoor single-layer behaviour is
+  [DESIGN], to confirm in issue #4.
 - **ADR-0011** A2 (retail draw distance) — *bonus*: `LandscapeDrawDistance ∈ {3..15}`
   landblocks is the retail landscape draw distance. ADR-0011 stays Proposed (its fog
   /horizon treatment, M4, is still [VERIFY]), but the block-count side of A2 now has

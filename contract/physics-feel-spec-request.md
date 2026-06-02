@@ -45,14 +45,14 @@ file in place on a feature branch — either is fine, just be explicit).
 |---|---|---|
 | AC coordinate handedness (left- or right-handed) | axis triad CONFIRMED +X E/+Y N/+Z up; sign-*label* still UNKNOWN (issue #4) → response §0 | `[acclient: 0x504F90]` |
 | AC up-axis (X, Y, or Z) | **Z-up** CONFIRMED (issue #3) → response §0 | `[acclient: 0x505460]` |
-| AC linear unit | **metres** CONFIRMED (`block_length = square_length·8 = 192 m`) → response §0 | `[acclient: 0x5063A0]`, region_dereth.json |
+| AC linear unit | magnitudes `square_length=24`, `block_length=square_length·8=192` **[DATA]**; the **"metres" label is [REF-IMPL: ACE]** convention (the binary stores no unit) → response §0 | `[acclient: 0x6C2CD0]`, region_dereth.json |
 | AC angular unit (radians vs degrees in client storage) | UNKNOWN (issue #4) | |
 | AC time unit for sim tick (seconds, or a fixed-point representation) | seconds (float), variable-step → response §1 | `[ACE: PhysicsGlobals]` |
-| Landblock physical extent (meters per side) | **192 m** CONFIRMED → response §0 | `[acclient: 0x5063A0]`, region_dereth.json |
+| Landblock physical extent (meters per side) | **192** = `square_length·8` **[DATA]** magnitude (unit "m" = [REF-IMPL: ACE]) → response §0 | `[acclient: 0x6C2CD0]`, region_dereth.json |
 | Landblock grid dimensions (count × count of landblocks per world) | **255 × 255** CONFIRMED (cell guard `≤0x7f7`) → response §0 | `[acclient: 0x5063A0]` |
 | Landblock ID encoding (bit layout, byte order, which bits are X vs Y, which bits are intra-LB position) | **`((LbX<<8)\|LbY)<<16 \| (cell+1)`**; high byte LbX/E, low byte LbY/N CONFIRMED → response §0 | `[acclient: 0x5063A0]`; `[ACE: LandDefs.cs]` |
 | Height-sample grid resolution within a landblock | UNKNOWN — community sources cite 9 × 9; confirm (issue #4) | |
-| World origin in AC coordinates (which corner of which landblock is (0,0,0)) | **SW (min-E, min-N) corner of landblock (0,0)**; +X East, +Y North, +Z up CONFIRMED (issue #3) → response §0 | `[acclient: 0x504F90, 0x505460]` |
+| World origin in AC coordinates (which corner of which landblock is (0,0,0)) | axes +X East/+Y North/+Z up **[DATA]**; **SW (min-E, min-N) corner of landblock (0,0) [DERIVED]** (issue #3) → response §0 | `[acclient: 0x504F90]` |
 
 **Why this section exists first:** The Phase 0 coordinate-transform module
 in `Source/AcUnreal/Public/CoordCore/CoordTransform.h` encodes these as
