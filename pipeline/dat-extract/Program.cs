@@ -14,6 +14,7 @@
 //   acdat find-building-blocks <datDir>
 //   acdat dump-envcell-positions <datDir> <hexId>
 //   acdat export-landblock <datDir> <hexId> <outFile.aclb>
+//   acdat export-region <datDir> <out.json>
 //
 // "Phase 5 / content extraction" scaffold. Next steps (future sessions):
 //   - Find the Aluvian Training Academy landblock(s) via list/search.
@@ -87,6 +88,7 @@ internal static class Program
                 "export-academy-statics" => Commands.ExportAcademyStatics(args.AsSpan(1)),
                 "dump-starterareas"  => Commands.DumpStarterAreas(args.AsSpan(1)),
                 "export-landblock"   => Commands.ExportLandblock(args.AsSpan(1)),
+                "export-region"      => Commands.ExportRegion(args.AsSpan(1)),
                 "--help" or "-h"     => DoUsage(),
                 _ => DoUnknown(args[0]),
             };
@@ -170,6 +172,15 @@ internal static class Program
               acdat export-landblock   <datDir> <hexId> <outFile.aclb>
                     Convert one landblock to our v1 .aclb intermediate format
                     (see pipeline/asset-ingest/FORMAT.md).
+
+              acdat export-region      <datDir> <out.json>
+                    Export the single RegionDesc (0x13000000) from
+                    client_portal.dat to engine-neutral JSON: the day-night sky
+                    cycle (SkyDesc DayGroups/TickSize, per-time-of-day ambient,
+                    directional light, and fog), the GameTime calendar, and
+                    LandDefs (incl. the 256-entry LandHeightTable). Raw AC values
+                    + provenance. Unblocks ADR-0011 — this is the extraction that
+                    replaces invented sky/fog values, so do NOT invent them.
 
             <datDir> is the directory containing client_portal.dat,
             client_cell_1.dat, client_highres.dat, client_local_English.dat.
@@ -2131,6 +2142,175 @@ internal static class Commands
         Console.WriteLine("TODO: height samples currently written as raw ACE indices cast to float.");
         Console.WriteLine("      Real metres require PortalDat.RegionDesc.LandDefs.LandHeightTable lookup.");
         Console.WriteLine("      Tracked for the next Phase 5 iteration.");
+        return 0;
+    }
+
+    /// <summary>
+    /// Export the single RegionDesc (0x13000000) from client_portal.dat to an
+    /// engine-neutral JSON: the day-night sky cycle (SkyDesc DayGroups/TickSize,
+    /// per-time-of-day ambient + directional light + fog), the GameTime calendar,
+    /// and LandDefs (incl. the 256-entry LandHeightTable that ExportLandblock
+    /// needs to resolve heightfield indices into metres).
+    ///
+    /// Values are emitted RAW from the DAT. No AC->UE coordinate transform is
+    /// applied: the sim/wire coordinate convention is still contract/ §0 [VERIFY]
+    /// (ADR-0010), so angles (dir_heading/dir_pitch, sky-object begin/end_angle)
+    /// stay in raw AC units and the UE side interprets them once §0 resolves.
+    /// Packed colours are emitted as the raw 0xAARRGGBB word plus a decoded
+    /// a/r/g/b (0..1) convenience — the raw word is authoritative. This command
+    /// is the extraction that unblocks ADR-0011; it exists precisely so sky/fog
+    /// values are read, not invented.
+    /// </summary>
+    public static int ExportRegion(ReadOnlySpan<string> args)
+    {
+        if (args.Length < 2) { Console.Error.WriteLine("export-region: missing <datDir> <out.json>"); return 1; }
+        var datDir = args[0];
+        var outPath = args[1];
+        if (!Directory.Exists(datDir)) { Console.Error.WriteLine($"DAT dir not found: {datDir}"); return 1; }
+
+        // RegionDesc lives only in client_portal.dat; no cell DB needed.
+        DatManager.Initialize(datDir, keepOpen: false, loadCell: false);
+        var portalDb = DatManager.PortalDat ?? throw new InvalidOperationException("PortalDat unavailable.");
+        var region = portalDb.RegionDesc ?? throw new InvalidOperationException("RegionDesc (0x13000000) not found in PortalDat.");
+
+        // AC packed colour -> { raw, a, r, g, b }. AC colours are 0xAARRGGBB; the
+        // high byte (a) is alpha/unused and is often 0x00 or 0xFF for sky/fog.
+        // Raw is authoritative; channels are a decode convenience (0..1).
+        static object Color(uint c) => new
+        {
+            raw = $"0x{c:X8}",
+            a = ((c >> 24) & 0xFF) / 255.0,
+            r = ((c >> 16) & 0xFF) / 255.0,
+            g = ((c >> 8) & 0xFF) / 255.0,
+            b = ((c >> 0) & 0xFF) / 255.0,
+        };
+
+        var sky = region.SkyInfo;
+        var hasSkyInfo = (region.PartsMask & 0x10) != 0;
+
+        var dayGroups = sky.DayGroups.Select(dg => new
+        {
+            chance_of_occur = dg.ChanceOfOccur,
+            day_name = dg.DayName,
+            sky_objects = dg.SkyObjects.Select(so => new
+            {
+                begin_time = so.BeginTime,
+                end_time = so.EndTime,
+                begin_angle = so.BeginAngle,
+                end_angle = so.EndAngle,
+                // Only X/Y are unpacked from the DAT; ACE's TexVelocityZ is a
+                // constant 0 that is never read (SkyObject.cs), so it is NOT
+                // DAT-backed and is omitted to keep every emitted value real.
+                tex_velocity = new { x = so.TexVelocityX, y = so.TexVelocityY },
+                default_gfx_object_id = $"0x{so.DefaultGFXObjectId:X8}",
+                default_pes_object_id = $"0x{so.DefaultPESObjectId:X8}",
+                properties = so.Properties,
+            }).ToList(),
+            sky_time = dg.SkyTime.Select(st => new
+            {
+                begin = st.Begin,
+                dir_bright = st.DirBright,
+                dir_heading = st.DirHeading,
+                dir_pitch = st.DirPitch,
+                dir_color = Color(st.DirColor),
+                amb_bright = st.AmbBright,
+                amb_color = Color(st.AmbColor),
+                min_world_fog = st.MinWorldFog,
+                max_world_fog = st.MaxWorldFog,
+                world_fog_color = Color(st.WorldFogColor),
+                world_fog = st.WorldFog,
+                sky_obj_replace = st.SkyObjReplace.Select(sr => new
+                {
+                    object_index = sr.ObjectIndex,
+                    gfx_obj_id = $"0x{sr.GFXObjId:X8}",
+                    rotate = sr.Rotate,
+                    transparent = sr.Transparent,
+                    luminosity = sr.Luminosity,
+                    max_bright = sr.MaxBright,
+                }).ToList(),
+            }).ToList(),
+        }).ToList();
+
+        var ld = region.LandDefs;
+        var gt = region.GameTime;
+
+        // Emit the sky fields only when the region actually carries SkyInfo
+        // (PartsMask 0x10). ACE always instantiates an empty SkyDesc, so a
+        // region without the bit would otherwise serialize tick_size=0 + empty
+        // day_groups, which a consumer could misread as real values. Collapse to
+        // { has_sky_info: false } instead. (Dereth has the bit; unaffected.)
+        object skyBlock = hasSkyInfo
+            ? (object)new
+            {
+                has_sky_info = true,
+                tick_size = sky.TickSize,
+                light_tick_size = sky.LightTickSize,
+                day_group_count = dayGroups.Count,
+                day_groups = dayGroups,
+            }
+            : new { has_sky_info = false };
+
+        var doc = new
+        {
+            schema_version = 1,
+            provenance = new
+            {
+                source_dat = "client_portal.dat",
+                dat_iteration = portalDb.Iteration,
+                region_file_id = "0x13000000",
+                region_number = region.RegionNumber,
+                region_name = region.RegionName,
+                version = region.Version,
+                parts_mask = $"0x{region.PartsMask:X8}",
+                extractor = "acdat export-region",
+                // No wall-clock timestamp in the committed artifact: the data's
+                // provenance is dat_iteration (above), and a volatile extracted_utc
+                // would make the dump non-reproducible (defeats stale-vs-DAT checks).
+                // Regenerate deterministically with:
+                source_command = "acdat export-region <datDir> <out.json>",
+                units_note = "Raw AC values, no AC->UE coordinate transform (sim coord convention is contract/ §0 [VERIFY], ADR-0010). Colours are 0xAARRGGBB; decoded a/r/g/b are 0..1. Angles (dir_heading/dir_pitch, sky-object begin/end_angle, sky_obj_replace.rotate) are raw AC values with UNVERIFIED unit/reference frame -- do NOT assume radians or degrees (e.g. dir_heading reads as 90, rotate as 270, which look like degrees); resolve via contract/ §0 before authoring. Times (begin, times_of_day.start, sky-object begin/end_time) are day-cycle fractions in 0..1 (times_of_day.start steps by 1/16 across 16 entries).",
+            },
+            land_defs = new
+            {
+                num_block_length = ld.NumBlockLength,
+                num_block_width = ld.NumBlockWidth,
+                square_length = ld.SquareLength,
+                lblock_length = ld.LBlockLength,
+                vertex_per_cell = ld.VertexPerCell,
+                max_obj_height = ld.MaxObjHeight,
+                sky_height = ld.SkyHeight,
+                road_width = ld.RoadWidth,
+                land_height_table_count = ld.LandHeightTable.Count,
+                land_height_table = ld.LandHeightTable,
+            },
+            game_time = new
+            {
+                zero_time_of_year = gt.ZeroTimeOfYear,
+                zero_year = gt.ZeroYear,
+                day_length = gt.DayLength,
+                days_per_year = gt.DaysPerYear,
+                year_spec = gt.YearSpec,
+                times_of_day = gt.TimesOfDay.Select(t => new { start = t.Start, is_night = t.IsNight, name = t.Name }).ToList(),
+                days_of_the_week = gt.DaysOfTheWeek,
+                seasons = gt.Seasons.Select(s => new { start_date = s.StartDate, name = s.Name }).ToList(),
+            },
+            sky = skyBlock,
+        };
+
+        var json = JsonSerializer.Serialize(doc, new JsonSerializerOptions { WriteIndented = true });
+        var dir = Path.GetDirectoryName(outPath);
+        if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+        File.WriteAllText(outPath, json);
+
+        Console.WriteLine($"Wrote region JSON to {outPath}");
+        Console.WriteLine($"  region='{region.RegionName}' (#{region.RegionNumber})  portal iteration={portalDb.Iteration}  partsMask=0x{region.PartsMask:X8}");
+        if (!hasSkyInfo)
+            Console.WriteLine("  WARNING: PartsMask bit 0x10 (SkyInfo) is NOT set -- sky/day-night data is absent for this region.");
+        Console.WriteLine($"  sky: {dayGroups.Count} day-group(s), tickSize={sky.TickSize}, lightTickSize={sky.LightTickSize}");
+        foreach (var dg in sky.DayGroups)
+            Console.WriteLine($"    day-group '{dg.DayName}' chance={dg.ChanceOfOccur}: {dg.SkyObjects.Count} sky-object(s), {dg.SkyTime.Count} time-of-day step(s)");
+        Console.WriteLine($"  gameTime: dayLength={gt.DayLength}s, daysPerYear={gt.DaysPerYear}, {gt.TimesOfDay.Count} times-of-day, {gt.Seasons.Count} season(s)");
+        Console.WriteLine($"  landHeightTable: {ld.LandHeightTable.Count} entries (min={ld.LandHeightTable.DefaultIfEmpty().Min()}, max={ld.LandHeightTable.DefaultIfEmpty().Max()})");
         return 0;
     }
 
